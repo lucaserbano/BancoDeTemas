@@ -11,10 +11,12 @@ const PORTAL_STATE = {
   isPreview:   false,    // true quando admin usa ?preview=1
   cliente:     null,     // objeto cliente
   posts:       [],       // posts dos próximos 3 meses
-  objetivos:   [],       // objetivos_mes dos próximos 3 meses
+  objetivos:   [],       // objetivos_mes dos próximos 3 meses (Supabase)
   meses:       [],       // ex: ["Abril", "Maio", "Junho"]
   contagem:    {},       // { postId: numero_de_comentarios }
-  comentarios: {}        // { postId: [comentario, ...] } — cache lazy
+  comentarios: {},       // { postId: [comentario, ...] } — cache lazy
+  userId:      null,     // UUID do usuário logado
+  userRole:    null      // 'admin' | 'client'
 };
 
 /* -----------------------------------------------
@@ -27,6 +29,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = await portalDb.exigirLogin();
   if (!user) return;
 
+  PORTAL_STATE.userId   = user.id;
+  PORTAL_STATE.userRole = await portalDb.getRole();
+
   // 2. Ler parâmetros da URL
   const params = new URLSearchParams(location.search);
   PORTAL_STATE.isPreview = params.get("preview") === "1";
@@ -35,20 +40,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 3. Determinar clienteId e validar acesso
   if (PORTAL_STATE.isPreview && urlClienteId) {
     // Modo preview: verificar que é admin
-    const role = await portalDb.getRole();
-    if (role !== "admin") {
+    if (PORTAL_STATE.userRole !== "admin") {
       _mostrarErro("Acesso negado", "Apenas o administrador pode usar o modo preview.");
       return;
     }
     PORTAL_STATE.clienteId = urlClienteId;
   } else if (urlClienteId) {
-    // URL tem client_id mas não é preview — possível tentativa indevida
-    // Verificar se é admin ou se o cliente pertence ao usuário
-    const role = await portalDb.getRole();
-    if (role === "admin") {
+    // URL tem client_id mas não é preview
+    if (PORTAL_STATE.userRole === "admin") {
       PORTAL_STATE.clienteId = urlClienteId;
     } else {
-      // Segurança: ignorar o client_id da URL e usar o vínculo real
+      // Segurança: ignorar client_id da URL e usar vínculo real
       const cliente = await portalDb.fetchMinhaCliente();
       if (!cliente) {
         _mostrarErro("Sem acesso", "Sua conta ainda não foi vinculada a nenhuma cliente. Entre em contato com a administração.");
@@ -109,7 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 ----------------------------------------------- */
 function _proximos3Meses(mesesAtivos) {
   if (!mesesAtivos || mesesAtivos.length === 0) return [];
-  const hoje    = new Date();
+  const hoje     = new Date();
   const mesAtual = hoje.getMonth(); // 0 = Janeiro
   const resultado = [];
 
@@ -118,6 +120,47 @@ function _proximos3Meses(mesesAtivos) {
     if (mesesAtivos.includes(nome)) resultado.push(nome);
   }
   return resultado;
+}
+
+/* -----------------------------------------------
+   HELPER: buscar objetivo do mês
+   Prioridade: Supabase → fallback hardcoded (data.js)
+----------------------------------------------- */
+function _getObjetivo(mes) {
+  // 1. Supabase (dados salvos via mes.html)
+  const banco = PORTAL_STATE.objetivos.find(o => o.mes === mes);
+  if (banco && banco.objetivo) {
+    return {
+      objetivo:           banco.objetivo,
+      orcamento_anuncios: banco.orcamento_anuncios || "",
+      tipo_anuncio:       banco.tipo_anuncio       || "",
+      datas_importantes:  banco.datas_importantes  || [],
+      funil_topo:         banco.funil_topo  ?? 50,
+      funil_meio:         banco.funil_meio  ?? 30,
+      funil_fundo:        banco.funil_fundo ?? 20
+    };
+  }
+
+  // 2. Fallback: dados hardcoded em data.js (OBJETIVOS_MES)
+  if (typeof OBJETIVOS_MES === "undefined") return null;
+  const c = PORTAL_STATE.cliente;
+  const handleKey = (c?.handle || "").replace("@", "");
+  const nomeKey   = (c?.nome   || "").split(" ")[0]
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  const hard = (OBJETIVOS_MES[handleKey] || OBJETIVOS_MES[nomeKey] || {})[mes];
+  if (!hard || !hard.objetivo) return null;
+
+  return {
+    objetivo:           hard.objetivo,
+    orcamento_anuncios: hard.orcamento_anuncios || "",
+    tipo_anuncio:       hard.tipo_anuncio       || "",
+    datas_importantes:  hard.datas_importantes  || [],
+    funil_topo:         hard.funil_meta?.topo  ?? 50,
+    funil_meio:         hard.funil_meta?.meio  ?? 30,
+    funil_fundo:        hard.funil_meta?.fundo ?? 20
+  };
 }
 
 /* -----------------------------------------------
@@ -172,8 +215,8 @@ function _renderBloco1_Objetivos() {
   if (!el) return;
 
   const cards = PORTAL_STATE.meses.map(mes => {
-    const obj = PORTAL_STATE.objetivos.find(o => o.mes === mes);
-    if (!obj || !obj.objetivo) {
+    const obj = _getObjetivo(mes);
+    if (!obj) {
       return `
         <div class="portal-card portal-card-vazio">
           <span>${_esc(mes)}</span>
@@ -206,7 +249,7 @@ function _renderBloco2_Orcamento() {
   if (!el) return;
 
   const cards = PORTAL_STATE.meses.map(mes => {
-    const obj = PORTAL_STATE.objetivos.find(o => o.mes === mes);
+    const obj = _getObjetivo(mes);
 
     if (!obj || !obj.orcamento_anuncios) {
       return `
@@ -249,53 +292,90 @@ function _renderBloco2_Orcamento() {
 }
 
 /* -----------------------------------------------
-   BLOCO 3 — CALENDÁRIO VISUAL
+   BLOCO 3 — CALENDÁRIO VISUAL (grade por mês)
 ----------------------------------------------- */
 function _renderBloco3_Calendario() {
   const el = document.getElementById("bloco-calendario");
   if (!el) return;
 
-  const colunas = PORTAL_STATE.meses.map(mes => {
-    const posts = PORTAL_STATE.posts.filter(p => p.mes === mes);
+  const c   = PORTAL_STATE.cliente;
+  const ano = c?.ano || 2026;
 
-    if (posts.length === 0) {
-      return `
-        <div class="cal-mes-col">
-          <div class="cal-mes-header">${_esc(mes)}</div>
-          <div class="cal-sem-posts">Nenhum post programado</div>
-        </div>
-      `;
-    }
-
-    const chips = posts.map(p => {
-      const cls   = _chaveStatusCal(p.status);
-      const data  = p.data_publicacao ? _formatarDia(p.data_publicacao) : "—";
-      const temCom = (PORTAL_STATE.contagem[p.id] || 0) > 0;
-      return `
-        <div class="cal-chip cal-chip-${cls}" onclick="scrollParaPost('${p.id}')" title="${_esc(p.titulo)}">
-          <span class="cal-chip-data">${data}</span>
-          <span class="cal-chip-titulo">${_esc(p.titulo)}</span>
-          ${temCom ? `<span class="cal-chip-comentado" title="Comentado"></span>` : ""}
-        </div>
-      `;
-    }).join("");
-
-    return `
-      <div class="cal-mes-col">
-        <div class="cal-mes-header">${_esc(mes)}</div>
-        <div class="cal-mes-body">${chips}</div>
-      </div>
-    `;
-  }).join("");
+  const mesesHtml = PORTAL_STATE.meses
+    .map(mesNome => _renderCalMes(mesNome, ano))
+    .join("");
 
   el.innerHTML = `
-    <div class="cal-grid">${colunas}</div>
+    <div class="pcal-wrap">${mesesHtml}</div>
     <div class="cal-legenda">
       <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-emproducao"></span> Em produção</span>
       <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-aprovado"></span> Aprovado</span>
       <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-reprovado"></span> Reprovado</span>
       <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-publicado"></span> Publicado</span>
       <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-outro"></span> Outro status</span>
+    </div>
+  `;
+}
+
+function _renderCalMes(mesNome, ano) {
+  const mesIdx = MESES_ANO.indexOf(mesNome);
+  if (mesIdx === -1) return "";
+
+  const mesNum      = mesIdx + 1;
+  const diasNoMes   = new Date(ano, mesNum, 0).getDate();
+  const primeiroDia = new Date(ano, mesIdx, 1).getDay(); // 0=Dom
+  const offset      = (primeiroDia + 6) % 7;            // Seg=0 … Dom=6
+
+  // Posts deste mês com data de publicação
+  const postsMes = PORTAL_STATE.posts.filter(p => p.mes === mesNome);
+  const porDia   = {};
+  postsMes.forEach(p => {
+    if (p.data_publicacao) {
+      const d = new Date(p.data_publicacao + "T12:00:00");
+      if (d.getMonth() + 1 === mesNum && d.getFullYear() === ano) {
+        const dia = d.getDate();
+        if (!porDia[dia]) porDia[dia] = [];
+        porDia[dia].push(p);
+      }
+    }
+  });
+
+  const hoje       = new Date();
+  const ehHojeAno  = hoje.getFullYear() === ano;
+  const ehHojeMes  = hoje.getMonth() + 1 === mesNum;
+  const diasNome   = ["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+
+  let grid = diasNome.map(d => `<div class="pcal-dia-nome">${d}</div>`).join("");
+
+  for (let i = 0; i < offset; i++) {
+    grid += `<div class="pcal-dia vazio"></div>`;
+  }
+
+  for (let dia = 1; dia <= diasNoMes; dia++) {
+    const ehHoje = ehHojeAno && ehHojeMes && hoje.getDate() === dia;
+    const posts  = porDia[dia] || [];
+
+    const chipsHtml = posts.map(p => {
+      const cls    = _chaveStatusCal(p.status);
+      const titulo = p.titulo.length > 22 ? p.titulo.slice(0, 21) + "…" : p.titulo;
+      const temCom = (PORTAL_STATE.contagem[p.id] || 0) > 0;
+      return `<span class="pcal-chip pcal-chip-${cls}"
+                    data-post-id="${p.id}"
+                    title="${_esc(p.titulo)}"
+                    onclick="event.stopPropagation();scrollParaPost('${p.id}')"
+              >${_esc(titulo)}${temCom ? `<span class="pcal-chip-com" title="Com comentário">●</span>` : ""}</span>`;
+    }).join("");
+
+    grid += `<div class="pcal-dia${ehHoje ? " hoje" : ""}">
+      <div class="pcal-dia-num">${dia}</div>
+      ${chipsHtml}
+    </div>`;
+  }
+
+  return `
+    <div class="pcal-mes">
+      <div class="pcal-mes-titulo">${_esc(mesNome)} ${ano}</div>
+      <div class="pcal-grid">${grid}</div>
     </div>
   `;
 }
@@ -335,11 +415,11 @@ function _renderBloco4_Lista() {
 
 function _renderCardPost(p) {
   const contagemCom = PORTAL_STATE.contagem[p.id] || 0;
-  const data = p.data_publicacao ? _formatarDataCompleta(p.data_publicacao) : null;
-  const statusCls = _chaveStatusCss(p.status);
+  const data        = p.data_publicacao ? _formatarDataCompleta(p.data_publicacao) : null;
+  const statusCls   = _chaveStatusCss(p.status);
 
   const badgeStatus = p.status
-    ? `<span class="badge badge-status-${statusCls}">${_esc(p.status)}</span>`
+    ? `<span class="badge badge-status-${statusCls}" id="badge-status-${p.id}">${_esc(p.status)}</span>`
     : "";
 
   const badgeFormato = p.formato
@@ -384,9 +464,12 @@ function _renderCardPost(p) {
             <div class="lista-campo-label">Roteiro</div>
             <div class="lista-campo-valor">${_esc(p.roteiro)}</div>
           </div>
+          <div class="aprovacao-section" id="aprovacao-${p.id}">
+            ${_aprovacaoHTML(p)}
+          </div>
         ` : ""}
         <div class="comentarios-wrap" id="comentarios-${p.id}">
-          <div class="comentarios-titulo">Seus comentários</div>
+          <div class="comentarios-titulo">Comentários</div>
           <div id="comentarios-lista-${p.id}" class="comentarios-lista">
             <div class="comentarios-vazio">Carregando comentários...</div>
           </div>
@@ -408,13 +491,26 @@ function _renderCardPost(p) {
   `;
 }
 
+/** Renderiza os botões Aprovar / Reprovar para um post */
+function _aprovacaoHTML(p) {
+  if (p.status === "publicado") return "";
+  const aprovado  = p.status === "aprovado";
+  const reprovado = p.status === "reprovado";
+  return `
+    <div class="aprovacao-btns">
+      <button class="btn-aprovar${aprovado ? " ativo" : ""}"
+              onclick="aprovarPost('${p.id}')">✓ Aprovar</button>
+      <button class="btn-reprovar${reprovado ? " ativo" : ""}"
+              onclick="reprovarPost('${p.id}')">✗ Reprovar</button>
+    </div>
+  `;
+}
+
 /* -----------------------------------------------
-   INTERAÇÕES
+   INTERAÇÕES — CARDS
 ----------------------------------------------- */
 
-/**
- * Abre/fecha o card de um post e carrega comentários lazy.
- */
+/** Abre/fecha o card de um post e carrega comentários lazy. */
 async function toggleCard(postId) {
   const card = document.getElementById(`post-${postId}`);
   if (!card) return;
@@ -428,31 +524,77 @@ async function toggleCard(postId) {
   }
 }
 
-/**
- * Navega até o card de um post (chamado pelo calendário).
- */
+/** Navega até o card de um post (chamado pelo calendário). */
 function scrollParaPost(postId) {
   const el = document.getElementById(`post-${postId}`);
   if (!el) return;
   el.scrollIntoView({ behavior: "smooth", block: "start" });
 
-  // Abrir o card se estiver fechado
   if (!el.classList.contains("aberto")) {
     toggleCard(postId);
   }
 }
 
-/**
- * Carrega e renderiza os comentários de um post (lazy).
- */
+/* -----------------------------------------------
+   APROVAÇÃO / REPROVAÇÃO
+----------------------------------------------- */
+
+async function aprovarPost(postId) {
+  const resultado = await portalDb.atualizarStatusPost(postId, "aprovado");
+  if (!resultado) { _toastPortal("Erro ao aprovar post. Tente novamente."); return; }
+  _atualizarCardStatus(postId, "aprovado");
+  _toastPortal("✓ Post marcado como aprovado!");
+}
+
+async function reprovarPost(postId) {
+  const resultado = await portalDb.atualizarStatusPost(postId, "reprovado");
+  if (!resultado) { _toastPortal("Erro ao reprovar post. Tente novamente."); return; }
+  _atualizarCardStatus(postId, "reprovado");
+  _toastPortal("✗ Post marcado como reprovado.");
+}
+
+/** Atualiza visualmente o status de um post sem re-renderizar o bloco inteiro */
+function _atualizarCardStatus(postId, novoStatus) {
+  // Atualiza estado local
+  const post = PORTAL_STATE.posts.find(p => p.id === postId);
+  if (post) post.status = novoStatus;
+
+  // Atualiza badge de status no cabeçalho do card
+  const badge = document.getElementById(`badge-status-${postId}`);
+  if (badge) {
+    const cls = _chaveStatusCss(novoStatus);
+    badge.className = `badge badge-status-${cls}`;
+    badge.textContent = novoStatus;
+  }
+
+  // Atualiza botões Aprovar / Reprovar
+  const secEl = document.getElementById(`aprovacao-${postId}`);
+  if (secEl && post) secEl.innerHTML = _aprovacaoHTML(post);
+
+  // Atualiza chips no calendário (cor por status)
+  document.querySelectorAll(`[data-post-id="${postId}"]`).forEach(chip => {
+    chip.className = chip.className.replace(/pcal-chip-\w+/g, `pcal-chip-${_chaveStatusCal(novoStatus)}`);
+  });
+}
+
+/* -----------------------------------------------
+   COMENTÁRIOS
+----------------------------------------------- */
+
+/** Carrega e renderiza os comentários de um post (lazy). */
 async function _carregarComentarios(postId) {
   const listaEl = document.getElementById(`comentarios-lista-${postId}`);
   if (!listaEl) return;
 
   const comentarios = await portalDb.fetchComentarios(postId);
   PORTAL_STATE.comentarios[postId] = comentarios;
-
   _renderComentariosLista(postId, comentarios);
+}
+
+/** Retorna o rótulo do autor de um comentário */
+function _autorLabel(comentarioUserId) {
+  if (comentarioUserId === PORTAL_STATE.userId) return "Você";
+  return PORTAL_STATE.userRole === "admin" ? "Cliente" : "Administrador";
 }
 
 function _renderComentariosLista(postId, comentarios) {
@@ -465,16 +607,20 @@ function _renderComentariosLista(postId, comentarios) {
   }
 
   listaEl.innerHTML = comentarios.map(c => `
-    <div class="comentario-item">
-      <div class="comentario-data">${_formatarDataHora(c.created_at)}</div>
+    <div class="comentario-item" id="com-${c.id}">
+      <div class="comentario-header">
+        <span class="comentario-autor">${_esc(_autorLabel(c.user_id))}</span>
+        <span class="comentario-data">${_formatarDataHora(c.created_at)}</span>
+        <button class="btn-excluir-com"
+                onclick="excluirComentario('${postId}', '${c.id}')"
+                title="Excluir comentário">×</button>
+      </div>
       <div class="comentario-corpo">${_esc(c.corpo)}</div>
     </div>
   `).join("");
 }
 
-/**
- * Envia um comentário para um post.
- */
+/** Envia um comentário para um post. */
 async function enviarComentario(postId) {
   const textarea = document.getElementById(`textarea-${postId}`);
   const btn      = document.getElementById(`btn-comentar-${postId}`);
@@ -483,7 +629,7 @@ async function enviarComentario(postId) {
   const texto = textarea.value.trim();
   if (!texto) return;
 
-  btn.disabled = true;
+  btn.disabled    = true;
   btn.textContent = "Enviando...";
 
   const novo = await portalDb.adicionarComentario(postId, texto);
@@ -491,32 +637,43 @@ async function enviarComentario(postId) {
   if (novo) {
     textarea.value = "";
 
-    // Atualizar cache e re-renderizar lista
     if (!PORTAL_STATE.comentarios[postId]) PORTAL_STATE.comentarios[postId] = [];
     PORTAL_STATE.comentarios[postId].push(novo);
     _renderComentariosLista(postId, PORTAL_STATE.comentarios[postId]);
 
-    // Atualizar contagem
     PORTAL_STATE.contagem[postId] = (PORTAL_STATE.contagem[postId] || 0) + 1;
-
-    // Atualizar badge no card
     _atualizarBadgeComentario(postId);
-
-    // Atualizar indicador no calendário
     _atualizarCalChip(postId);
-
     _toastPortal("Comentário enviado!");
   } else {
     _toastPortal("Erro ao enviar comentário. Tente novamente.");
   }
 
-  btn.disabled = false;
+  btn.disabled    = false;
   btn.textContent = "Enviar comentário";
 }
 
-/**
- * Atualiza o badge de comentário no card da lista.
- */
+/** Exclui um comentário */
+async function excluirComentario(postId, commentId) {
+  const ok = await portalDb.excluirComentario(commentId);
+  if (!ok) { _toastPortal("Erro ao excluir comentário."); return; }
+
+  // Remove do cache local
+  if (PORTAL_STATE.comentarios[postId]) {
+    PORTAL_STATE.comentarios[postId] = PORTAL_STATE.comentarios[postId].filter(c => c.id !== commentId);
+  }
+
+  // Atualiza contagem
+  PORTAL_STATE.contagem[postId] = Math.max(0, (PORTAL_STATE.contagem[postId] || 0) - 1);
+
+  // Re-renderiza lista
+  _renderComentariosLista(postId, PORTAL_STATE.comentarios[postId] || []);
+  _atualizarBadgeComentario(postId);
+  _atualizarCalChip(postId);
+  _toastPortal("✓ Comentário excluído");
+}
+
+/** Atualiza o badge de comentário no card da lista. */
 function _atualizarBadgeComentario(postId) {
   const card = document.getElementById(`post-${postId}`);
   if (!card) return;
@@ -527,18 +684,19 @@ function _atualizarBadgeComentario(postId) {
   badge.textContent = `💬 ${n > 0 ? n + " comentário" + (n > 1 ? "s" : "") : "Comentar"}`;
 }
 
-/**
- * Atualiza o indicador de comentado no chip do calendário.
- */
+/** Atualiza o indicador de comentado nos chips do calendário. */
 function _atualizarCalChip(postId) {
-  const chips = document.querySelectorAll(`.cal-chip[onclick*="${postId}"]`);
-  chips.forEach(chip => {
-    const jaTemPonto = chip.querySelector(".cal-chip-comentado");
-    if (!jaTemPonto) {
-      const ponto = document.createElement("span");
-      ponto.className = "cal-chip-comentado";
-      ponto.title = "Comentado";
-      chip.appendChild(ponto);
+  const temComentario = (PORTAL_STATE.contagem[postId] || 0) > 0;
+  document.querySelectorAll(`[data-post-id="${postId}"]`).forEach(chip => {
+    const ponto = chip.querySelector(".pcal-chip-com");
+    if (temComentario && !ponto) {
+      const el = document.createElement("span");
+      el.className = "pcal-chip-com";
+      el.title     = "Com comentário";
+      el.textContent = "●";
+      chip.appendChild(el);
+    } else if (!temComentario && ponto) {
+      ponto.remove();
     }
   });
 }
@@ -640,16 +798,12 @@ function _chaveStatusCal(status) {
   return mapa[s] || "neutro";
 }
 
-/**
- * Converte o status para a chave CSS usada nos badges (mesma lógica).
- */
+/** Converte o status para a chave CSS usada nos badges (mesma lógica). */
 function _chaveStatusCss(status) {
   return _chaveStatusCal(status);
 }
 
-/**
- * Retorna a classe CSS para badge de formato.
- */
+/** Retorna a classe CSS para badge de formato. */
 function _classeFormato(formato) {
   if (!formato) return "badge-neutro";
   const f = formato.toLowerCase();

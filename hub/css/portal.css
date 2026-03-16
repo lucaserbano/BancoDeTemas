@@ -600,10 +600,189 @@ body {
 }
 
 /* -----------------------------------------------
+   BLOCO 3 — CALENDÁRIO VISUAL (grade real por mês)
+----------------------------------------------- */
+.pcal-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.pcal-mes {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.pcal-mes-titulo {
+  padding: 14px 16px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1D23;
+  border-bottom: 1px solid #F3F4F6;
+  background: #F9FAFB;
+  letter-spacing: -0.1px;
+}
+.pcal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.pcal-dia-nome {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  padding: 8px 2px 6px;
+  border-bottom: 1px solid #F3F4F6;
+  letter-spacing: 0.3px;
+}
+.pcal-dia {
+  min-height: 76px;
+  padding: 5px 4px 4px;
+  border-right: 1px solid #F3F4F6;
+  border-bottom: 1px solid #F3F4F6;
+  vertical-align: top;
+}
+.pcal-dia:nth-child(7n) { border-right: none; }
+.pcal-dia.vazio {
+  background: #FAFAFA;
+  border-color: #F3F4F6;
+}
+.pcal-dia.hoje {
+  background: #F0F9FF;
+  border-color: #BAE6FD;
+}
+.pcal-dia-num {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9CA3AF;
+  margin-bottom: 3px;
+  line-height: 1;
+}
+.pcal-dia.hoje .pcal-dia-num {
+  color: #0369A1;
+  background: #BAE6FD;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+/* Chips dos posts no calendário — coloridos por status */
+.pcal-chip {
+  display: block;
+  font-size: 9px;
+  line-height: 1.3;
+  padding: 2px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  transition: opacity 0.1s;
+}
+.pcal-chip:hover { opacity: 0.75; }
+.pcal-chip-com {
+  font-size: 6px;
+  opacity: 0.7;
+  margin-left: 2px;
+  vertical-align: middle;
+}
+
+/* Cores por status */
+.pcal-chip-emproducao { background: #FFFBEB; border-color: #FDE68A; color: #92400E; }
+.pcal-chip-aprovado   { background: #ECFDF5; border-color: #A7F3D0; color: #065F46; }
+.pcal-chip-reprovado  { background: #FEF2F2; border-color: #FECACA; color: #991B1B; }
+.pcal-chip-publicado  { background: #EDE9FE; border-color: #DDD6FE; color: #4C1D95; }
+.pcal-chip-neutro     { background: #F3F4F6; border-color: #E5E7EB; color: #374151; }
+
+/* -----------------------------------------------
+   SEÇÃO DE APROVAÇÃO (abaixo do roteiro)
+----------------------------------------------- */
+.aprovacao-section {
+  border-top: 1px solid #F3F4F6;
+  padding-top: 14px;
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+.aprovacao-btns {
+  display: flex;
+  gap: 10px;
+}
+.btn-aprovar,
+.btn-reprovar {
+  padding: 8px 22px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border: 2px solid;
+}
+.btn-aprovar {
+  background: #fff;
+  color: #059669;
+  border-color: #059669;
+}
+.btn-aprovar:hover,
+.btn-aprovar.ativo {
+  background: #059669;
+  color: #fff;
+}
+.btn-reprovar {
+  background: #fff;
+  color: #DC2626;
+  border-color: #DC2626;
+}
+.btn-reprovar:hover,
+.btn-reprovar.ativo {
+  background: #DC2626;
+  color: #fff;
+}
+
+/* -----------------------------------------------
+   COMENTÁRIOS — autor + botão excluir
+----------------------------------------------- */
+.comentario-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.comentario-autor {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4B5563;
+}
+.btn-excluir-com {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+  color: #D1D5DB;
+  padding: 0 2px;
+  transition: color 0.1s;
+  flex-shrink: 0;
+}
+.btn-excluir-com:hover { color: #EF4444; }
+
+/* -----------------------------------------------
    RESPONSIVO
 ----------------------------------------------- */
 @media (max-width: 600px) {
   .portal-wrap { padding: 24px 16px 60px; }
   .portal-header-nome { font-size: 20px; }
   .orc-valor { font-size: 18px; }
+  .pcal-chip { font-size: 8px; }
+  .pcal-dia  { min-height: 60px; padding: 3px 2px; }
+  .aprovacao-btns { flex-direction: column; }
+  .btn-aprovar, .btn-reprovar { width: 100%; }
 }

@@ -201,6 +201,44 @@ const portalDb = {
       return null;
     }
     return data;
+  },
+
+  /**
+   * Exclui um comentário pelo ID.
+   * Funciona para o autor do comentário e para admins (RLS valida no banco).
+   * @param {string} id — UUID do comentário
+   */
+  async excluirComentario(id) {
+    const { error } = await sb
+      .from("post_comments")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Erro ao excluir comentário:", error.message);
+      return false;
+    }
+    return true;
+  },
+
+  /**
+   * Atualiza o status de um post (aprovado / reprovado / em produção / publicado).
+   * @param {string} postId
+   * @param {string} status
+   */
+  async atualizarStatusPost(postId, status) {
+    const { data, error } = await sb
+      .from("posts")
+      .update({ status })
+      .eq("id", postId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Erro ao atualizar status do post:", error.message);
+      return null;
+    }
+    return data;
   }
 
 };
