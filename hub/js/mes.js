@@ -116,7 +116,8 @@ function renderObjetivos() {
   const objBanco = OBJETIVOS_BANCO.find(o => o.mes === mes && o.ano === ano);
 
   // 2. Se não tiver no banco, tenta o hardcoded (fallback)
-  const objHard  = (OBJETIVOS_MES[c?.id] || {})[mes];
+  //    O id do Supabase é UUID; tenta também por primeiro nome normalizado
+  const objHard  = (OBJETIVOS_MES[c?.id] || OBJETIVOS_MES[_clienteHardKey(c)] || {})[mes];
 
   // Unifica: banco tem prioridade
   const obj = objBanco ? _normalizeObjetivoBanco(objBanco) : objHard;
@@ -479,6 +480,25 @@ async function adicionarBancoAoMes() {
 function limparBancoPendentes() {
   MES_STATE.bancoPendentes.clear();
   renderBanco();
+}
+
+/**
+ * Deriva a chave do OBJETIVOS_MES a partir dos dados do cliente.
+ * Necessário porque o id no Supabase é UUID, mas as chaves hardcoded
+ * usam o primeiro nome normalizado (ex: "Paôla" → "paola").
+ */
+function _clienteHardKey(c) {
+  if (!c) return null;
+  // Tenta pelo handle sem @ (ex: "@paolapreto" → "paolapreto")
+  const handleKey = (c.handle || "").replace("@", "");
+  if (OBJETIVOS_MES[handleKey]) return handleKey;
+  // Tenta pelo primeiro nome, removendo acentos e em minúsculo
+  const nomeKey = (c.nome || "").split(" ")[0]
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  if (OBJETIVOS_MES[nomeKey]) return nomeKey;
+  return null;
 }
 
 function toggleBanco() {

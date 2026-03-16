@@ -766,10 +766,8 @@ th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: "⇅"; }
   min-height: 0;
   overflow-y: auto;
   padding: 20px 24px 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
 }
+.mes-content > * + * { margin-top: 20px; }
 
 /* Card de objetivos */
 .obj-card {
