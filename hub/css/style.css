@@ -193,6 +193,19 @@ body {
 
 .client-header-actions { display: flex; gap: 8px; }
 
+.btn-editar-cliente {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  opacity: 0.5;
+  transition: opacity .15s;
+  vertical-align: middle;
+}
+.btn-editar-cliente:hover { opacity: 1; }
+
 /* =============================================
    CARDS DE MÉTRICAS
    ============================================= */
@@ -750,8 +763,9 @@ th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: "⇅"; }
 /* Conteúdo mensal */
 .mes-content {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 20px 24px;
+  padding: 20px 24px 48px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -809,6 +823,41 @@ th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: "⇅"; }
 .obj-data-pill.destaque {
   background: #111111;
   color: #FFFFFF;
+}
+
+/* Seções extras de objetivo */
+.obj-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #888888;
+  margin: 14px 0 6px;
+}
+
+.obj-anuncio-bloco {
+  font-size: 13px;
+  color: #333333;
+  background: #F7F7F7;
+  border-left: 3px solid #CCCCCC;
+  padding: 10px 12px;
+  border-radius: 0 6px 6px 0;
+  line-height: 1.6;
+}
+
+.obj-kpi-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.obj-kpi-chip {
+  font-size: 11px;
+  font-weight: 600;
+  background: #111111;
+  color: #FFFFFF;
+  padding: 3px 10px;
+  border-radius: 20px;
 }
 
 /* Barra de funil */
@@ -966,7 +1015,7 @@ th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: "⇅"; }
   flex-direction: column;
   gap: 0;
   border-top: 1px solid #EEEEEE;
-  max-height: 400px;
+  max-height: 600px;
   overflow-y: auto;
 }
 .banco-lista.aberta { display: flex; }
@@ -1119,4 +1168,251 @@ th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: "⇅"; }
 @keyframes spin-anim {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
+}
+
+/* =============================================
+   BOTÃO HAMBURGER (visível só em mobile)
+   ============================================= */
+.btn-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #111111;
+  padding: 4px 6px;
+  border-radius: 6px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.btn-hamburger:hover { background: #F0F0F0; }
+
+/* Overlay escuro ao abrir sidebar no mobile */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 190;
+}
+.sidebar-overlay.visivel { display: block; }
+
+/* =============================================
+   MEDIA QUERIES — MOBILE (≤ 768px)
+   ============================================= */
+/* =============================================
+   CALENDÁRIO VISUAL (calendario.html)
+   ============================================= */
+.cal-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #F5F5F5;
+}
+
+.cal-header {
+  background: #111111;
+  color: #FFFFFF;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.cal-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 24px 48px;
+}
+
+.cal-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #888888;
+  margin-bottom: 14px;
+}
+
+/* Grade semanal */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.cal-dia-nome {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #888888;
+  text-align: center;
+  padding: 6px 0;
+}
+
+.cal-dia {
+  background: #FFFFFF;
+  border: 1px solid #DDDDDD;
+  border-radius: 8px;
+  min-height: 90px;
+  padding: 8px;
+  cursor: pointer;
+  transition: box-shadow .15s, border-color .15s;
+  position: relative;
+}
+.cal-dia:hover { border-color: #AAAAAA; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.cal-dia.vazio { background: transparent; border-color: transparent; cursor: default; min-height: 90px; }
+.cal-dia.hoje { border-color: #111111; border-width: 2px; }
+
+.cal-dia-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333333;
+  margin-bottom: 6px;
+  line-height: 1;
+}
+.cal-dia.hoje .cal-dia-num { color: #111111; }
+
+/* Chips de post no dia */
+.cal-post-chip {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 3px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: opacity .12s;
+}
+.cal-post-chip:hover { opacity: .75; }
+.cal-post-chip.mev   { background: #EBF8FF; color: #1A5276; }
+.cal-post-chip.conv  { background: #FDEDEC; color: #922B21; }
+.cal-post-chip.causa { background: #D5F5E3; color: #1E8449; }
+.cal-post-chip.hum   { background: #F4ECF7; color: #76448A; }
+
+/* Botão + para adicionar post ao dia */
+.cal-dia-add {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  background: #EEEEEE;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888888;
+  opacity: 0;
+  transition: opacity .15s, background .15s;
+}
+.cal-dia:hover .cal-dia-add { opacity: 1; }
+.cal-dia-add:hover { background: #DDDDDD; color: #111111; }
+
+/* Legenda inferior */
+.cal-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.cal-legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #666666;
+}
+.cal-legenda-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* Modal de atribuir post ao dia */
+.cal-modal-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.cal-modal-item {
+  padding: 10px 12px;
+  border: 1px solid #EEEEEE;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background .12s;
+}
+.cal-modal-item:hover { background: #F5F5F5; }
+.cal-modal-item-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111111;
+  margin-bottom: 3px;
+}
+.cal-modal-item-meta {
+  font-size: 11px;
+  color: #888888;
+  display: flex;
+  gap: 6px;
+}
+
+@media (max-width: 768px) {
+
+  /* Sidebar vira drawer fixo */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    height: 100vh;
+    width: 260px;
+    z-index: 200;
+    transition: left .25s ease;
+  }
+  .sidebar.aberta { left: 0; }
+
+  /* Botão hamburger aparece */
+  .btn-hamburger { display: flex; align-items: center; justify-content: center; }
+
+  /* Main ocupa tela toda */
+  .main { width: 100%; }
+
+  /* Header do cliente: compactar */
+  .client-header {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .client-header-nome { font-size: 15px; }
+  .client-header-actions { flex-wrap: wrap; }
+  .client-header-actions .btn { font-size: 11px; padding: 5px 10px; }
+
+  /* Métricas: 3 colunas → 1 linha, ou 2x2 */
+  .metrics-row { grid-template-columns: repeat(2, 1fr); }
+
+  /* Tabela: padding menor */
+  .toolbar { padding: 8px 12px; gap: 6px; }
+  .toolbar-filtros { flex-wrap: wrap; gap: 6px; }
+  .toolbar-filtros select { font-size: 12px; }
+
+  /* Posts grid: 1 coluna no mobile */
+  .posts-grid { grid-template-columns: 1fr; }
+
+  /* mes.html header */
+  .mes-header { padding: 0 12px; gap: 8px; }
+  .mes-header-cliente { display: none; }
+  .mes-nav-label { min-width: 100px; font-size: 13px; }
+  .mes-content { padding: 12px 12px 48px; }
 }

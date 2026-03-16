@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l *.json)",
+      "mcp__gdrive__search",
+      "Bash(python3 -c \"import openpyxl; print\\(''ok''\\)\")",
+      "Bash(python3 gerar_planilha.py)",
+      "WebFetch(domain:docs.google.com)",
+      "WebFetch(domain:doc-0g-bs-sheets.googleusercontent.com)",
+      "Bash(python3 gerar_aba_objetivos.py)",
+      "Bash(python3 gerar_aba_conversao.py)",
+      "Bash(python3 gerar_html.py)",
+      "Bash(open \"/Users/lucas/Downloads/Paôla - Calendário Editorial 2026/banco_temas.html\")",
+      "Bash(python3 -c \":*)",
+      "Bash(ls -la \"/Users/lucas/Downloads/Paôla - Calendário Editorial 2026/\"*.html)",
+      "Bash(grep -n '^\\\\];$' \"/Users/lucas/Downloads/Paôla - Calendário Editorial 2026/banco_temas.html\")",
+      "Bash(gh --version)",
+      "Bash(git --version)",
+      "Bash(git config:*)"
+    ]
+  }
+}

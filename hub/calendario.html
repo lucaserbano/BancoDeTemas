@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendário Visual — Hub de Conteúdo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { font-family: 'Inter', -apple-system, sans-serif; }
+  </style>
+</head>
+<body>
+
+<div class="cal-layout">
+
+  <!-- ===== CABEÇALHO ===== -->
+  <header class="cal-header">
+    <a href="index.html" class="mes-header-back">← Dashboard</a>
+
+    <div class="mes-header-cliente">
+      <div class="mes-header-nome" id="cal-header-nome">—</div>
+      <div class="mes-header-handle" id="cal-header-handle">—</div>
+    </div>
+
+    <div class="mes-nav">
+      <button class="mes-nav-btn" onclick="navegarMesCal(-1)" title="Mês anterior">◀</button>
+      <div class="mes-nav-label" id="cal-nav-label">Abril 2026</div>
+      <button class="mes-nav-btn" onclick="navegarMesCal(1)" title="Próximo mês">▶</button>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <a href="mes.html" class="btn btn-secondary" style="font-size:12px;padding:6px 12px">📋 Lista</a>
+    </div>
+  </header>
+
+  <!-- ===== CONTEÚDO ===== -->
+  <div class="cal-content">
+
+    <div class="cal-titulo" id="cal-titulo">Abril 2026</div>
+
+    <!-- Legenda -->
+    <div class="cal-legenda">
+      <div class="cal-legenda-item">
+        <div class="cal-legenda-dot" style="background:#BEE3F8"></div>
+        <span>MEV</span>
+      </div>
+      <div class="cal-legenda-item">
+        <div class="cal-legenda-dot" style="background:#FED7D7"></div>
+        <span>Conversão</span>
+      </div>
+      <div class="cal-legenda-item">
+        <div class="cal-legenda-dot" style="background:#C6F6D5"></div>
+        <span>Causa</span>
+      </div>
+      <div class="cal-legenda-item">
+        <div class="cal-legenda-dot" style="background:#E9D8FD"></div>
+        <span>Humanização</span>
+      </div>
+      <div class="cal-legenda-item" style="margin-left:auto;color:#888;font-size:11px">
+        Clique em um dia para atribuir post · Clique no chip para remover a data
+      </div>
+    </div>
+
+    <!-- Grade do calendário -->
+    <div class="cal-grid" id="cal-grid">
+      <!-- Renderizado por calendario.js -->
+    </div>
+
+  </div><!-- /cal-content -->
+
+</div><!-- /cal-layout -->
+
+<!-- ===== MODAL: ATRIBUIR POST AO DIA ===== -->
+<div class="modal-overlay" id="modal-cal-atribuir">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="cal-modal-titulo">Atribuir post</h2>
+      <button class="modal-fechar" onclick="closeModal('modal-cal-atribuir')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:#888;margin-bottom:12px">Escolha um post do mês para publicar neste dia:</p>
+      <div class="cal-modal-lista" id="cal-modal-lista">
+        <!-- Preenchido por calendario.js -->
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('modal-cal-atribuir')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: REMOVER DATA ===== -->
+<div class="modal-overlay" id="modal-cal-remover">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-hdr">
+      <h2>Remover data</h2>
+      <button class="modal-fechar" onclick="closeModal('modal-cal-remover')">×</button>
+    </div>
+    <div class="modal-body">
+      <p id="cal-remover-texto" style="font-size:14px;color:#333;line-height:1.5"></p>
+      <p style="font-size:12px;color:#888;margin-top:8px">O post voltará a aparecer como disponível para outros dias.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('modal-cal-remover')">Cancelar</button>
+      <button class="btn btn-primary" style="background:#CC0000" onclick="confirmarRemoverDia()">Remover data</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== INDICADOR DE AUTO-SAVE ===== -->
+<div id="save-status" class="save-status"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/db.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/calendario.js"></script>
+
+</body>
+</html>

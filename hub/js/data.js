@@ -438,67 +438,85 @@ const _POSTS_FICTICIO_REF = [
 const OBJETIVOS_MES = {
   paola: {
     Abril: {
-      objetivo: "Lançamento da nova fase em SP + Dia Mundial da Saúde (7/abr)",
+      objetivo: "Lançamento do perfil renovado + Prevenção cardiovascular. Estreia com apresentação em SP ancorada no Dia Mundial da Saúde (7/abr). Estabelecer voz, identidade e localização.",
       orcamento_anuncios: "R$ 250–350",
       tipo_anuncio: "Reconhecimento de Marca",
       datas_importantes: ["7/abr — Dia Mundial da Saúde"],
-      funil_meta: { topo: 50, meio: 30, fundo: 20 }
+      funil_meta: { topo: 50, meio: 30, fundo: 20 },
+      anuncio_detalhes: "Objetivo: reconhecimento de marca (lançamento). Impulsionar post 1 (Conv) + post 2 (MEV) por 7–10 dias cada. Público: mulheres e homens 40–70 anos, SP capital + raio 30 km, interesses: saúde, cardiologia, bem-estar. Orçamento sugerido: R$ 250–350 (lançamento).",
+      kpis: ["Alcance e impressões","Novos seguidores","Visitas ao perfil","CPM (meta: < R$ 20)","Taxa de engajamento"]
     },
     Maio: {
-      objetivo: "Saúde da mulher + Dia das Mães (10/mai)",
-      orcamento_anuncios: "R$ 100",
-      tipo_anuncio: "Engajamento",
+      objetivo: "Saúde cardiovascular da mulher + Dia das Mães. Usar o gancho emocional do Dia das Mães (10/mai) para conectar cuidado e saúde cardíaca. Incorporar temas de estresse e lifestyle.",
+      orcamento_anuncios: "R$ 150–200",
+      tipo_anuncio: "Alcance + Tráfego",
       datas_importantes: ["10/mai — Dia das Mães"],
-      funil_meta: { topo: 50, meio: 30, fundo: 20 }
+      funil_meta: { topo: 50, meio: 30, fundo: 20 },
+      anuncio_detalhes: "Objetivo: alcance + tráfego. Impulsionar post Conv (Dia das Mães) próximo a 10/mai. Público: mulheres 35–65, SP, + públicos semelhantes a seguidores atuais. Orçamento sugerido: R$ 150–200.",
+      kpis: ["Alcance orgânico vs pago","Cliques no link da bio","CTR (meta: > 1%)","Novos seguidores","Compartilhamentos"]
     },
     Junho: {
-      objetivo: "Exercício físico e cardiologia — posicionamento como médica do esporte cardíaco",
+      objetivo: "Exercício físico e cardiologia. Posicionar exercício como prescrição médica cardiovascular. Gancho do inverno (retomada de atividade). Apresentar VO2max e qualidade de vida pós-Tx.",
       orcamento_anuncios: "R$ 150–200",
       tipo_anuncio: "Mensagens/WhatsApp",
       datas_importantes: [],
-      funil_meta: { topo: 50, meio: 25, fundo: 25 }
+      funil_meta: { topo: 50, meio: 25, fundo: 25 },
+      anuncio_detalhes: "Objetivo: tráfego / mensagens. Impulsionar post Conv (onde atendo + como agendar) com objetivo Mensagens. Público: pessoas que interagiram com o perfil nos últimos 60 dias + semelhantes a quem clicou no link. Orçamento sugerido: R$ 150–200.",
+      kpis: ["Mensagens iniciadas","CPC (meta: < R$ 3)","CPL — custo por lead","Cliques no link da bio","Salvamentos (qualidade)"]
     },
     Julho: {
-      objetivo: "Posicionamento profissional em IC avançada e transplante",
-      orcamento_anuncios: "R$ 100",
-      tipo_anuncio: "Engajamento",
-      datas_importantes: [],
-      funil_meta: { topo: 50, meio: 30, fundo: 20 }
+      objetivo: "Posicionamento profissional + IC avançada. Consolidar autoridade na especialidade de IC avançada e transplante. Aproveitar congresso para humanização com gancho médico.",
+      orcamento_anuncios: "R$ 100–150",
+      tipo_anuncio: "Reconhecimento de Marca",
+      datas_importantes: ["Verificar: SOCESP / CBC"],
+      funil_meta: { topo: 50, meio: 30, fundo: 20 },
+      anuncio_detalhes: "Objetivo: reconhecimento de marca (especialidade). Impulsionar post MEV IC avançada para alcançar pacientes com IC. Público: pessoas com interesse em insuficiência cardíaca, transplante, 50–75 anos, SP. Orçamento sugerido: R$ 100–150.",
+      kpis: ["Alcance segmentado","CPM","Salvamentos","Visitas ao perfil","Novos seguidores qualificados"]
     },
     Agosto: {
-      objetivo: "Fatores de risco cardiovascular + aquecimento para Setembro",
+      objetivo: "Fatores de risco cardiovascular + aquecimento para Setembro. Resgatar temas de hipertensão, diabetes, sono e dieta. Preparar audiência para a campanha de setembro.",
       orcamento_anuncios: "R$ 100–150",
       tipo_anuncio: "Reconhecimento de Marca",
       datas_importantes: [],
-      funil_meta: { topo: 60, meio: 25, fundo: 15 }
+      funil_meta: { topo: 60, meio: 25, fundo: 15 },
+      anuncio_detalhes: "Objetivo: alcance + aquecimento de público. Impulsionar post MEV de maior apelo (sono ou dieta) para ampliar audiência antes de set. Criar público personalizado de remarketing para usar em setembro. Orçamento sugerido: R$ 100–150.",
+      kpis: ["Alcance","Impressões","Taxa de engajamento","Crescimento de seguidores","Público de remarketing gerado"]
     },
     Setembro: {
-      objetivo: "Campanha: Mês do Coração — máximo alcance e engajamento",
+      objetivo: "CAMPANHA: Mês do Coração — maior mês do ano. Concentração máxima de causa e conscientização. Pico de alcance orgânico. 5 posts (bônus de engajamento). Ancoragem nas datas mais importantes do calendário cardiovascular.",
       orcamento_anuncios: "R$ 400–600",
       tipo_anuncio: "Reconhecimento de Marca + Causa",
-      datas_importantes: ["27/set — Dia Nacional da Doação de Órgãos", "29/set — Dia Mundial do Coração"],
-      funil_meta: { topo: 60, meio: 30, fundo: 10 }
+      datas_importantes: ["27/set — Dia Nacional de Doação de Órgãos", "29/set — Dia Mundial do Coração"],
+      funil_meta: { topo: 60, meio: 30, fundo: 10 },
+      anuncio_detalhes: "INVESTIMENTO MÁXIMO DO ANO. Impulsionar TODOS os posts da campanha. Estratégia dupla: Posts de Causa (27/set e abertura): objetivo Alcance — público amplo SP. Post Conv (29/set): objetivo Mensagens — público quente (remarketing de ago+set). Público frio: interesse em doação de órgãos, cardiologia, saúde — SP. Orçamento sugerido: R$ 400–600 (mês inteiro).",
+      kpis: ["Alcance total da campanha","Impressões","CPM (eficiência)","Mensagens iniciadas","CPL — custo por lead","Crescimento de seguidores","Visitas ao perfil"]
     },
     Outubro: {
-      objetivo: "Reconversão pós-campanha — trazer seguidor novo para consulta",
+      objetivo: "Reconversão pós-campanha. Aproveitar o aquecimento de setembro para converter novos seguidores em pacientes. Aprofundar temas técnicos e abrir espaço para Q&A.",
       orcamento_anuncios: "R$ 150–200",
       tipo_anuncio: "Mensagens/WhatsApp",
       datas_importantes: [],
-      funil_meta: { topo: 40, meio: 30, fundo: 30 }
+      funil_meta: { topo: 40, meio: 30, fundo: 30 },
+      anuncio_detalhes: "Objetivo: conversão / mensagens. Impulsionar post Q&A (Conv) com objetivo Mensagens. Público: remarketing de quem interagiu em setembro + semelhantes. Orçamento sugerido: R$ 150–200.",
+      kpis: ["Mensagens iniciadas","CPL","Taxa comentários (Q&A)","CPC","Conversão DM → consulta"]
     },
     Novembro: {
-      objetivo: "Prevenção e saúde preventiva — campanha de checkup",
+      objetivo: "Prevenção — saúde preventiva. Mês de reforço preventivo. Tabagismo realocado de março. Humanização com aniversário ou congresso se houver. Reafirmar diferenciais antes do encerramento.",
       orcamento_anuncios: "R$ 150–200",
       tipo_anuncio: "Mensagens/WhatsApp",
-      datas_importantes: [],
-      funil_meta: { topo: 40, meio: 30, fundo: 30 }
+      datas_importantes: ["Verificar: Congresso Medicina do Estilo de Vida"],
+      funil_meta: { topo: 40, meio: 30, fundo: 30 },
+      anuncio_detalhes: "Objetivo: conversão. Impulsionar post Conv (por que me escolher) com objetivo Mensagens. Público: seguidores há mais de 30 dias que ainda não interagiram com Conv. Orçamento sugerido: R$ 150–200.",
+      kpis: ["Mensagens iniciadas","CPC","CPL","Taxa de conversão DM → agendamento","Custo por consulta agendada"]
     },
     Dezembro: {
-      objetivo: "Fechamento do ano + cuidados nas festas + agendamento para 2027",
+      objetivo: "Fechamento do ano + cuidados nas festas. Encerrar 2026 com conteúdo prático para as festas, humanização (retrospectiva) e CTA de agendamento para 2027.",
       orcamento_anuncios: "R$ 150–200",
       tipo_anuncio: "Mensagens/WhatsApp",
-      datas_importantes: ["31/dez — Réveillon"],
-      funil_meta: { topo: 30, meio: 30, fundo: 40 }
+      datas_importantes: ["Festas de fim de ano"],
+      funil_meta: { topo: 30, meio: 30, fundo: 40 },
+      anuncio_detalhes: "Objetivo: conversão / agendamentos jan/2027. Impulsionar post Conv (checkup 2027) com objetivo Mensagens na última semana de dez. Público: todas as pessoas que interagiram com o perfil em 2026. Orçamento sugerido: R$ 150–200.",
+      kpis: ["Mensagens iniciadas (meta: agendamentos para jan)","CPL","CPC","ROAS geral do ano (opcional)","Crescimento de seguidores 2026"]
     }
   },
   rafael: {

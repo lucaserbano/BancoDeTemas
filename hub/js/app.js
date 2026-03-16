@@ -7,12 +7,13 @@
    ESTADO DA PÁGINA
 ----------------------------------------------- */
 const STATE = {
-  mesFiltro:    "Todos",
-  statusFiltro: "Todos",
-  linhaFiltro:  "Todas",
-  editandoId:   null,  // ID do post sendo editado (null = novo post)
-  sortCampo:    null,  // campo de ordenação ativo
-  sortDir:      1      // 1 = asc, -1 = desc
+  mesFiltro:         "Todos",
+  statusFiltro:      "Todos",
+  linhaFiltro:       "Todas",
+  editandoId:        null,  // ID do post sendo editado (null = novo post)
+  editandoClienteId: null,  // ID do cliente sendo editado (null = novo cliente)
+  sortCampo:         null,  // campo de ordenação ativo
+  sortDir:           1      // 1 = asc, -1 = desc
 };
 
 /* -----------------------------------------------
@@ -120,16 +121,21 @@ function renderClienteHeader() {
   if (!c) return;
 
   el.innerHTML = `
+    <button class="btn-hamburger" onclick="toggleSidebar()" title="Menu">☰</button>
     <div class="client-header-info">
       <div class="client-header-avatar">${c.avatar}</div>
       <div>
-        <div class="client-header-nome">${c.nome}</div>
+        <div class="client-header-nome">
+          ${c.nome}
+          <button class="btn-editar-cliente" onclick="abrirModalEditarCliente()" title="Editar cliente">✏️</button>
+        </div>
         <div class="client-header-handle">${c.handle} · ${c.seguidores.toLocaleString("pt-BR")} seguidores</div>
         <div class="client-header-espec">${c.especialidade}</div>
       </div>
     </div>
     <div class="client-header-actions">
       <a href="mes.html" class="btn btn-secondary">📅 Ver Calendário</a>
+      <a href="calendario.html" class="btn btn-secondary">🗓️ Cal. Visual</a>
     </div>
   `;
 }
@@ -144,10 +150,6 @@ function renderMetrics() {
   const posts = POSTS; // já filtrados pelo cliente ativo
   const pub   = posts.filter(p => p.status === "Publicado");
   const agend = posts.filter(p => p.status !== "Publicado").length;
-  const avgLikes = pub.length
-    ? Math.round(pub.reduce((s, p) => s + (p.likes || 0), 0) / pub.length)
-    : 0;
-
   el.innerHTML = `
     <div class="metric-card">
       <div class="metric-icon">📋</div>
@@ -168,13 +170,6 @@ function renderMetrics() {
       <div>
         <div class="metric-value">${agend}</div>
         <div class="metric-label">Em produção</div>
-      </div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-icon">❤️</div>
-      <div>
-        <div class="metric-value">${avgLikes > 0 ? avgLikes.toLocaleString("pt-BR") : "—"}</div>
-        <div class="metric-label">Média de likes</div>
       </div>
     </div>
   `;
@@ -497,9 +492,45 @@ async function excluirPost(id) {
 }
 
 /* -----------------------------------------------
-   MODAL DE NOVO CLIENTE
+   MODAL DE NOVO / EDITAR CLIENTE
 ----------------------------------------------- */
 function abrirModalNovoCliente() {
+  STATE.editandoClienteId = null;
+  const tituloEl = document.getElementById("modal-cliente-titulo-h");
+  if (tituloEl) tituloEl.textContent = "Novo Cliente";
+  const btnEl = document.querySelector("#modal-cliente .btn-primary");
+  if (btnEl) btnEl.textContent = "Cadastrar";
+
+  // Limpa os campos
+  ["nc-nome","nc-handle","nc-avatar","nc-espec"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+  const meta = document.getElementById("nc-meta");
+  if (meta) meta.value = "4";
+
+  openModal("modal-cliente");
+}
+
+function abrirModalEditarCliente() {
+  const c = getClienteAtivo();
+  if (!c) return;
+  STATE.editandoClienteId = c.id;
+
+  const tituloEl = document.getElementById("modal-cliente-titulo-h");
+  if (tituloEl) tituloEl.textContent = "Editar Cliente";
+  const btnEl = document.querySelector("#modal-cliente .btn-primary");
+  if (btnEl) btnEl.textContent = "Salvar";
+
+  // Preenche com dados atuais
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ""; };
+  set("nc-nome",   c.nome);
+  set("nc-handle", c.handle);
+  set("nc-avatar", c.avatar);
+  set("nc-espec",  c.especialidade);
+  const metaEl = document.getElementById("nc-meta");
+  if (metaEl) metaEl.value = c.meta_posts_mes || 4;
+
   openModal("modal-cliente");
 }
 
@@ -508,38 +539,57 @@ async function salvarCliente() {
   const handle = document.getElementById("nc-handle")?.value.trim();
   if (!nome || !handle) { alert("Nome e handle são obrigatórios."); return; }
 
-  const dados = {
-    nome,
-    handle:         handle.startsWith("@") ? handle : "@" + handle,
-    especialidade:  document.getElementById("nc-espec")?.value.trim() || "",
-    avatar:         document.getElementById("nc-avatar")?.value.trim() || "👤",
-    meta_posts_mes: parseInt(document.getElementById("nc-meta")?.value) || 4,
-    seguidores:     0,
-    ano:            2026,
-    meses_ativos:   MESES_ANO.slice()
-  };
-
   const btnSalvar = document.querySelector("#modal-cliente .btn-primary");
   if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.textContent = "Salvando..."; }
 
-  const novoCliente = await db.criarCliente(dados);
+  if (STATE.editandoClienteId) {
+    // ── Editar cliente existente ──
+    const dados = {
+      nome,
+      handle:         handle.startsWith("@") ? handle : "@" + handle,
+      especialidade:  document.getElementById("nc-espec")?.value.trim() || "",
+      avatar:         document.getElementById("nc-avatar")?.value.trim() || "👤",
+      meta_posts_mes: parseInt(document.getElementById("nc-meta")?.value) || 4,
+    };
+    const atualizado = await db.atualizarCliente(STATE.editandoClienteId, dados);
+    if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = "Salvar"; }
+    if (!atualizado) return;
 
-  if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = "Cadastrar"; }
+    const idx = CLIENTES.findIndex(c => c.id === STATE.editandoClienteId);
+    if (idx !== -1) CLIENTES[idx] = atualizado;
+    STATE.editandoClienteId = null;
+    closeModal("modal-cliente");
+    renderSidebar();
+    renderClienteHeader();
+    showToast("✓ Cliente atualizado");
+  } else {
+    // ── Novo cliente ──
+    const dados = {
+      nome,
+      handle:         handle.startsWith("@") ? handle : "@" + handle,
+      especialidade:  document.getElementById("nc-espec")?.value.trim() || "",
+      avatar:         document.getElementById("nc-avatar")?.value.trim() || "👤",
+      meta_posts_mes: parseInt(document.getElementById("nc-meta")?.value) || 4,
+      seguidores:     0,
+      ano:            2026,
+      meses_ativos:   MESES_ANO.slice()
+    };
+    const novoCliente = await db.criarCliente(dados);
+    if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = "Cadastrar"; }
+    if (!novoCliente) return;
 
-  if (!novoCliente) return; // erro já exibido por db.js
-
-  CLIENTES.push(novoCliente);
-  closeModal("modal-cliente");
-  setClienteAtivo(novoCliente.id);
-  POSTS.length = 0; // novo cliente não tem posts ainda
-
-  renderSidebar();
-  renderClienteHeader();
-  renderMetrics();
-  renderToolbar();
-  renderTabela();
-  _preencherCartMes();
-  showToast("✓ Cliente cadastrado");
+    CLIENTES.push(novoCliente);
+    closeModal("modal-cliente");
+    setClienteAtivo(novoCliente.id);
+    POSTS.length = 0;
+    renderSidebar();
+    renderClienteHeader();
+    renderMetrics();
+    renderToolbar();
+    renderTabela();
+    _preencherCartMes();
+    showToast("✓ Cliente cadastrado");
+  }
 }
 
 /* -----------------------------------------------
@@ -556,6 +606,17 @@ function _preencherCartMes() {
   const c = getClienteAtivo();
   const meses = c ? [...(c.meses_ativos || MESES_ANO), "Banco"] : [...MESES_ANO, "Banco"];
   sel.innerHTML = meses.map(m => `<option value="${m}">${m}</option>`).join("");
+}
+
+/* -----------------------------------------------
+   SIDEBAR MOBILE (toggle)
+----------------------------------------------- */
+function toggleSidebar() {
+  const sidebar  = document.querySelector(".sidebar");
+  const overlay  = document.getElementById("sidebarOverlay");
+  if (!sidebar) return;
+  sidebar.classList.toggle("aberta");
+  if (overlay) overlay.classList.toggle("visivel");
 }
 
 /* -----------------------------------------------

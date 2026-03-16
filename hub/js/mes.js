@@ -147,6 +147,18 @@ function renderObjetivos() {
   const pMeio  = Math.round((meio  / total) * 100);
   const pFundo = 100 - pTopo - pMeio;
 
+  const anuncioHTML = obj.anuncio_detalhes
+    ? `<div class="obj-section-label">Estratégia de Anúncio</div>
+       <div class="obj-anuncio-bloco">${obj.anuncio_detalhes}</div>`
+    : "";
+
+  const kpisHTML = (obj.kpis && obj.kpis.length)
+    ? `<div class="obj-section-label">KPIs Prioritários</div>
+       <div class="obj-kpi-chips">
+         ${obj.kpis.map(k => `<span class="obj-kpi-chip">${k}</span>`).join("")}
+       </div>`
+    : "";
+
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
       <h2>Objetivos de ${mes}</h2>
@@ -170,6 +182,8 @@ function renderObjetivos() {
       <span><span class="funil-dot" style="background:#666666"></span>MEIO ${pMeio}%</span>
       <span><span class="funil-dot" style="background:#111111"></span>FUNDO ${pFundo}%</span>
     </div>
+    ${anuncioHTML}
+    ${kpisHTML}
   `;
 }
 
@@ -183,6 +197,8 @@ function _normalizeObjetivoBanco(row) {
     orcamento_anuncios: row.orcamento_anuncios || "",
     tipo_anuncio:       row.tipo_anuncio || "",
     datas_importantes:  row.datas_importantes || [],
+    anuncio_detalhes:   row.anuncio_detalhes || "",
+    kpis:               row.kpis || [],
     funil_meta: {
       topo:  row.funil_topo  ?? 50,
       meio:  row.funil_meio  ?? 30,

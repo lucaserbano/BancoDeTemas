@@ -32,6 +32,9 @@
     </div>
   </aside>
 
+  <!-- Overlay para fechar sidebar no mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
   <!-- ===== CONTEÚDO PRINCIPAL ===== -->
   <main class="main">
 
@@ -102,11 +105,11 @@
   </div>
 </div>
 
-<!-- ===== MODAL: NOVO CLIENTE ===== -->
+<!-- ===== MODAL: NOVO / EDITAR CLIENTE ===== -->
 <div class="modal-overlay" id="modal-cliente">
   <div class="modal">
     <div class="modal-hdr">
-      <h2>Novo Cliente</h2>
+      <h2 id="modal-cliente-titulo-h">Novo Cliente</h2>
       <button class="modal-fechar" onclick="closeModal('modal-cliente')">×</button>
     </div>
     <div class="modal-body">
