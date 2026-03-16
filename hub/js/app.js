@@ -25,6 +25,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const usuario = await db.exigirLogin();
   if (!usuario) return;
 
+  // 2. Verifica se é admin — redireciona cliente para portal.html
+  const isAdmin = await db.exigirAdmin();
+  if (!isAdmin) return;
+
   // 2. Adiciona botão de logout no header (se existir o container)
   _renderBotaoLogout();
 

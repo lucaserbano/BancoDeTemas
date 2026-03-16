@@ -58,6 +58,20 @@ const db = {
     return user;
   },
 
+  /**
+   * Verifica se o usuário logado é admin.
+   * Se não for, redireciona para portal.html (área da cliente).
+   * Chame isso nas páginas internas após exigirLogin().
+   */
+  async exigirAdmin() {
+    const { data } = await sb.from("profiles").select("role").eq("id", (await this.getUsuario())?.id).single();
+    if (!data || data.role !== "admin") {
+      window.location.href = "portal.html";
+      return false;
+    }
+    return true;
+  },
+
   /* -----------------------------------------------
      CLIENTES
   ----------------------------------------------- */

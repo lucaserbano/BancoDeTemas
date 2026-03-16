@@ -16,6 +16,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const usuario = await db.exigirLogin();
   if (!usuario) return;
 
+  // Verifica se é admin — redireciona cliente para portal.html
+  const isAdmin = await db.exigirAdmin();
+  if (!isAdmin) return;
+
   const clientes = await db.fetchClientes();
   CLIENTES.length = 0;
   clientes.forEach(c => CLIENTES.push(c));
