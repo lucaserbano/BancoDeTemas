@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importar Banco de Temas — Hub de Conteúdo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #F5F5F5; }
+
+    .imp-layout {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    .imp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .imp-title h1 { font-size: 20px; font-weight: 700; color: #111; }
+    .imp-title p  { font-size: 13px; color: #888; margin-top: 3px; }
+
+    .imp-config {
+      background: #FFFFFF;
+      border: 1px solid #DDDDDD;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .imp-config label { font-size: 13px; font-weight: 600; color: #333; white-space: nowrap; }
+
+    .imp-config select {
+      padding: 7px 12px;
+      border: 1px solid #DDD;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #FAFAFA;
+      min-width: 220px;
+    }
+
+    /* Filtros de linha */
+    .imp-filtros {
+      background: #FFFFFF;
+      border: 1px solid #DDDDDD;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .imp-filtros span { font-size: 12px; font-weight: 600; color: #555; margin-right: 4px; }
+
+    .btn-filtro {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1.5px solid #DDD;
+      background: #FFF;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: .15s;
+      color: #444;
+    }
+    .btn-filtro:hover { border-color: #999; }
+    .btn-filtro.ativo { border-color: transparent; color: #FFF; font-weight: 600; }
+    .btn-filtro.ativo.f-todos  { background: #1A3A4A; }
+    .btn-filtro.ativo.f-mev    { background: #1A5276; }
+    .btn-filtro.ativo.f-conv   { background: #922B21; }
+    .btn-filtro.ativo.f-causa  { background: #1E8449; }
+    .btn-filtro.ativo.f-hum    { background: #76448A; }
+
+    .imp-table-wrap {
+      background: #FFFFFF;
+      border: 1px solid #DDDDDD;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .imp-table-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #EEEEEE;
+      background: #FAFAFA;
+      flex-wrap: wrap;
+    }
+
+    .imp-table-toolbar label { font-size: 12px; color: #555; }
+
+    .imp-count-badge {
+      background: #111;
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .imp-table { width: 100%; border-collapse: collapse; }
+
+    .imp-table thead th {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #666;
+      padding: 9px 12px;
+      text-align: left;
+      border-bottom: 1px solid #EEEEEE;
+      background: #F7F7F7;
+      white-space: nowrap;
+    }
+
+    .imp-table tbody tr { border-bottom: 1px solid #F5F5F5; }
+    .imp-table tbody tr:last-child { border-bottom: none; }
+    .imp-table tbody tr:hover { background: #FAFAFA; }
+    .imp-table tbody tr.selecionado { background: #FFFCE0; }
+    .imp-table tbody tr.ja-existe { background: #F5F5F5; opacity: .55; }
+
+    .imp-table td {
+      padding: 9px 12px;
+      font-size: 13px;
+      color: #222;
+      vertical-align: middle;
+    }
+
+    .imp-titulo {
+      max-width: 320px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .imp-subtema { font-size: 11px; color: #999; margin-top: 1px; }
+
+    .imp-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .imp-badge.linha-mev   { background: #D6EAF8; color: #1A5276; }
+    .imp-badge.linha-conv  { background: #FDEDEC; color: #922B21; }
+    .imp-badge.linha-causa { background: #D5F5E3; color: #1E8449; }
+    .imp-badge.linha-hum   { background: #F4ECF7; color: #76448A; }
+    .imp-badge.formato     { background: #F0F0F0; color: #333; }
+    .imp-badge.funil-topo  { background: #FEF9C3; color: #854D0E; }
+    .imp-badge.funil-meio  { background: #DBEAFE; color: #1E40AF; }
+    .imp-badge.funil-fundo { background: #DCFCE7; color: #166534; }
+
+    .imp-mes { font-size: 12px; color: #555; white-space: nowrap; }
+
+    .imp-footer {
+      background: #FFFFFF;
+      border: 1px solid #DDD;
+      border-radius: 10px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .imp-footer-info { flex: 1; font-size: 13px; color: #555; }
+    .imp-footer-info strong { color: #111; }
+
+    .progress-wrap { display: none; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .progress-wrap.visivel { display: flex; }
+
+    .progress-bar-track {
+      width: 100%;
+      height: 8px;
+      background: #EEEEEE;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #111111;
+      border-radius: 4px;
+      transition: width .2s;
+      width: 0%;
+    }
+
+    .progress-label { font-size: 12px; color: #666; }
+
+    .imp-resultado {
+      display: none;
+      background: #FFFFFF;
+      border: 1px solid #DDD;
+      border-radius: 10px;
+      padding: 24px 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    .imp-resultado.visivel { display: block; }
+    .imp-resultado-icon { font-size: 40px; margin-bottom: 10px; }
+    .imp-resultado h2 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .imp-resultado p  { font-size: 13px; color: #666; line-height: 1.6; }
+    .imp-resultado .btn { margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+<div class="imp-layout">
+
+  <div class="imp-header">
+    <div class="imp-title">
+      <h1>Importar Banco de Temas</h1>
+      <p>150 temas editoriais planejados — selecione e importe para o banco do cliente</p>
+    </div>
+    <a href="index.html" class="btn btn-secondary">&larr; Voltar ao Dashboard</a>
+  </div>
+
+  <!-- Seleção de cliente -->
+  <div class="imp-config">
+    <label for="imp-cliente">Importar para:</label>
+    <select id="imp-cliente">
+      <option value="">Carregando clientes...</option>
+    </select>
+  </div>
+
+  <!-- Filtros por linha -->
+  <div class="imp-filtros">
+    <span>Filtrar:</span>
+    <button class="btn-filtro ativo f-todos" onclick="setFiltro('')" id="fbTodos">Todos (150)</button>
+    <button class="btn-filtro f-mev"   onclick="setFiltro('Medicina do Estilo de Vida')" id="fbMev">MEV</button>
+    <button class="btn-filtro f-conv"  onclick="setFiltro('Conversão')"                  id="fbConv">Conversão</button>
+    <button class="btn-filtro f-causa" onclick="setFiltro('Causa &amp; Conscientização')" id="fbCausa">Causa &amp; Conscientização</button>
+    <button class="btn-filtro f-hum"   onclick="setFiltro('Humanização')"                 id="fbHum">Humanização</button>
+  </div>
+
+  <!-- Tabela -->
+  <div class="imp-table-wrap">
+    <div class="imp-table-toolbar">
+      <input type="checkbox" id="cbTodos" onchange="toggleTodos(this.checked)">
+      <label for="cbTodos">Selecionar todos visíveis</label>
+      <span class="imp-count-badge" id="impContagem">0 selecionados</span>
+      <span style="font-size:12px;color:#AAAAAA;margin-left:auto">
+        Linhas acinzentadas já existem no banco para o cliente selecionado
+      </span>
+    </div>
+    <table class="imp-table" id="impTabela">
+      <thead>
+        <tr>
+          <th style="width:32px"></th>
+          <th>Mês</th>
+          <th>Linha</th>
+          <th>Título</th>
+          <th>Formato</th>
+          <th>Funil</th>
+        </tr>
+      </thead>
+      <tbody id="impTbody">
+        <!-- preenchido por JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Rodapé -->
+  <div class="imp-footer">
+    <div class="imp-footer-info" id="impFooterInfo">
+      Selecione os temas que deseja importar acima.
+    </div>
+    <button class="btn btn-primary" id="btnImportar" onclick="importar()" disabled>
+      Importar selecionados
+    </button>
+  </div>
+
+  <!-- Progresso -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label" id="progressLabel">Preparando importação...</div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- Resultado -->
+  <div class="imp-resultado" id="impResultado">
+    <div class="imp-resultado-icon" id="resIcon">&#x2705;</div>
+    <h2 id="resTitulo">Importação concluída!</h2>
+    <p id="resTexto"></p>
+    <a href="index.html" class="btn btn-primary">Ver posts no Dashboard</a>
+  </div>
+
+</div><!-- /imp-layout -->
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/db.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+
+<script>
+/* =============================================
+   BANCO DE TEMAS EDITORIAIS — @paolapreto 2026
+   Gerado a partir de banco_temas.html
+   ============================================= */
+const TEMAS_BANCO = [
+  {"id":0,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Exercício físico como prescrição médica","formato":"Reels","funil":"TOPO","objetivo":"Posicionar exercício como remédio cardiovascular comprovado — não como sugestão de estilo de vida","gancho":"Exercício não é sugestão de estilo de vida. É prescrição médica. E eu vou te explicar por quê.","orientacoes":"Reels ≤60s. Abertura com afirmação provocativa. Dado: pacientes que se exercitam têm X% menos risco de morte cardiovascular. Linguagem de amiga médica, sem jargão. CTA fundo de funil: 'Agende sua avaliação para receber a sua prescrição.'","serie":"—","mes":"Janeiro"},
+  {"id":1,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Frequência cardíaca ideal para treinar","formato":"Carrossel","funil":"MEIO","objetivo":"Ensinar pacientes a monitorar a intensidade do exercício com segurança e sem medo","gancho":"Você está se exercitando forte demais — ou fraco demais. Como saber qual é o seu caso?","orientacoes":"Carrossel 6 slides. S1: pergunta-gancho. S2: FC máxima em linguagem leiga ('220 menos sua idade'). S3–4: zonas de treino com exemplos ('respiração ofegante = zona 3'). S5: sinais de alerta. S6: CTA 'Salva esse post antes do próximo treino.'","serie":"—","mes":"Junho"},
+  {"id":2,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"VO2max: o número que prevê sua longevidade","formato":"Reels","funil":"MEIO","objetivo":"Apresentar VO2max como marcador de saúde cardiovascular acessível e melhorável","gancho":"Tem um número que prevê quanto tempo você vai viver. Seu cardiologista já te perguntou sobre ele?","orientacoes":"Reels ≤60s. Abertura com dado surpresa. Explicar VO2max como 'capacidade do coração de entregar oxigênio ao corpo'. Citar estudo de mortalidade. Boa notícia: melhora com treino regular. CTA: 'Deixa nos comentários se você conhecia esse número.'","serie":"—","mes":"Junho"},
+  {"id":3,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Cardio vs musculação: qual é melhor para o coração?","formato":"Carrossel","funil":"TOPO","objetivo":"Desmistificar que apenas aeróbico protege o coração e ampliar a percepção de exercício saudável","gancho":"Você vai à academia mas só faz cardio? Seu coração precisa mais do que isso.","orientacoes":"Carrossel 6 slides. S1: gancho. S2: benefícios do aeróbico. S3: benefícios surpreendentes da musculação (reduz PA, melhora insulina). S4: combinação ideal. S5: cuidados para quem tem doença cardíaca. S6: CTA 'Compartilha com quem só faz uma coisa.'","serie":"—","mes":"Maio"},
+  {"id":4,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Quanto exercício por semana protege o coração?","formato":"Post único","funil":"TOPO","objetivo":"Dar uma meta simples e acionável para o público sedentário começar a se mover","gancho":"30 minutos por dia, 5 vezes por semana. É tudo que o seu coração pede.","orientacoes":"Post único com infográfico limpo: pictograma 5 dias × 30 min. Legenda: 150 min semanais em pequenas metas ('pode ser 3x de 10 min'). CTA: 'Compartilha com quem precisa começar hoje.'","serie":"—","mes":"Janeiro"},
+  {"id":5,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Posso fazer exercício se tenho pressão alta?","formato":"Reels","funil":"MEIO","objetivo":"Quebrar o medo de que hipertensos não podem se exercitar — crença que piora o quadro","gancho":"Dra., tenho pressão alta. Posso malhar? Essa dúvida pode estar te impedindo de proteger o coração.","orientacoes":"Reels ≤60s. Voz do paciente na abertura. Resposta direta: sim, com acompanhamento. Exercício REDUZ a pressão a longo prazo. Quando NÃO fazer. CTA: 'Agende sua avaliação — prescrição individualizada.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Março"},
+  {"id":6,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Exercício e insuficiência cardíaca: é seguro?","formato":"Reels","funil":"MEIO","objetivo":"Mostrar que pacientes com IC podem e devem se exercitar — com supervisão","gancho":"Meu paciente me disse: 'Prefiro não arriscar.' Mas parar de se mover com insuficiência cardíaca pode piorar tudo.","orientacoes":"Reels ≤60s. Crença errada do paciente na abertura. Virada: reabilitação cardíaca reduz hospitalização. Dado de impacto. Quem indica e como funciona a prescrição segura. CTA: 'Encaminha pra quem você conhece com IC.'","serie":"—","mes":"Outubro"},
+  {"id":7,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Caminhar conta como exercício para o coração?","formato":"Post único","funil":"TOPO","objetivo":"Incentivar o público sedentário a começar com algo acessível — remover barreiras de entrada","gancho":"Você não precisa de academia. Nem de tênis caro. Nem de tempo sobrando. Só precisa começar.","orientacoes":"Post único com visual motivacional. Caminhada de 30 min reduz risco de infarto em X%. Meta: 'comece com 15 minutos hoje'. Tom acolhedor. CTA: 'Salva esse post pra lembrar amanhã de manhã.'","serie":"—","mes":"Abril"},
+  {"id":8,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Dieta DASH: a mais recomendada por cardiologistas","formato":"Carrossel","funil":"TOPO","objetivo":"Apresentar a dieta DASH como estratégia comprovada de controle pressórico em linguagem acessível","gancho":"Essa dieta reduz a pressão arterial em semanas. E a maioria das pessoas nunca ouviu falar dela.","orientacoes":"Carrossel 7 slides. S1: dado de impacto sobre PA. S2: o que é a DASH em 1 frase. S3–6: componentes práticos (frutas, vegetais, laticínios magros, redução de sal) com exemplos. S7: CTA 'Salva e começa essa semana.'","serie":"—","mes":"Agosto"},
+  {"id":9,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Alimentos que inflamam o coração (e os substitutos)","formato":"Carrossel","funil":"TOPO","objetivo":"Mostrar quais alimentos aumentam inflamação cardiovascular e dar opções concretas de troca","gancho":"Você come sem saber que está inflamando o seu coração. Vou te mostrar o que trocar.","orientacoes":"Carrossel estilo 'vilão vs herói': cada slide = 1 alimento problemático + 1 substituto com foto. Tom prático, sem julgamento. CTA: 'Qual troca você consegue fazer essa semana? Comenta aqui.'","serie":"—","mes":"Agosto"},
+  {"id":10,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Gordura faz mal ao coração? Mito ou verdade","formato":"Reels","funil":"TOPO","objetivo":"Desmistificar a visão de que toda gordura é ruim — diferenciar saturada de insaturada","gancho":"Mito ou Verdade: gordura faz mal ao coração. Você vai se surpreender com a resposta.","orientacoes":"Reels ≤60s, formato Mito ou Verdade. 'Verdade — mas só metade da história.' Saturada (vilã) vs insaturada (aliada): manteiga vs azeite, embutido vs abacate. CTA: 'Compartilha com quem ainda tem medo de gordura.'","serie":"Mito ou Verdade? 🫀","mes":"Março"},
+  {"id":11,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Sal e pressão alta: quanto é seguro por dia?","formato":"Post único","funil":"TOPO","objetivo":"Dar referência numérica clara sobre sódio e gerar consciência sobre consumo excessivo","gancho":"Você provavelmente está consumindo o dobro do sal recomendado — e não sabe.","orientacoes":"Post único com infográfico: colher de sal + 5g/dia (OMS). 1 dica prática para reduzir sem sofrimento. CTA: 'Salva e mede o seu sal hoje.'","serie":"—","mes":"Março"},
+  {"id":12,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Suplementos com evidência real para o coração","formato":"Carrossel","funil":"MEIO","objetivo":"Orientar sobre suplementos com evidência científica e desmistificar modas sem base","gancho":"Ômega-3, coenzima Q10, vitamina D... Quais realmente funcionam? A resposta não é simples.","orientacoes":"Carrossel 6 slides. S1: lista de suplementos populares. S2–5: veredito por suplemento ('evidência forte / fraca / sem evidência') em linguagem leiga. S6: 'nenhum substitui medicamento prescrito' + CTA.","serie":"Mito ou Verdade? 🫀","mes":"Outubro"},
+  {"id":13,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"O que comer antes e depois do treino para o coração","formato":"Carrossel","funil":"TOPO","objetivo":"Cruzar nutrição e exercício para engajar público ativo e mostrar cuidado integrado","gancho":"Você treina mas não sabe o que comer? Seu coração sente a diferença.","orientacoes":"Carrossel 5 slides. S1: gancho. S2: antes (carboidrato leve, hidratação). S3: depois (proteína + hidratação). S4: o que EVITAR (cafeína em excesso, jejum). S5: CTA 'Salva e leva pro próximo treino.'","serie":"—","mes":"Junho"},
+  {"id":14,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Álcool e coração: existe dose segura?","formato":"Reels","funil":"TOPO","objetivo":"Atualizar o público sobre as evidências mais recentes que revisaram o 'vinho faz bem'","gancho":"Dra., uma taça de vinho por dia faz bem para o coração? A ciência mudou de ideia — e eu preciso te contar.","orientacoes":"Reels ≤60s. Tom: 'eu sei que você não quer ouvir isso'. Citar revisão das diretrizes recentes. Sem julgamento. CTA: 'Compartilha com quem sempre usou essa justificativa.'","serie":"Mito ou Verdade? 🫀","mes":"Dezembro"},
+  {"id":15,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Hipertensão: a doença que não avisa","formato":"Reels","funil":"TOPO","objetivo":"Criar consciência sobre a prevalência da hipertensão silenciosa e motivar check-up","gancho":"Pressão alta não dói. Não avisa. E quando o coração finalmente sente — já passou tempo demais.","orientacoes":"Reels ≤60s. Abertura emocional. 1 em 3 brasileiros tem hipertensão sem saber. 'Como descobrir' → 'o que fazer'. CTA: 'Você sabe sua pressão hoje? Se não, agenda uma consulta.'","serie":"—","mes":"Janeiro"},
+  {"id":16,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Diabetes tipo 2 e o risco duplo para o coração","formato":"Carrossel","funil":"MEIO","objetivo":"Alertar diabéticos e pré-diabéticos sobre o risco cardiovascular aumentado","gancho":"Se você tem diabetes, o risco para o seu coração já é o dobro. Você está cuidando dos dois?","orientacoes":"Carrossel 6 slides. S1: dado de impacto. S2: por que diabetes danifica os vasos ('açúcar desgasta as paredes'). S3: exames para monitorar os dois. S4: metas de controle. S5: papel do cardiologista. S6: CTA.","serie":"—","mes":"Março"},
+  {"id":17,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Colesterol alto: remédio ou só dieta?","formato":"Reels","funil":"MEIO","objetivo":"Orientar sobre quando a estatina é necessária e desmistificar o medo do medicamento","gancho":"Dra., meu colesterol tá alto. Preciso mesmo tomar remédio? Essa dúvida chega toda semana no meu consultório.","orientacoes":"Reels ≤60s. Voz do paciente. Depende do risco global, não só do número. 'Risco cardiovascular' em 1 frase. Quando só dieta basta vs quando remédio é necessário. CTA: 'Deixa nos comentários o que você já ouviu sobre estatina.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Outubro"},
+  {"id":18,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Tabagismo: o que acontece com o coração a cada cigarro","formato":"Carrossel","funil":"TOPO","objetivo":"Mostrar o impacto imediato e progressivo do cigarro no sistema cardiovascular","gancho":"Você sabe o que acontece com o seu coração nos 20 minutos depois que você acende um cigarro?","orientacoes":"Carrossel cronológico. S1: gancho. S2: '2 min — FC e PA sobem'. S3: '20 min — vasos ainda contraídos'. S4: '1 ano sem fumar — risco de infarto cai à metade'. S5: onde buscar ajuda. S6: CTA.","serie":"—","mes":"Novembro"},
+  {"id":19,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Gordura abdominal e risco cardiovascular","formato":"Post único","funil":"TOPO","objetivo":"Associar gordura visceral ao risco cardíaco sem julgamento estético — foco em saúde","gancho":"Não é sobre estética. É sobre o coração.","orientacoes":"Post único visual limpo. Circunferência de risco (homens >94cm, mulheres >80cm) + por que essa gordura é diferente. Tom acolhedor, zero julgamento. CTA: 'Salva e mede hoje em casa.'","serie":"—","mes":"Abril"},
+  {"id":20,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Sedentarismo: o risco invisível do dia a dia","formato":"Reels","funil":"TOPO","objetivo":"Criar urgência sobre o sedentarismo para motivar pequenas mudanças de comportamento","gancho":"Ficar sentado por 8 horas por dia é tão perigoso para o coração quanto fumar. Você sabia disso?","orientacoes":"Reels ≤60s. Dado de impacto na abertura. Mecanismo: inflamação crônica, PA elevada, resistência à insulina. Dicas práticas sem academia. CTA: 'Levanta e faz 5 minutos de caminhada agora.'","serie":"—","mes":"Janeiro"},
+  {"id":21,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Histórico familiar de doença cardíaca: o que fazer?","formato":"Carrossel","funil":"TOPO","objetivo":"Sensibilizar quem tem parentes com doença cardíaca a fazer rastreamento precoce","gancho":"Seu pai ou mãe teve infarto? Isso importa — mas não é destino. Vou te explicar.","orientacoes":"Carrossel 5 slides. S1: gancho empoderador. S2: o que herança genética significa de verdade. S3: fatores que você PODE controlar. S4: quais exames pedir e quando. S5: CTA.","serie":"—","mes":"Fevereiro"},
+  {"id":22,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Estresse crônico como fator de risco cardiovascular","formato":"Reels","funil":"TOPO","objetivo":"Conectar saúde mental à saúde cardiovascular — ampliar a percepção de prevenção","gancho":"O estresse que você normaliza pode estar matando o seu coração. E isso não é figura de linguagem.","orientacoes":"Reels ≤60s. Abertura emocional forte. Mecanismo: cortisol → inflamação → artérias. Conexão com sono e IC. Tom: 'você não está exagerando, seu corpo sente de verdade'. CTA: 'Compartilha com quem precisa ouvir isso.'","serie":"—","mes":"Fevereiro"},
+  {"id":23,"linha":"Medicina do Estilo de Vida","subtema":"Sono & Estresse","titulo":"Apneia do sono e o coração: a conexão que poucos conhecem","formato":"Reels","funil":"MEIO","objetivo":"Alertar sobre apneia obstrutiva como fator de risco cardiovascular subestimado","gancho":"Você ronca? Acorda cansado mesmo depois de dormir? Isso pode estar sobrecarregando o seu coração.","orientacoes":"Reels ≤60s. Sintomas que o paciente reconhece. Mecanismo: falta de oxigênio à noite → PA sobe → coração sofre. Citar polissonografia. CTA: 'Pergunta pro seu parceiro se você ronca e agenda uma avaliação.'","serie":"—","mes":"Agosto"},
+  {"id":24,"linha":"Medicina do Estilo de Vida","subtema":"Sono & Estresse","titulo":"Quantas horas de sono protegem o coração?","formato":"Post único","funil":"TOPO","objetivo":"Estabelecer sono como pilar da saúde cardiovascular — simples e direto","gancho":"7 a 9 horas. Não é luxo — é cardioprevenção.","orientacoes":"Post único com tipografia limpa e impactante. Sono <6h e risco de infarto. Tom firme mas acolhedor. CTA: 'Compartilha com quem dorme pouco achando que tá tudo bem.'","serie":"—","mes":"Agosto"},
+  {"id":25,"linha":"Medicina do Estilo de Vida","subtema":"Sono & Estresse","titulo":"Síndrome de Takotsubo: o coração pode se partir de emoção?","formato":"Reels","funil":"MEIO","objetivo":"Explicar o Takotsubo de forma emocional e educativa — alta compartilhabilidade","gancho":"Dra., é verdade que existe síndrome do coração partido? Uma paciente me fez essa pergunta — e a resposta é sim.","orientacoes":"Reels ≤60s. Pergunta real da paciente na abertura. Takotsubo em linguagem leiga: 'estresse emocional intenso pode paralisar parte do coração temporariamente'. Quem está em risco. Como tratar. CTA: 'Compartilha com quem está passando por um momento difícil.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Fevereiro"},
+  {"id":26,"linha":"Medicina do Estilo de Vida","subtema":"Sono & Estresse","titulo":"Estresse crônico deixa marcas reais no coração","formato":"Carrossel","funil":"MEIO","objetivo":"Aprofundar a relação entre estresse, inflamação e doença cardiovascular","gancho":"O estresse não é 'coisa da cabeça'. Ele deixa marcas reais e visíveis no seu coração.","orientacoes":"Carrossel 6 slides. S1: gancho debunking. S2: mecanismo (cortisol → inflamação → aterosclerose). S3: estresse agudo vs crônico. S4–5: estratégias com evidência. S6: CTA.","serie":"—","mes":"Maio"},
+  {"id":27,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"ECG: o que essa folha de papel revela sobre você","formato":"Carrossel","funil":"MEIO","objetivo":"Desmistificar o ECG e mostrar seu valor diagnóstico de forma visual e acessível","gancho":"Esse exame é só uma folha de papel. Mas ela conta a história do seu coração — e eu vou te ensinar a ler.","orientacoes":"Carrossel 7 slides. S1: gancho. S2: foto real de ECG com destaque nas ondas. S3–5: o que cada parte revela em linguagem leiga. S6: quando o médico pede. S7: CTA 'Salva — na próxima consulta você vai entender seu próprio ECG.'","serie":"—","mes":"Agosto"},
+  {"id":28,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"Ecocardiograma: por que o médico pediu esse exame?","formato":"Reels","funil":"MEIO","objetivo":"Explicar o ecocardiograma de forma acessível para pacientes que receberam a solicitação","gancho":"O cardiologista pediu um ecocardiograma. O que isso significa? Primeiro: não precisa se assustar.","orientacoes":"Reels ≤60s. Tranquilizar na abertura. 'É um ultrassom do coração, não dói, não irradia'. O que avalia (estrutura, função, válvulas). Quando é indicado. CTA: 'Deixa nos comentários se você já fez um.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Setembro"},
+  {"id":29,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"MAPA: quando a pressão no consultório engana","formato":"Post único","funil":"TOPO","objetivo":"Explicar o MAPA e o fenômeno da hipertensão do jaleco branco","gancho":"Você sabia que a sua pressão pode ser diferente em casa e no consultório? Isso tem nome — e tem solução.","orientacoes":"Post único com foto do aparelho + legenda. 'Hipertensão do jaleco branco' em 2 frases. Quando o MAPA é indicado. CTA: 'Pergunta pro seu cardiologista se você precisa desse exame.'","serie":"—","mes":"Abril"},
+  {"id":30,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"Teste ergométrico: por que o médico pediu a esteira?","formato":"Reels","funil":"MEIO","objetivo":"Orientar sobre o que o teste ergométrico avalia e quando é indicado","gancho":"O cardiologista pediu uma esteira. O que esse exame realmente mede sobre o seu coração?","orientacoes":"Reels ≤60s. Dúvida do paciente na abertura. Capacidade funcional, isquemia e arritmia durante esforço. Para quem é indicado. Como é feito. CTA: 'Já fez esse exame? Conta nos comentários como foi.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Novembro"},
+  {"id":31,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"Checkup cardiovascular: quem precisa e com qual frequência?","formato":"Carrossel","funil":"TOPO","objetivo":"Gerar demanda por consulta de rastreamento — mostrar que prevenção é para todos","gancho":"Quando foi a última vez que você checou a saúde do seu coração? Se você precisou pensar — já passou da hora.","orientacoes":"Carrossel 5 slides. S1: dado de mortalidade. S2: quem deve fazer (grupos de risco + assintomáticos >40). S3: frequência por faixa etária. S4: o que é avaliado. S5: CTA direto 'Agende sua avaliação — Einstein, São Luiz Itaim, Dante Pazzanese.'","serie":"—","mes":"Janeiro"},
+  {"id":32,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"Exame de sangue e coração: o que pedir ao médico","formato":"Carrossel","funil":"TOPO","objetivo":"Empoderar o paciente a saber quais exames solicitar para rastreamento cardiovascular","gancho":"Você vai ao médico mas não sabe o que pedir pra proteger o seu coração. Aqui está o checklist.","orientacoes":"Carrossel tipo checklist. S1: gancho empoderador. S2–5: exames essenciais (colesterol fracionado, glicemia, PCR-us, hemograma) com o que cada um revela. S6: CTA 'Salva antes da sua próxima consulta.'","serie":"—","mes":"Abril"},
+  {"id":33,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"Holter 24h: quando o coração precisa ser monitorado","formato":"Post único","funil":"MEIO","objetivo":"Explicar o Holter de forma simples para pacientes que receberão a solicitação","gancho":"Sentiu o coração disparar ou pular um batimento? Esse exame pode finalmente dar uma resposta.","orientacoes":"Post único com foto discreta do aparelho. O que o Holter registra. Quando é indicado (palpitações, tontura, síncope). Tom tranquilizador. CTA: 'Já usou um Holter? Conta nos comentários.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Julho"},
+  {"id":34,"linha":"Medicina do Estilo de Vida","subtema":"Doenças Cardiovasculares","titulo":"Insuficiência cardíaca: os sintomas que você não pode ignorar","formato":"Reels","funil":"MEIO","objetivo":"Alertar para sintomas de IC e motivar busca por diagnóstico precoce","gancho":"Cansaço ao subir uma escada. Falta de ar ao deitar. Pés inchados. Esses sinais têm algo em comum — e falam sobre o seu coração.","orientacoes":"Reels ≤60s. Sintomas concretos que o paciente reconhece. 'Muita gente acha que é cansaço de trabalho ou da idade'. Revelar: podem ser sinais de IC. CTA: 'Encaminha pra quem tem esses sintomas e ainda não foi ao médico.'","serie":"—","mes":"Outubro"},
+  {"id":35,"linha":"Medicina do Estilo de Vida","subtema":"Doenças Cardiovasculares","titulo":"Arritmia: quando o coração bate diferente","formato":"Reels","funil":"MEIO","objetivo":"Tranquilizar e orientar quem já sentiu arritmia sobre quando buscar avaliação urgente","gancho":"Senti o coração bater diferente. Preciso me preocupar? Depende — e eu vou te explicar a diferença.","orientacoes":"Reels ≤60s. Medo do paciente na abertura. Benignas (extrassístoles) vs sinais de alerta (taquicardia sustentada, síncope). Quando ir ao PS vs consulta eletiva. CTA: 'Salva — pode ser útil num momento de susto.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Maio"},
+  {"id":36,"linha":"Medicina do Estilo de Vida","subtema":"Doenças Cardiovasculares","titulo":"Miocardiopatia: quando o músculo do coração adoece","formato":"Reels","funil":"MEIO","objetivo":"Explicar o conceito de miocardiopatia e seus tipos para pacientes com diagnóstico ou risco","gancho":"Você sabia que o próprio músculo do coração pode adoecer — independente dos vasos e das válvulas?","orientacoes":"Reels ≤60s. Dado surpresa na abertura. Tipos em linguagem leiga: 'dilatada (grande e fraco), hipertrófica (espessado), restritiva (rígido)'. Conectar com IC avançada. CTA: 'Agende avaliação se tem histórico familiar ou sintomas.'","serie":"—","mes":"Outubro"},
+  {"id":37,"linha":"Medicina do Estilo de Vida","subtema":"Doenças Cardiovasculares","titulo":"Aterosclerose: a placa que se forma em silêncio","formato":"Carrossel","funil":"TOPO","objetivo":"Visualizar o processo de aterosclerose para aumentar percepção de risco e motivar prevenção","gancho":"A placa de gordura no seu vaso não surge do dia para a noite. É um processo de anos — que começa antes dos 30.","orientacoes":"Carrossel visual com ilustração do processo. S1: gancho temporal. S2: artéria saudável. S3: formação da placa. S4: estreitamento e risco de infarto. S5: o que freia esse processo. S6: CTA.","serie":"—","mes":"Julho"},
+  {"id":38,"linha":"Medicina do Estilo de Vida","subtema":"Doenças Cardiovasculares","titulo":"Infarto: os sinais que muita gente não reconhece","formato":"Reels","funil":"TOPO","objetivo":"Ampliar capacidade do público de reconhecer sintomas atípicos de infarto e agir rápido","gancho":"Infarto não começa sempre com dor no peito. Esses outros sinais salvam vidas — e muita gente não conhece.","orientacoes":"Reels de alto impacto. Sintomas atípicos: dor no braço/mandíbula/costas, náusea, suor frio. Sintomas em mulheres são diferentes. 'Ligue 192 imediatamente'. CTA: 'Compartilha. Pode salvar uma vida.'","serie":"—","mes":"Setembro"},
+  {"id":39,"linha":"Medicina do Estilo de Vida","subtema":"Doenças Cardiovasculares","titulo":"Prevenção primária vs secundária: você sabe qual é a sua?","formato":"Post único","funil":"TOPO","objetivo":"Explicar os dois tipos de prevenção e posicionar a Paôla como especialista em ambos","gancho":"Mito ou Verdade: prevenção cardiovascular é só para quem ainda não teve problema no coração.","orientacoes":"Post único formato Mito ou Verdade. Resposta: MITO. Prevenção primária (antes da doença) e secundária (após evento). CTA: 'Sabe qual é a sua? Agende sua avaliação.'","serie":"Mito ou Verdade? 🫀","mes":"Abril"},
+  {"id":40,"linha":"Conversão","subtema":"Apresentação & Posicionamento","titulo":"Apresentação: nova fase em São Paulo","formato":"Reels","funil":"FUNDO","objetivo":"Marcar o início do perfil renovado apresentando a Paôla como especialista em IC avançada e transplante, recém estabelecida em SP, humanizando a marca sem perder autoridade médica.","gancho":"Eu sou cardiologista. Mas a especialidade que escolhi cuida de quem o coração já não consegue mais sozinho. Agora em São Paulo — e quero te apresentar o meu trabalho.","orientacoes":"Reels ≤60s. Abertura com posicionamento (não 'olá, me chamo'). Mostrar rosto, tom acolhedor e direto. Citar os 3 locais de atendimento. CTA: 'Me segue — toda semana tem conteúdo sobre saúde do coração.' Fundo neutro ou consultório.","serie":"—","mes":"Abril"},
+  {"id":41,"linha":"Conversão","subtema":"Diferenciais & Especialidade","titulo":"Meus diferenciais: IC avançada e transplante cardíaco","formato":"Carrossel","funil":"FUNDO","objetivo":"Explicar de forma acessível o que é a especialidade de IC avançada e transplante, e por que ter um especialista faz diferença — gerando desejo de consulta.","gancho":"Nem todo cardiologista trata o mesmo. Vou te explicar o que faz um especialista em insuficiência cardíaca avançada — e por que isso pode mudar tudo no seu cuidado.","orientacoes":"Carrossel 6 slides. S1: diferenciação. S2: IC avançada em 1 frase leiga. S3: o que o especialista faz diferente. S4: perfil do paciente ideal. S5: onde atendo (Einstein, São Luiz, Dante Pazzanese). S6: CTA.","serie":"—","mes":"Abril"},
+  {"id":42,"linha":"Conversão","subtema":"Apresentação & Posicionamento","titulo":"Cuidar da saúde = o melhor presente para quem você ama","formato":"Post único","funil":"FUNDO","objetivo":"Usar o gancho emocional do Dia das Mães para conectar cuidado com saúde e gerar CTA de agendamento sem parecer apelativo.","gancho":"A melhor coisa que você pode fazer pela sua família não tem embrulho. É continuar aqui.","orientacoes":"Post único com visual emocional. Legenda curta: 2-3 frases conectando saúde cardiovascular à presença para a família. CTA: 'Agende sua consulta — atendo no Einstein, São Luiz Itaim e Dante Pazzanese.' Publicar próximo ao Dia das Mães (10/mai).","serie":"—","mes":"Maio"},
+  {"id":43,"linha":"Conversão","subtema":"Onde Atendo & Agenda","titulo":"Onde te atendo em SP e como agendar sua consulta","formato":"Post único","funil":"FUNDO","objetivo":"Remover a fricção do processo de agendamento: dar todas as informações práticas de forma clara e memorável.","gancho":"Você quer agendar, mas não sabe por onde começar. Deixa eu facilitar isso pra você.","orientacoes":"Post único guia prático. Visual com os 3 locais. Legenda: nome dos hospitais + como agendar em cada um. Tom acolhedor e prático. CTA: 'Salva esse post — quando precisar, estará aqui.' Fixar no perfil após publicação.","serie":"—","mes":"Junho"},
+  {"id":44,"linha":"Conversão","subtema":"Primeira Consulta","titulo":"O que esperar da sua primeira consulta comigo","formato":"Carrossel","funil":"FUNDO","objetivo":"Reduzir a ansiedade do paciente sobre o que acontece na consulta e antecipar o valor da avaliação especializada — transformando curiosidade em decisão.","gancho":"Dra., o que você faz na consulta? Essa pergunta chega toda semana. Vou responder de um jeito diferente: te conto exatamente o que acontece quando você senta na minha frente.","orientacoes":"Carrossel 6 slides. S1: pergunta do paciente. S2: 'começo pela sua história'. S3: exame físico cardiovascular. S4: revisão dos exames (o que trazer). S5: construção do plano junto. S6: CTA 'Pronto para agendar? Link na bio.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Julho"},
+  {"id":45,"linha":"Conversão","subtema":"Diferenciais & Especialidade","titulo":"Por que consultar um especialista em IC avançada?","formato":"Reels","funil":"FUNDO","objetivo":"Gerar consciência sobre a importância do acompanhamento especializado em IC — posicionar a Paôla como a profissional certa para esse público.","gancho":"Se você tem insuficiência cardíaca e não está sendo acompanhado por um especialista, precisa ouvir isso.","orientacoes":"Reels ≤60s. Tom direto e urgente. Dado de impacto: mortalidade de IC não tratada adequadamente. Diferenciar clínico geral vs cardiologista vs especialista em IC. O que o especialista monitora. CTA: 'Agende sua avaliação — link na bio.'","serie":"—","mes":"Agosto"},
+  {"id":46,"linha":"Conversão","subtema":"Onde Atendo & Agenda","titulo":"Dia Mundial do Coração: agende sua avaliação cardiovascular","formato":"Post único","funil":"FUNDO","objetivo":"Aproveitar o Dia Mundial do Coração (29/set) para gerar CTA de agendamento com urgência legítima e emocional.","gancho":"Hoje é o Dia Mundial do Coração. E eu tenho um pedido: não deixa pra amanhã o que pode salvar a sua vida.","orientacoes":"Post único de alto impacto visual (coração, paleta vermelha). Legenda emocional: estatística + convite. CTA direto: 'Agende agora — Einstein, São Luiz Itaim, Dante Pazzanese. Link na bio.' Publicar 29/set. Considerar impulsionamento.","serie":"—","mes":"Setembro"},
+  {"id":47,"linha":"Conversão","subtema":"Q&A & Engajamento","titulo":"Q&A: respondendo suas dúvidas sobre o coração","formato":"Carrossel","funil":"FUNDO","objetivo":"Gerar engajamento com perguntas reais dos seguidores, mostrar acessibilidade e construir confiança — convertendo seguidores em pacientes.","gancho":"Toda semana chegam perguntas na minha caixa. Hoje eu respondo as mais repetidas — com a mesma atenção que daria no consultório.","orientacoes":"Carrossel 6-8 slides. Cada slide = 1 pergunta real + resposta curta em linguagem leiga. Fundo escuro, pergunta em branco, resposta em destaque. Último slide: 'Manda sua pergunta nos comentários.' CTA de agendamento discreto no final.","serie":"Pergunte à Dra. Paôla 🩺","mes":"Outubro"},
+  {"id":48,"linha":"Conversão","subtema":"Diferenciais & Especialidade","titulo":"Por que me escolher como sua cardiologista","formato":"Reels","funil":"FUNDO","objetivo":"Post de autoridade: consolidar percepção de valor antes do fechamento do ano, capturando indecisos que já seguem há meses.","gancho":"Existem muitos cardiologistas em São Paulo. Vou te contar o que me diferencia — não para me vender, mas para que você tome a melhor decisão para a sua saúde.","orientacoes":"Reels ≤60s. Tom seguro, sem arrogância. Formação em IC avançada e transplante, hospitais de referência, medicina do estilo de vida + alta tecnologia, atendimento humanizado. Não citar preços (vedado pelo CFM). CTA: 'Agende sua consulta.'","serie":"—","mes":"Novembro"},
+  {"id":49,"linha":"Conversão","subtema":"Onde Atendo & Agenda","titulo":"Agende seu checkup cardiovascular para 2027","formato":"Post único","funil":"FUNDO","objetivo":"Fechar o ano com CTA de planejamento preventivo, criando urgência positiva e gerando agenda para janeiro/2027.","gancho":"O ano acabou. Mas o coração trabalhou 365 dias sem parar. Quando foi a última vez que você cuidou dele?","orientacoes":"Post único com visual de virada de ano (minimalista). Legenda: dado de prevenção + convite ao checkup. CTA: 'Agende agora para janeiro — Einstein, São Luiz Itaim, Dante Pazzanese. Link na bio.' Considerar impulsionamento.","serie":"—","mes":"Dezembro"},
+  {"id":50,"linha":"Conversão","subtema":"Apresentação & Posicionamento","titulo":"Minha trajetória: por que escolhi IC avançada e transplante","formato":"Reels","funil":"FUNDO","objetivo":"Humanizar a marca médica contando a história de como chegou à subespecialidade mais complexa da cardiologia — gerar conexão e confiança com pacientes que precisam de referência.","gancho":"A maioria dos médicos foge da IC avançada. Eu corri em direção a ela. Deixa eu te contar por quê.","orientacoes":"Reels ≤90s. Tom pessoal e autêntico — não currículo, uma história. Contar o que levou à escolha: o primeiro contato com IC avançada, o que a especialidade representa. Encerrar com propósito. CTA: 'Me segue — estou aqui pra te mostrar que IC avançada tem tratamento.'","serie":"—","mes":"Banco"},
+  {"id":51,"linha":"Conversão","subtema":"Diferenciais & Especialidade","titulo":"IC avançada não é o fim — é o começo de um novo protocolo","formato":"Reels","funil":"FUNDO","objetivo":"Desconstruir o medo e o estigma associados ao diagnóstico de IC avançada, posicionando o tratamento especializado como esperança real.","gancho":"Meu paciente chegou achando que tinha recebido uma sentença. O que eu disse a ele mudou tudo.","orientacoes":"Reels ≤60s. Narrativa de paciente (sem identificação) na abertura. Virada emocional: IC avançada hoje com o Quarteto Fantástico + possibilidade de transplante. Tom esperançoso e realista. CTA: 'Se você ou alguém próximo tem IC avançada, me manda uma mensagem.'","serie":"—","mes":"Banco"},
+  {"id":52,"linha":"Conversão","subtema":"Primeira Consulta","titulo":"Quais exames trazer na primeira consulta comigo?","formato":"Carrossel","funil":"FUNDO","objetivo":"Reduzir a barreira de agendamento com um checklist prático — elimina a insegurança de 'não sei se estou preparado'.","gancho":"Antes de vir ao consultório, você precisa ler isso. Vai tornar nossa consulta muito mais completa.","orientacoes":"Carrossel 6 slides checklist. S1: gancho. S2: exames cardiovasculares (ECG, eco, MAPA, Holter). S3: exames de sangue (colesterol, glicemia, função renal, TSH). S4: laudos e relatórios anteriores. S5: lista de medicamentos. S6: CTA. Indicado para fixar no perfil.","serie":"—","mes":"Banco"},
+  {"id":53,"linha":"Conversão","subtema":"Primeira Consulta","titulo":"Como me preparar para a consulta cardiológica","formato":"Post único","funil":"FUNDO","objetivo":"Empoderar o paciente novo, reduzindo ansiedade pré-consulta e aumentando a qualidade do encontro clínico desde o primeiro contato.","gancho":"Uma consulta boa começa antes de você entrar no consultório. Aqui está o que fazer.","orientacoes":"Post único guia visual rápido. 4-5 dicas: anotar sintomas com frequência/intensidade, trazer lista de medicamentos, registrar PA em casa se hipertenso, não ir em jejum sem exame, anotar perguntas com antecedência. CTA: 'Salva antes da sua próxima consulta.'","serie":"—","mes":"Banco"},
+  {"id":54,"linha":"Conversão","subtema":"Onde Atendo & Agenda","titulo":"Atendo convênio? Como acessar minha consulta","formato":"Post único","funil":"FUNDO","objetivo":"Remover a barreira de acesso mais frequente: 'será que aceita meu plano?' — ser transparente sobre as opções e eliminar desistência por dúvida prática.","gancho":"A pergunta que mais recebo no DM: Dra., você atende convênio? Vou responder de uma vez por todas.","orientacoes":"Post único direto e prático. Listar planos aceitos em cada hospital (preencher com dados reais). Canal de agendamento de cada hospital. Opção de consulta particular quando aplicável. CTA: 'Me manda uma mensagem se tiver dúvida sobre seu plano.'","serie":"—","mes":"Banco"},
+  {"id":55,"linha":"Conversão","subtema":"Onde Atendo & Agenda","titulo":"Einstein, São Luiz Itaim, Dante Pazzanese: por que esses hospitais?","formato":"Carrossel","funil":"FUNDO","objetivo":"Posicionar os hospitais como referências de excelência e reforçar que a escolha não é arbitrária — aumentar confiança e senso de segurança.","gancho":"Não escolhi esses hospitais por acaso. Cada um tem um papel no meu trabalho com você.","orientacoes":"Carrossel 4 slides. S1: gancho. S2: Albert Einstein — referência em IC e transplante. S3: São Luiz Itaim — excelência cardiovascular, equipe multidisciplinar. S4: Dante Pazzanese — instituto cardiológico de referência nacional. Último slide: logos/fotos + CTA.","serie":"—","mes":"Banco"},
+  {"id":56,"linha":"Conversão","subtema":"Diferenciais & Especialidade","titulo":"Acompanhamento pós-transplante: o que acontece depois?","formato":"Reels","funil":"FUNDO","objetivo":"Mostrar o ciclo completo do cuidado pós-transplante — posicionar como expert em todo o espectro do tratamento, do diagnóstico ao pós-cirúrgico.","gancho":"O transplante foi. E agora? O que ninguém te conta sobre o que vem depois.","orientacoes":"Reels ≤60s. Lacuna de informação dos pacientes na abertura. Biópsia de rotina (o que é), ajuste de imunossupressores, restrições e liberdades progressivas, qualidade de vida real. Tom: realista, esperançoso e prático. CTA: 'Manda nos comentários se você é transplantado ou familiar.'","serie":"—","mes":"Banco"},
+  {"id":57,"linha":"Conversão","subtema":"Q&A & Engajamento","titulo":"Quando buscar um segundo parecer cardiológico?","formato":"Reels","funil":"FUNDO","objetivo":"Empoderar o paciente a buscar especialização quando necessário — posicionando a Paôla como a referência ideal para segundo parecer em IC avançada.","gancho":"Você tem o direito de buscar um segundo parecer. E às vezes ele muda tudo.","orientacoes":"Reels ≤60s. Caso (sem identificação) em que o segundo parecer foi decisivo. Quando buscar: IC sem melhora, sintomas inexplicados, cirurgia indicada, dúvida sobre diagnóstico. Tom empoderador — sem criticar outros médicos. CTA: 'Se está em dúvida, me manda uma mensagem — posso ser seu segundo parecer.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Banco"},
+  {"id":58,"linha":"Conversão","subtema":"Q&A & Engajamento","titulo":"Perguntas que você tem direito de fazer ao seu médico","formato":"Carrossel","funil":"FUNDO","objetivo":"Posicionar a Paôla como médica que respeita a autonomia do paciente e estimula participação ativa — diferencial de relacionamento que converte seguidores que se sentem seguros.","gancho":"Consulta não é monólogo. Você tem perguntas importantes a fazer — e o direito de receber respostas.","orientacoes":"Carrossel 7 slides. S1: gancho. S2-6: perguntas essenciais ('Por que esse medicamento?' / 'Quais efeitos colaterais?' / 'Quais sinais de alerta?' / 'Quando retorno?' / 'Existe outra opção?'). S7: 'Na minha consulta, você pode e deve fazer todas essas perguntas.' CTA: 'Salva e leva pra próxima consulta.'","serie":"—","mes":"Banco"},
+  {"id":59,"linha":"Conversão","subtema":"Diferenciais & Especialidade","titulo":"Clínico geral, cardiologista, especialista em IC: qual é a diferença?","formato":"Carrossel","funil":"FUNDO","objetivo":"Educar sobre os diferentes papéis no cuidado cardiovascular, criando consciência de que o paciente com IC avançada precisa de acompanhamento especializado.","gancho":"Clínico geral, cardiologista, especialista em IC avançada. São três coisas diferentes — e o seu coração merece saber a diferença.","orientacoes":"Carrossel comparativo 5 slides. S1: gancho. S2: clínico geral (rastreamento, encaminhamento). S3: cardiologista geral (maioria das condições). S4: especialista em IC (Quarteto Fantástico, dispositivos, transplante). S5: quando cada um é necessário + CTA.","serie":"—","mes":"Banco"},
+  {"id":60,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Doação de órgãos: mitos e verdades que podem custar uma vida","formato":"Carrossel","funil":"TOPO","objetivo":"Desmistificar as crenças mais comuns que impedem pessoas de se declararem doadoras — cada mito eliminado pode salvar uma vida em lista de espera.","gancho":"\"Não vou ser doador porque os médicos vão me deixar morrer de propósito.\" Essa crença existe — e ela está custando vidas.","orientacoes":"Carrossel 8 slides estilo Mito/Verdade. S1: gancho. S2–6: 1 mito por slide ('médico não se esforça para salvar doador' / 'família decide mesmo com declaração' / 'jovens não precisam se declarar' / 'religião proíbe' / 'doador não pode ter funeral aberto'). S7: dado real: Brasil tem uma das maiores listas de espera do mundo. S8: CTA 'Declare-se doador — conte para sua família agora.'","serie":"Mito ou Verdade? 🫀","mes":"Banco"},
+  {"id":61,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Fila de espera pelo transplante cardíaco: como funciona?","formato":"Carrossel","funil":"TOPO","objetivo":"Humanizar e explicar o processo da lista de espera para o público geral — gerar empatia com pacientes e familiares, e motivar a declaração de doação.","gancho":"Alguém está esperando por um coração agora mesmo. Talvez a vizinha da sua mãe. Talvez alguém que você conhece.","orientacoes":"Carrossel 7 slides. S1: gancho emocional. S2: quem entra na lista (critérios em linguagem leiga). S3: como a fila funciona (SING, compatibilidade, urgência). S4: tempo médio de espera. S5: o que acontece enquanto se espera. S6: dado impactante — quantos morrem na fila por ano no Brasil. S7: CTA 'Declare-se doador. Link na bio.'","serie":"—","mes":"Agosto"},
+  {"id":62,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Morte encefálica: o que é e por que importa para a doação","formato":"Reels","funil":"TOPO","objetivo":"Esclarecer o conceito de morte encefálica — principal barreira de compreensão para a decisão de doação — em linguagem acessível e sem sensacionalismo.","gancho":"Morte encefálica não é coma. Não é sono profundo. É morte. E entender isso pode mudar tudo na sua decisão de doar órgãos.","orientacoes":"Reels ≤60s. Abertura direta e respeitosa. Explicar em linguagem leiga: 'o cérebro para definitivamente — o coração só bate porque máquinas sustentam a circulação'. Diferença entre coma e morte encefálica. Protocolo rigoroso de diagnóstico. Tom: informativo, sem dramatização. CTA: 'Compartilha com quem ainda tem dúvida sobre esse tema.'","serie":"—","mes":"Banco"},
+  {"id":63,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Qualidade de vida pós-transplante cardíaco: dados reais","formato":"Reels","funil":"TOPO","objetivo":"Mostrar resultados concretos e humanos do transplante — dar esperança a pacientes em lista de espera e familiares, e incentivar a doação com dados positivos.","gancho":"Meu paciente foi transplantado. Dois anos depois, voltou a trabalhar, treinar e viver. Isso é o que os dados não mostram — mas eu vou te contar.","orientacoes":"Reels ≤60s. Narrativa de paciente (sem identificação). Dados reais: sobrevida em 1 ano (>85%), 5 anos. O que 'qualidade de vida' significa na prática: trabalho, exercício, família. Tom esperançoso e real. CTA: 'Compartilha com quem precisa de esperança hoje.'","serie":"—","mes":"Junho"},
+  {"id":64,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Coração artificial: a ponte entre a vida e o transplante","formato":"Reels","funil":"TOPO","objetivo":"Explicar dispositivos de assistência ventricular (LVAD) de forma acessível — ampliar o conhecimento sobre as opções disponíveis para pacientes com IC avançada enquanto aguardam transplante.","gancho":"Enquanto o coração não chega, existe uma máquina que faz o coração trabalhar por você. Deixa eu te explicar.","orientacoes":"Reels ≤60s. Abertura com a realidade da lista de espera. Explicar LVAD em linguagem leiga: 'uma bomba que ajuda o coração a circular o sangue'. Para quem é indicado. Limitações e liberdades na vida diária. Tom: realista e esperançoso. CTA: 'Salva esse post — pode ser uma informação que alguém próximo precisa.'","serie":"—","mes":"Dezembro"},
+  {"id":65,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"27 de setembro: Dia Nacional de Doação de Órgãos","formato":"Post único","funil":"TOPO","objetivo":"Marcar a data com uma publicação de alto impacto emocional que converta seguidores em potenciais doadores declarados — aproveitando o pico de atenção do mês do coração.","gancho":"Hoje é o dia de falar sobre o maior presente que existe: a vida. E ela pode vir de você.","orientacoes":"Post único com visual de alto impacto (coração, cor vermelha intensa). Texto curto e emocional: 1 dado sobre lista de espera + convite à declaração. CTA: 'Declare-se doador. Conte para sua família. Salva esse post.' Publicar em 27/set. Alto potencial de compartilhamento — considerar impulsionamento.","serie":"—","mes":"Setembro"},
+  {"id":66,"linha":"Causa & Conscientização","subtema":"Conscientização Cardiovascular","titulo":"Setembro é o Mês do Coração: os dados que você precisa conhecer","formato":"Reels","funil":"TOPO","objetivo":"Abrir setembro com impacto máximo — dados de mortalidade cardiovascular no Brasil para criar urgência e preparar a audiência para a campanha do mês.","gancho":"Todo setembro o mundo fala sobre o coração. Mas você sabe quantas pessoas vão morrer de doença cardiovascular só esse ano no Brasil?","orientacoes":"Reels ≤60s. Abertura com dado impactante (maior causa de morte no Brasil). Humanizar com comparação ('mais do que toda a população de Florianópolis'). O que pode ser prevenido vs o que não pode. Tom: urgente sem alarmismo. CTA: 'Salva esse post e compartilha — essa informação precisa circular.'","serie":"—","mes":"Setembro"},
+  {"id":67,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Você é doador de órgãos? (Pergunta de engajamento)","formato":"Post único","funil":"TOPO","objetivo":"Gerar engajamento máximo com uma pergunta simples — coletar dados da audiência e iniciar conversa sobre doação de órgãos de forma leve e não invasiva.","gancho":"Uma pergunta simples que pode salvar muitas vidas: você é doador de órgãos?","orientacoes":"Post único visual limpo com a pergunta em destaque. Propor 3 opções nos comentários: 'Sim, já me declarei' / 'Não, tenho dúvidas' / 'Nunca pensei nisso'. Responder ativamente nos comentários. Tom: acolhedor, sem julgamento, sem pressão. Bônus de setembro — publicar na semana do 27/set.","serie":"—","mes":"Setembro"},
+  {"id":68,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Já contou para sua família que você é doador?","formato":"Reels","funil":"TOPO","objetivo":"Incentivar o ato mais concreto de solidificar a decisão de doação — a conversa com a família, juridicamente determinante no Brasil.","gancho":"Você pode se declarar doador em todos os documentos do país. Mas se a sua família não souber — pode não valer de nada.","orientacoes":"Reels ≤60s. Dado legal: no Brasil, a família tem a palavra final na doação. Por isso a conversa importa. Como iniciar essa conversa sem ser pesado — scripts simples. Tom: prático e empoderador. CTA: 'Compartilha esse vídeo para a sua família ver junto com você.'","serie":"—","mes":"Banco"},
+  {"id":69,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Resultados do transplante cardíaco no Brasil: o que os dados dizem","formato":"Carrossel","funil":"MEIO","objetivo":"Apresentar dados concretos sobre os resultados do transplante no Brasil — dar substância científica para pacientes e familiares avaliarem o procedimento com base em evidências.","gancho":"Quanto tempo dura um coração transplantado? Os dados são melhores do que você imagina.","orientacoes":"Carrossel 6 slides. S1: dado surpresa positivo (sobrevida). S2: sobrevida em 1, 5 e 10 anos com números reais. S3: qualidade de vida relatada por pacientes. S4: evolução tecnológica que melhorou os resultados. S5: papel do centro especializado nos resultados. S6: CTA 'Tem dúvida sobre transplante? Me manda uma mensagem.'","serie":"—","mes":"Outubro"},
+  {"id":70,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Quem está na fila de espera pelo coração?","formato":"Carrossel","funil":"TOPO","objetivo":"Humanizar o rosto dos pacientes em lista de espera — transformar um número abstrato em pessoas reais para aumentar a empatia e motivar a declaração de doação.","gancho":"São quase mil pessoas esperando por um coração no Brasil. Elas têm nome, família, sonhos. Deixa eu te apresentar o perfil delas.","orientacoes":"Carrossel 6 slides. S1: dado impactante com humanização. S2: faixa etária (adultos e crianças). S3: diagnósticos mais comuns (IC avançada, miocardiopatia dilatada). S4: quanto tempo esperam em média. S5: o que fazem enquanto esperam (LVAD, restrições). S6: CTA 'Declare-se doador — você pode ser a resposta para uma dessas histórias.'","serie":"—","mes":"Banco"},
+  {"id":71,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Como funciona a doação de órgãos? O processo passo a passo","formato":"Reels","funil":"TOPO","objetivo":"Desmistificar o processo técnico da doação — muitas pessoas não se declaram por desconhecimento ou medo do processo, não por objeção moral.","gancho":"A maioria das pessoas que não é doadora, não é porque não quer. É porque não sabe o que acontece. Deixa eu explicar.","orientacoes":"Reels ≤60s. Sequência clara: diagnóstico de morte encefálica → comunicação à família → consentimento → captação no centro cirúrgico → distribuição pelo SING. Tom: respeitoso, informativo, sem detalhes mórbidos. CTA: 'Compartilha — essa informação pode mudar a decisão de alguém.'","serie":"—","mes":"Banco"},
+  {"id":72,"linha":"Causa & Conscientização","subtema":"Conscientização Cardiovascular","titulo":"Brasil no transplante cardíaco: onde estamos no mundo?","formato":"Post único","funil":"TOPO","objetivo":"Posicionar o Brasil no contexto global de transplante cardíaco — mostrar que o gap entre oferta e demanda é um problema solucionável com mais doadores declarados.","gancho":"O Brasil é o 2º país do mundo em número de transplantes de órgãos. E ainda assim a fila não para de crescer.","orientacoes":"Post único com infográfico comparativo. Dado: posição do Brasil globalmente. Por que a fila não fecha: proporção doadores/população vs países líderes. Solução simples: mais declarações de doação + conversa familiar. CTA: 'Salva e compartilha — informação que transforma.'","serie":"—","mes":"Banco"},
+  {"id":73,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Quando a insuficiência cardíaca chega ao ponto do transplante?","formato":"Reels","funil":"MEIO","objetivo":"Esclarecer os critérios de indicação do transplante cardíaco — orientar pacientes com IC avançada e familiares sobre quando e por que essa opção é discutida.","gancho":"\"Dra., meu pai tem insuficiência cardíaca. Vai precisar de transplante?\" Essa pergunta chega toda semana. A resposta não é simples — mas eu vou te explicar os critérios.","orientacoes":"Reels ≤60s. Voz do familiar preocupado na abertura. Critérios em linguagem leiga: IC avançada refratária ao tratamento máximo, FEVE muito baixa, hospitalizações frequentes, qualidade de vida gravemente comprometida. Alternativas antes do transplante. Tom: claro, sem alarmismo. CTA: 'Manda sua dúvida nos comentários.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Banco"},
+  {"id":74,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"A família disse não: o que acontece com a doação?","formato":"Reels","funil":"TOPO","objetivo":"Explicar o papel legal e emocional da família na doação — e porque a conversa prévia é a única proteção real da vontade do doador.","gancho":"Você se declarou doador. Mas se a sua família disser não na hora mais difícil da vida delas — os seus órgãos não vão ser doados. É assim que funciona no Brasil.","orientacoes":"Reels ≤60s. Tom respeitoso e direto. Explicar o framework legal brasileiro. Por que a família diz não: desconhecimento, dor, urgência da decisão. Como a conversa prévia muda tudo. CTA: 'Compartilha com sua família agora — antes que esse momento chegue.'","serie":"—","mes":"Banco"},
+  {"id":75,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Por que o transplantado toma remédio para sempre?","formato":"Carrossel","funil":"MEIO","objetivo":"Explicar a imunossupressão de forma acessível — eliminar o medo de pacientes e familiares sobre o uso de medicamentos a longo prazo e reforçar a importância da adesão.","gancho":"Depois do transplante, o remédio não para. Nunca. E tem um motivo muito importante para isso.","orientacoes":"Carrossel 6 slides. S1: gancho. S2: por que o corpo rejeita o coração ('exército de defesa atacando o novo órgão'). S3: o que é imunossupressor e como funciona. S4: riscos de parar: rejeição aguda vs crônica. S5: cuidados com infecções. S6: CTA 'Tem dúvida sobre o pós-transplante? Manda mensagem.'","serie":"—","mes":"Banco"},
+  {"id":76,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Doação de órgãos pós-morte: o que realmente acontece","formato":"Reels","funil":"TOPO","objetivo":"Responder a dúvida mais íntima sobre doação — o que acontece com o corpo — de forma respeitosa e clara, removendo a barreira do desconhecimento.","gancho":"\"O corpo fica desfigurado depois da doação?\" É a pergunta que ninguém tem coragem de fazer em voz alta. Mas todo mundo quer saber. Aqui está a resposta.","orientacoes":"Reels ≤60s. Abordar a dúvida com respeito e clareza. A captação é feita em centro cirúrgico com todos os protocolos. O corpo é tratado com respeito. Velório aberto é possível. Tom: acolhedor, sem tabu. CTA: 'Compartilha com quem tem essa dúvida — pode ser o que falta para uma decisão.'","serie":"—","mes":"Banco"},
+  {"id":77,"linha":"Causa & Conscientização","subtema":"Conscientização Cardiovascular","titulo":"Doença cardiovascular mata mais do que qualquer outra no Brasil","formato":"Post único","funil":"TOPO","objetivo":"Impactar o público com a dimensão real da mortalidade cardiovascular — criar urgência para prevenção e consulta especializada.","gancho":"A maior assassina do Brasil não é o câncer. Não é a violência. É a doença cardiovascular. E ela é em grande parte prevenível.","orientacoes":"Post único com infográfico impactante: número de mortes por doença cardiovascular/ano vs outras causas. Dado: % que poderia ser prevenida com rastreamento e mudança de estilo de vida. Tom: urgente, direto, mobilizador — sem catastrofismo. CTA: 'Salva e compartilha — esse número precisa mudar.'","serie":"—","mes":"Banco"},
+  {"id":78,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Como é a cirurgia de transplante cardíaco?","formato":"Reels","funil":"MEIO","objetivo":"Desmistificar a cirurgia de transplante — muitos pacientes e familiares têm medo do procedimento por desconhecimento, e a informação clara reduz ansiedade e aumenta confiança.","gancho":"A cirurgia dura entre 4 e 6 horas. O novo coração começa a bater na mesa cirúrgica. O que acontece nesse meio tempo — eu vou te explicar.","orientacoes":"Reels ≤60s. Narração visual em linguagem leiga: anestesia, circulação extracorpórea, implante do novo coração, primeiros batimentos. Sem termos técnicos desnecessários. Tom: informativo e esperançoso. CTA: 'Salva esse post — pode ser informação valiosa para alguém na sua vida.'","serie":"—","mes":"Banco"},
+  {"id":79,"linha":"Causa & Conscientização","subtema":"Conscientização Cardiovascular","titulo":"1 em cada 10 pacientes na fila recebe um coração. Por quê?","formato":"Carrossel","funil":"TOPO","objetivo":"Mostrar a disparidade entre demanda e oferta de corações para transplante — criar consciência sobre a escassez real e a urgência da declaração de doação.","gancho":"No Brasil, só 1 em cada 10 pacientes que precisam de um coração novo chega a receber. Você sabia disso?","orientacoes":"Carrossel 5 slides. S1: dado de impacto. S2: número de transplantes realizados/ano vs pacientes em fila. S3: por que a diferença é tão grande (baixa taxa de doação vs potencial). S4: o que mudaria com mais doadores declarados. S5: CTA 'Declare-se doador agora e conta para sua família.'","serie":"—","mes":"Banco"},
+  {"id":80,"linha":"Humanização","subtema":"Congressos & Eventos","titulo":"SOCESP 2026: o que aprendi e o que levo para os meus pacientes","formato":"Reels","funil":"TOPO","objetivo":"Humanizar a médica mostrando atualização científica contínua — reforçar posicionamento de especialista atualizada sem parecer institucional.","gancho":"Fui ao SOCESP e voltei com novidades que vão mudar o jeito que cuido dos meus pacientes. Deixa eu te contar.","orientacoes":"Reels ≤60s. Bastidores do congresso (auditório, crachá, material). Destacar 1–2 novidades relevantes para pacientes com IC em linguagem leiga. Tom: entusiasmado, de especialista que gosta do que faz. CTA: 'Comenta o que você quer saber sobre novidades em cardiologia.'","serie":"—","mes":"Banco"},
+  {"id":81,"linha":"Humanização","subtema":"Congressos & Eventos","titulo":"Congresso Brasileiro de Cardiologia: bastidores e novidades","formato":"Post único","funil":"TOPO","objetivo":"Reforçar autoridade científica e mostrar comprometimento com atualização — conectar o conteúdo do congresso com o benefício direto para o paciente.","gancho":"Estou no maior congresso de cardiologia do Brasil. E já tenho novidades para trazer pra você.","orientacoes":"Post único com foto no congresso (crachá, auditório ou bastidores). Legenda: breve resumo de 1–2 aprendizados e como impactam os pacientes. Tom: presença real, não corporativo. CTA: 'Me manda sua dúvida — posso perguntar pra um especialista aqui.'","serie":"—","mes":"Banco"},
+  {"id":82,"linha":"Humanização","subtema":"Congressos & Eventos","titulo":"Congresso de Medicina do Estilo de Vida: o que há de novo na ciência do comportamento","formato":"Carrossel","funil":"TOPO","objetivo":"Conectar a Paôla ao movimento de medicina do estilo de vida — posicionar como cardiologista que integra evidências de comportamento saudável ao cuidado cardiovascular.","gancho":"Fui ao congresso de Medicina do Estilo de Vida. E saí de lá confirmando que o que prescrevemos vai muito além dos remédios.","orientacoes":"Carrossel 5 slides. S1: gancho. S2: 1 estudo apresentado sobre exercício e coração. S3: 1 estudo sobre sono e mortalidade. S4: perspectiva clínica — o que isso muda na consulta. S5: CTA 'Compartilha com quem precisa ouvir que estilo de vida é medicina.'","serie":"—","mes":"Banco"},
+  {"id":83,"linha":"Humanização","subtema":"Atividade Física & Corrida","titulo":"Fui correr no fim de semana — e o coração agradeceu","formato":"Reels","funil":"TOPO","objetivo":"Usar a prática pessoal de corrida para reforçar a mensagem de que exercício é medicina — humanizar a médica e engajar o público ativo.","gancho":"Antes de ser cardiologista, sou humana. E esse final de semana eu lembrei por que exercício é o melhor remédio que eu conheço.","orientacoes":"Reels ≤60s. Imagem ou vídeo da corrida com gancho cardiovascular real: frequência cardíaca, respiração, sensação. Conectar experiência pessoal ao que ela prescreve para pacientes. Tom: autêntico, não performático. CTA: 'Me conta: você se moveu essa semana?'","serie":"—","mes":"Banco"},
+  {"id":84,"linha":"Humanização","subtema":"Atividade Física & Corrida","titulo":"Minha semana de treino — e o que cada sessão faz pelo coração","formato":"Carrossel","funil":"TOPO","objetivo":"Compartilhar rotina de exercícios pessoal conectada a dados cardiovasculares — engajar público ativo e reforçar que a médica pratica o que prescreve.","gancho":"Você me pergunta o que eu faço para cuidar do meu próprio coração. Aqui está a minha semana de treino — com dados reais.","orientacoes":"Carrossel 5 slides. S1: gancho. S2–4: 3 treinos da semana com dado cardiovascular de cada (ex: 'corrida 5km — zona 2 → melhora VO2max'). S5: reflexão 'prescrevo para meus pacientes o que eu mesma pratico'. CTA: 'Salva e tenta montar a sua semana.'","serie":"—","mes":"Banco"},
+  {"id":85,"linha":"Humanização","subtema":"Vida Pessoal & Marcos","titulo":"Mais um ano: o que esse ciclo me ensinou como médica e como pessoa","formato":"Reels","funil":"TOPO","objetivo":"Humanizar a marca em data especial — conectar reflexão pessoal ao propósito profissional de forma autêntica, sem deixar de reforçar posicionamento médico.","gancho":"Hoje é meu aniversário. E no dia em que a gente para para olhar para trás, fica mais fácil entender por que escolhemos os caminhos que escolhemos.","orientacoes":"Reels ≤60s. Tom pessoal e reflexivo. 1–2 aprendizados do ano conectados ao trabalho com IC e transplante. Não precisa de produção elaborada — autenticidade importa mais. CTA: 'Manda uma mensagem se você quiser. Estou aqui por causa de vocês.'","serie":"—","mes":"Banco"},
+  {"id":86,"linha":"Humanização","subtema":"Bastidores","titulo":"Uma manhã no ambulatório de pós-transplante: o que acontece lá dentro","formato":"Reels","funil":"TOPO","objetivo":"Mostrar o cotidiano do acompanhamento pós-transplante de forma humana — posicionar a Paôla como especialista presente no pós-operatório, não só na indicação.","gancho":"Hoje atendi 8 pacientes transplantados. Todos com histórias diferentes. Todos com o mesmo coração renovado. Deixa eu te contar como é essa manhã.","orientacoes":"Reels ≤60s. Bastidores respeitosos sem identificar pacientes: consultório, avaliação, dinâmica. O que se discute: ajuste de imunossupressor, qualidade de vida, restrições progressivas. Tom: íntimo, presente, humano. CTA: 'Salva e compartilha com quem passou por transplante.'","serie":"—","mes":"Banco"},
+  {"id":87,"linha":"Humanização","subtema":"Bastidores","titulo":"Bastidores do Hospital Albert Einstein: como é um dia de trabalho","formato":"Post único","funil":"TOPO","objetivo":"Humanizar o ambiente de trabalho e reforçar a associação com uma instituição de excelência — aumentar confiança sem parecer institucional.","gancho":"Cheguei no Einstein às 7h. Saí às 14h. Entre esses dois horários, aconteceu muita coisa.","orientacoes":"Post único com foto do ambiente (corredor ou consultório — sem pacientes). Legenda: narrativa de um dia real, sem romantizar. O que é difícil, o que é gratificante. Tom: honesto e humano. CTA: 'Conta nos comentários: qual foi seu maior desafio essa semana?'","serie":"—","mes":"Banco"},
+  {"id":88,"linha":"Humanização","subtema":"Atividade Física & Corrida","titulo":"Por que uma cardiologista corre? (Não é o que você pensa)","formato":"Reels","funil":"TOPO","objetivo":"Conectar prática pessoal de corrida com saúde mental e cardiovascular — usar gancho de curiosidade para reforçar mensagem de exercício e humanizar a médica.","gancho":"Não corro porque sou cardiologista. Sou cardiologista porque entendo o que o movimento faz com a gente — e não consigo não fazer.","orientacoes":"Reels ≤60s. Tom introspectivo e genuíno. Conectar motivação pessoal (energia, saúde mental, longevidade) com o que ela prescreve para os pacientes. Sem performance — autenticidade. CTA: 'Compartilha com alguém que ainda está procurando uma razão para começar a se mover.'","serie":"—","mes":"Banco"},
+  {"id":89,"linha":"Humanização","subtema":"Vida Pessoal & Marcos","titulo":"Quando foi a última vez que você cuidou de você?","formato":"Carrossel","funil":"TOPO","objetivo":"Abordar o autocuidado como espelho para o paciente — criar identificação e reforçar que cuidar da saúde é uma prática contínua, não um evento.","gancho":"Eu cuido do coração dos outros todos os dias. E às vezes preciso parar e lembrar de cuidar do meu também. Você se identifica?","orientacoes":"Carrossel 4 slides. S1: gancho pessoal. S2: 3 práticas que ela mantém (sono, exercício, pausas). S3: reflexão 'se eu não me cuido, não consigo cuidar bem'. S4: CTA 'Compartilha com alguém que também precisa ouvir isso.'","serie":"—","mes":"Banco"},
+  {"id":90,"linha":"Humanização","subtema":"Vida Pessoal & Marcos","titulo":"O que os meus pacientes me ensinaram esse ano","formato":"Reels","funil":"TOPO","objetivo":"Criar conexão emocional e autenticidade — usar narrativa reversa (paciente ensinando o médico) para humanizar a relação e reforçar o propósito da especialidade.","gancho":"Eles vêm para que eu os ensine. Mas os meus pacientes de IC avançada me ensinam mais do que qualquer livro.","orientacoes":"Reels ≤60s. Tom reflexivo e emocionado, sem identificar pacientes. 2–3 aprendizados concretos: sobre resiliência, sobre prioridades, sobre o valor da presença. Encerrar com propósito: 'é por isso que escolhi essa especialidade'. CTA: 'Compartilha com alguém que te inspira todo dia.'","serie":"—","mes":"Banco"},
+  {"id":91,"linha":"Humanização","subtema":"Congressos & Eventos","titulo":"Apresentei no congresso: o que sinto antes de subir no palco","formato":"Post único","funil":"TOPO","objetivo":"Humanizar o backstage da vida acadêmica — mostrar que por trás da especialista existe uma pessoa que também sente nervosismo e prepara cada detalhe com cuidado.","gancho":"Antes de subir no palco para falar de IC avançada para 500 cardiologistas, meu coração também acelera.","orientacoes":"Post único com foto nos bastidores (antes da apresentação — crachá, telão, anotações). Legenda: 1 parágrafo humano sobre como é se preparar para uma aula num congresso. Tom: autêntico e confiante. CTA: 'O que você faz quando precisa se preparar para algo grande?'","serie":"—","mes":"Banco"},
+  {"id":92,"linha":"Humanização","subtema":"Atividade Física & Corrida","titulo":"Minha rotina de exercícios — e o que cada hábito protege","formato":"Reels","funil":"TOPO","objetivo":"Mostrar consistência e conexão entre prática pessoal e conhecimento médico — reforçar que exercício é prescrição ao vivo, não teoria.","gancho":"Não prescreveria exercício para meus pacientes se não acreditasse nele primeiro. Aqui está o que eu faço — e por quê.","orientacoes":"Reels ≤60s. Mostrar elementos reais da rotina (caminhada, corrida, academia). Para cada hábito: 1 benefício cardiovascular em linguagem leiga. Tom: natural e prático, sem julgamento. CTA: 'Salva e me conta: qual hábito você já tem?'","serie":"—","mes":"Banco"},
+  {"id":93,"linha":"Humanização","subtema":"Congressos & Eventos","titulo":"Voltei do congresso com 3 novidades que todo paciente com IC deveria saber","formato":"Carrossel","funil":"MEIO","objetivo":"Traduzir novidades científicas do congresso em informação útil para pacientes — reforçar autoridade e comprometimento com atualização clínica.","gancho":"Estive no congresso. Voltei com 3 novidades que qualquer paciente com IC deveria saber.","orientacoes":"Carrossel 5 slides. S1: gancho. S2–4: 1 novidade por slide (medicamento, dispositivo ou diretriz) explicada em linguagem leiga com impacto para o paciente. S5: 'Medicina avança. E eu avanço com ela para te oferecer o melhor.' CTA: 'Salva e compartilha com quem tem IC.'","serie":"—","mes":"Banco"},
+  {"id":94,"linha":"Humanização","subtema":"Vida Pessoal & Marcos","titulo":"2026: o que construímos juntos","formato":"Reels","funil":"TOPO","objetivo":"Fechar o ano com gratidão e propósito — criar conexão com a audiência e preparar o terreno para o início de 2027.","gancho":"Um ano se foi. Muitas consultas, muitas histórias, muitos aprendizados. E a certeza de que isso que estamos construindo aqui importa.","orientacoes":"Reels ≤60s. Compilação de momentos do ano (congresso, corridas, bastidores). Tom reflexivo e grato. Mencionar crescimento da comunidade. CTA: 'Obrigada por estar aqui. Nos vemos em 2027 — com ainda mais conteúdo sobre saúde do coração.'","serie":"—","mes":"Dezembro"},
+  {"id":95,"linha":"Humanização","subtema":"Atividade Física & Corrida","titulo":"No quilômetro 8, aprendi algo sobre o coração que nenhum livro me ensinou","formato":"Post único","funil":"TOPO","objetivo":"Usar a experiência de corrida para criar narrativa emocional conectada ao cuidado cardiovascular — engajar público ativo e reforçar a humanidade da médica.","gancho":"No quilômetro 8, meu corpo quis parar. Minha cabeça mandou continuar. Meu coração decidiu pelos dois.","orientacoes":"Post único com foto da corrida. Legenda: narrativa curta da experiência física com gancho metafórico conectando ao cuidado cardiovascular. Tom: poético e autêntico — sem exibicionismo. CTA: 'Você já teve um momento assim? Conta nos comentários.'","serie":"—","mes":"Banco"},
+  {"id":96,"linha":"Humanização","subtema":"Vida Pessoal & Marcos","titulo":"Comecei a meditar — e meu coração agradeceu","formato":"Reels","funil":"TOPO","objetivo":"Conectar prática de meditação/mindfulness com saúde cardiovascular — ampliar o conceito de medicina do estilo de vida além de exercício e dieta.","gancho":"Não sou a pessoa mais calma do mundo. Mas aprendi que 10 minutos por dia de silêncio fazem mais pelo coração do que muito remédio.","orientacoes":"Reels ≤60s. Tom pessoal e vulnerável. Dado: meditação regular reduz PA e marcadores inflamatórios. Prática dela: como começou, qual método. Tom: acessível, sem esoterismo. CTA: 'Você já tentou? Conta nos comentários.'","serie":"—","mes":"Banco"},
+  {"id":97,"linha":"Humanização","subtema":"Bastidores","titulo":"Nos bastidores de um plantão de IC avançada","formato":"Reels","funil":"TOPO","objetivo":"Mostrar a intensidade e o significado do trabalho com IC avançada — humanizar a médica e criar conexão emocional mostrando o propósito por trás da especialidade.","gancho":"Às 3 da manhã, meu paciente estava instável. Às 6h, estávamos sorrindo juntos. Isso é IC avançada.","orientacoes":"Reels ≤60s. Narrativa de um momento marcante do plantão (sem identificar paciente). O que passa pela cabeça, o que é difícil, o que faz valer. Tom: honesto, emocionado sem ser sentimental. CTA: 'Compartilha com quem você admira pelo trabalho que faz.'","serie":"—","mes":"Banco"},
+  {"id":98,"linha":"Humanização","subtema":"Atividade Física & Corrida","titulo":"Sou cardiologista e pratico esportes — os dois papéis se completam","formato":"Carrossel","funil":"TOPO","objetivo":"Integrar identidade profissional e pessoal para criar uma marca autêntica — mostrar que a médica vive o que prescreve.","gancho":"Quando eu corro, não paro de ser cardiologista. E quando atendo, não paro de ser atleta. Os dois me fazem melhor.","orientacoes":"Carrossel 4 slides. S1: gancho. S2: como o esporte me torna mais empática com pacientes que tentam se exercitar. S3: o que o esporte me ensina sobre fisiologia cardiovascular na prática. S4: CTA 'Compartilha com alguém que integra saúde na rotina.'","serie":"—","mes":"Banco"},
+  {"id":99,"linha":"Humanização","subtema":"Bastidores","titulo":"Como preparo o conteúdo que publico aqui","formato":"Reels","funil":"TOPO","objetivo":"Mostrar o cuidado e a seriedade por trás da produção de conteúdo médico — criar confiança e diferenciar do conteúdo raso que circula nas redes sociais.","gancho":"Antes de publicar qualquer coisa aqui, eu reviso referências, escolho as palavras e pergunto: isso vai ajudar meu paciente? Se a resposta for não, não vai.","orientacoes":"Reels ≤60s. Bastidores reais: anotações, roteiro, materiais de referência. Explicar o critério: evidência científica + linguagem acessível + sem sensacionalismo. Tom: transparente e comprometido. CTA: 'Me conta: o que você quer que eu fale aqui que eu ainda não falei?'","serie":"—","mes":"Banco"},
+  {"id":100,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Você pratica exercício com regularidade?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Identificar o comportamento do público e abrir conversa sobre atividade física cardiovascular","gancho":"Vou te perguntar direto: você se exercita toda semana?","orientacoes":"Enquete com 2 opções: 'Sim, toda semana 💪' / 'Nem tanto... 😅'. Story de resposta: dado de impacto sobre sedentarismo ('ficar sentado 8h/dia aumenta risco cardiovascular como fumar') + CTA para agendar avaliação.","serie":"—","mes":"Abril"},
+  {"id":101,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Quiz: seu coração está em boa forma?","formato":"Story · Quiz","funil":"MEIO","objetivo":"Engajar o público com autoteste de aptidão cardiovascular e criar desejo de avaliação especializada","gancho":"Você sabe se o seu coração está em forma? Um teste rápido.","orientacoes":"Quiz 3 perguntas: 'Você sobe escadas sem falta de ar?' / 'Sabe medir sua frequência cardíaca?' / 'Treina quantos minutos por semana?' Resultado final: perfil de aptidão em linguagem leiga + CTA: 'Agende sua avaliação cardiovascular.'","serie":"—","mes":"Junho"},
+  {"id":102,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Você sabe quanto sal consome por dia?","formato":"Story · Slider","funil":"TOPO","objetivo":"Criar consciência sobre consumo excessivo de sódio de forma lúdica antes do post sobre dieta DASH","gancho":"Desliza o emoji para mostrar o quanto de sal você acha que coloca na comida 🧂","orientacoes":"Slider de 'Pouquinho' a 'Muito'. Story de resposta: 'A maioria das pessoas consume 2× o limite recomendado pela OMS sem perceber.' Link para o post do feed sobre dieta DASH.","serie":"—","mes":"Agosto"},
+  {"id":103,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Você sabe sua pressão arterial de hoje?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Identificar quantos seguidores monitoram a PA e criar urgência para quem não monitora","gancho":"Última vez que você mediu sua pressão: quando foi?","orientacoes":"Enquete: 'Essa semana ✅' / 'Faz tempo... 😬'. Para quem votou 'Faz tempo': sequência com alerta sobre hipertensão silenciosa ('1 em 3 brasileiros não sabe que tem') + CTA para checkup.","serie":"—","mes":"Janeiro"},
+  {"id":104,"linha":"Medicina do Estilo de Vida","subtema":"Sono & Estresse","titulo":"Quantas horas você dorme por noite?","formato":"Story · Slider","funil":"TOPO","objetivo":"Revelar que a maioria do público dorme menos do que o coração precisa e criar gancho para post sobre sono","gancho":"Desliza para marcar quantas horas você costuma dormir 💤","orientacoes":"Slider de 4h a 10h. Story de resposta: 'Se você marcou menos de 7h, seu coração está trabalhando em déficit — vou te explicar por quê.' Link para post do feed sobre sono e coração.","serie":"—","mes":"Agosto"},
+  {"id":105,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"Você fez checkup cardiológico em 2025?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Identificar lacuna de rastreamento e gerar CTA de agendamento com urgência","gancho":"Pergunta rápida e importante:","orientacoes":"Enquete: 'Sim, tudo em dia ✅' / 'Não, ainda não ❌'. Para quem votou Não: sequência com por que o checkup é urgente ('a maioria das doenças cardíacas não dói até ser tarde') + CTA: 'Agende — Einstein, São Luiz Itaim, Dante Pazzanese.'","serie":"—","mes":"Abril"},
+  {"id":106,"linha":"Medicina do Estilo de Vida","subtema":"Doenças Cardiovasculares","titulo":"Quiz: você reconhece os sinais de infarto?","formato":"Story · Quiz","funil":"TOPO","objetivo":"Testar o conhecimento sobre sintomas atípicos e ampliar consciência de alerta cardiovascular","gancho":"Você saberia reconhecer um infarto — mesmo sem dor no peito?","orientacoes":"Quiz 4 perguntas sobre sintomas atípicos (dor no braço, náusea, suor frio, falta de ar isolada). Resultado: 'Infarto não é sempre dor no peito — 40% dos casos têm sintomas atípicos.' CTA: compartilhar com a família.","serie":"—","mes":"Setembro"},
+  {"id":107,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Você tem algum desses fatores de risco?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Mapear o perfil de risco dos seguidores e criar urgência de acompanhamento","gancho":"Marque se você tem:","orientacoes":"Enquete: 'Pressão alta / Diabetes / Colesterol alto' vs 'Nenhum (por enquanto)'. Story de resposta: risco cumulativo em linguagem leiga ('com 2 fatores, seu risco já é 4×') + CTA para avaliação cardiovascular.","serie":"—","mes":"Janeiro"},
+  {"id":108,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Mito ou Verdade: vinho tinto faz bem ao coração?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Engajar com desinformação comum e corrigir o mito de forma leve e direta","gancho":"Você já ouviu isso? Mito ou Verdade:","orientacoes":"Enquete: '🍷 Verdade!' / '🚫 Mito!'. Story de resposta: Mito — explicar revisão das diretrizes recentes ('a ciência mudou de ideia') sem julgamento. CTA: ver Reels completo sobre álcool e coração no feed.","serie":"Mito ou Verdade? 🫀","mes":"Dezembro"},
+  {"id":109,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Qual é o seu maior obstáculo para se exercitar?","formato":"Story · Caixinha","funil":"TOPO","objetivo":"Coletar objeções reais do público e usar as respostas para criar conteúdo futuro personalizado","gancho":"Me conta: o que te impede de se exercitar mais?","orientacoes":"Caixinha de texto aberta. Responder as mais comuns em stories seguintes com soluções práticas ('falta de tempo → 3 × 10 min funciona', 'medo de machucar → preciso de avaliação antes'). Tom: curiosidade genuína, zero julgamento.","serie":"Pergunte à Dra. Paôla 🩺","mes":"Maio"},
+  {"id":110,"linha":"Medicina do Estilo de Vida","subtema":"Sono & Estresse","titulo":"Você acorda descansado todos os dias?","formato":"Story · Enquete","funil":"MEIO","objetivo":"Criar abertura para falar sobre apneia do sono e qualidade do sono cardiovascular","gancho":"Resposta honesta:","orientacoes":"Enquete: 'Sim, acordo renovado 😴✅' / 'Não, acordo cansado 😵'. Para quem acorda cansado: sequência sobre apneia obstrutiva e risco cardíaco ('ronco + cansaço = coração sob pressão à noite'). CTA para avaliação.","serie":"—","mes":"Agosto"},
+  {"id":111,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"Você sabe para que serve o ECG?","formato":"Story · Quiz","funil":"MEIO","objetivo":"Educar sobre exame básico de cardiologia e gerar valor antes do post sobre ECG no feed","gancho":"Quiz: o eletrocardiograma serve para...","orientacoes":"Quiz 4 opções: a) Medir colesterol / b) Ver estrutura do coração / c) Registrar atividade elétrica / d) Medir pressão arterial. Resposta: c, com explicação simples ('como uma impressão do ritmo elétrico do coração'). CTA: ver carrossel sobre ECG.","serie":"—","mes":"Agosto"},
+  {"id":112,"linha":"Medicina do Estilo de Vida","subtema":"Doenças Cardiovasculares","titulo":"Você já sentiu o coração bater diferente?","formato":"Story · Caixinha","funil":"MEIO","objetivo":"Coletar relatos reais e criar abertura para educar sobre arritmias e quando se preocupar","gancho":"Uma pergunta que me fazem muito: 'Dra., sinto o coração pular um batimento — é perigoso?'","orientacoes":"Caixinha: 'Você já sentiu isso? Me conta como foi.' Story de resposta: explicação sobre extrassístoles benignas vs sinais de alerta ('palpitação isolada ≠ taquicardia sustentada'). CTA para avaliação se sintoma for frequente.","serie":"Pergunte à Dra. Paôla 🩺","mes":"Maio"},
+  {"id":113,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Qual desses você acha mais saudável para o coração?","formato":"Story · Quiz","funil":"TOPO","objetivo":"Testar percepções alimentares e corrigir crenças incorretas de forma interativa","gancho":"Dois alimentos. Qual é melhor para o coração?","orientacoes":"Quiz comparativo em 3 rodadas: manteiga vs azeite / ovo vs biscoito diet / suco de laranja vs laranja in natura. Explicação cardiológica curta em cada resposta. CTA: salvar e aplicar na próxima compra.","serie":"—","mes":"Agosto"},
+  {"id":114,"linha":"Medicina do Estilo de Vida","subtema":"Fatores de Risco","titulo":"Qual fator de risco você ainda não controla?","formato":"Story · Caixinha","funil":"MEIO","objetivo":"Abrir espaço de vulnerabilidade para gerar conexão e embasar conteúdo personalizado futuro","gancho":"Posso te perguntar algo? Sabe aquele fator de risco que você já sabe que existe mas ainda não resolveu?","orientacoes":"Caixinha aberta. Responder as mais frequentes em próximos stories com caminho prático de solução. Tom: sem julgamento — 'a maioria de nós tem um'. CTA: 'Esse é o primeiro passo — reconhecer.'","serie":"—","mes":"Novembro"},
+  {"id":115,"linha":"Medicina do Estilo de Vida","subtema":"Exercício Físico","titulo":"Você conseguiria caminhar 30 minutos hoje?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Remover barreira do público sedentário e motivar ação imediata com mínimo de fricção","gancho":"Você sabia que caminhar 30 minutos por dia já protege o coração?","orientacoes":"Enquete: 'Sim, vou fazer hoje! 👟' / 'Difícil, não tenho tempo ⏱️'. Para quem votou 'Difícil': dicas rápidas de como encaixar caminhada na rotina ('3 × 10 min tem o mesmo efeito'). CTA: começar com 15 minutos amanhã.","serie":"—","mes":"Janeiro"},
+  {"id":116,"linha":"Medicina do Estilo de Vida","subtema":"Doenças Cardiovasculares","titulo":"Sequência: 5 sinais que o coração manda antes de um infarto","formato":"Story · Sequência","funil":"TOPO","objetivo":"Educar sobre sintomas precursores e motivar busca por avaliação cardiológica","gancho":"Você conhece os avisos que o coração dá antes de um infarto?","orientacoes":"5 stories sequenciais, 1 sinal por story: 1) Dor no peito ao esforço — 'que passa em repouso' 2) Falta de ar desproporcional 3) Cansaço incomum 4) Palpitações frequentes 5) Dor em braço, mandíbula ou costas. Último story: 'Se você tem algum — não espera. CTA: agendar urgente.'","serie":"—","mes":"Setembro"},
+  {"id":117,"linha":"Medicina do Estilo de Vida","subtema":"Sono & Estresse","titulo":"Quanto estresse você sente no dia a dia?","formato":"Story · Slider","funil":"TOPO","objetivo":"Dimensionar o nível de estresse do público e conectar ao risco cardiovascular com gancho emocional","gancho":"Desliza para mostrar seu nível de estresse hoje 😤","orientacoes":"Slider de '😌 Tranquilo' a '🤯 Explodindo'. Story de resposta: 'Se você deslizou pro lado direito — seu coração sente isso. Cortisol elevado inflama as artérias.' CTA: ver post sobre Takotsubo e estresse no feed.","serie":"—","mes":"Fevereiro"},
+  {"id":118,"linha":"Medicina do Estilo de Vida","subtema":"Exames & Diagnóstico","titulo":"Você sabia que existe pressão do jaleco branco?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Educar sobre hipertensão do jaleco branco e valorizar o MAPA como exame de rastreamento","gancho":"Sua pressão sobe só de entrar no consultório? Tem nome para isso:","orientacoes":"Enquete: 'Sim, acontece comigo! 😅' / 'Não sabia disso 😮'. Próximo story: explicar 'hipertensão do jaleco branco' e quando pedir MAPA ('a pressão real do dia a dia pode ser diferente'). CTA: perguntar ao cardiologista.","serie":"—","mes":"Abril"},
+  {"id":119,"linha":"Medicina do Estilo de Vida","subtema":"Nutrição & Dieta","titulo":"Um hábito alimentar que você quer mudar — me conta","formato":"Story · Caixinha","funil":"TOPO","objetivo":"Coletar dados reais de comportamento alimentar para embasar próximos conteúdos sobre nutrição cardiovascular","gancho":"Sem julgamento: qual hábito alimentar você sabe que precisa mudar mas ainda não conseguiu?","orientacoes":"Caixinha aberta. Responder com encorajamento + dica prática baseada nas respostas mais frequentes (sal, açúcar, ultraprocessados). Tom: aliança, não cobrança. CTA: 'Uma troca por semana já conta.'","serie":"—","mes":"Outubro"},
+  {"id":120,"linha":"Conversão","subtema":"Apresentação & Posicionamento","titulo":"Me deixa me apresentar — nova fase em SP","formato":"Story · Sequência","funil":"FUNDO","objetivo":"Apresentar a Paôla de forma humanizada e direta para novos seguidores no lançamento do perfil","gancho":"Nova por aqui? Deixa eu me apresentar em 30 segundos.","orientacoes":"4 stories: 1) Nome + especialidade IC avançada e transplante 2) Onde atendo (Einstein, São Luiz Itaim, Dante Pazzanese) 3) Por que escolhi essa especialidade em 1 frase 4) CTA: 'Me segue — todo conteúdo que eu publico é sobre proteger o seu coração.'","serie":"—","mes":"Abril"},
+  {"id":121,"linha":"Conversão","subtema":"Onde Atendo & Agenda","titulo":"Como agendar sua consulta comigo — passo a passo","formato":"Story · Sequência","funil":"FUNDO","objetivo":"Eliminar a fricção do agendamento com informações práticas claras e acessíveis","gancho":"Pergunta que recebo muito: como agendar consulta com você?","orientacoes":"3 stories: 1) Onde atendo + canal de agendamento em cada hospital 2) O que levar na primeira consulta (exames, lista de medicamentos) 3) CTA: 'Dúvida? Me manda mensagem — te ajudo.'","serie":"—","mes":"Junho"},
+  {"id":122,"linha":"Conversão","subtema":"Diferenciais & Especialidade","titulo":"Cardiologista e especialista em IC são a mesma coisa?","formato":"Story · Enquete","funil":"FUNDO","objetivo":"Criar consciência sobre subespecialização e gerar desejo de consulta com a especialista certa","gancho":"Cardiologista geral e especialista em IC avançada são a mesma coisa?","orientacoes":"Enquete: 'Sim, é tudo igual 🤷' / 'Não, são diferentes 🎯'. Próximo story: 'São muito diferentes — e se você tem IC, essa diferença muda tudo.' Explicação em 3 linhas + CTA: 'Agende com quem é especialista.'","serie":"—","mes":"Agosto"},
+  {"id":123,"linha":"Conversão","subtema":"Primeira Consulta","titulo":"O que você quer saber antes da sua 1ª consulta?","formato":"Story · Caixinha","funil":"FUNDO","objetivo":"Coletar dúvidas reais sobre o processo de consulta e reduzir barreiras de agendamento","gancho":"Vou responder: o que você quer saber sobre a primeira consulta comigo?","orientacoes":"Caixinha aberta. Responder dúvidas em stories seguintes (duração, o que trazer, se pode trazer familiar). Tom: acolhedor. CTA no final: 'Pronto para agendar? Link na bio.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Julho"},
+  {"id":124,"linha":"Conversão","subtema":"Q&A & Engajamento","titulo":"Manda sua dúvida sobre o coração","formato":"Story · Caixinha","funil":"FUNDO","objetivo":"Gerar engajamento direto e coletar perguntas para o carrossel de Q&A do feed","gancho":"Caixa de perguntas aberta: o que você sempre quis perguntar pra uma cardiologista?","orientacoes":"Caixinha aberta. Responder as melhores no feed (Carrossel Q&A) e em próximos stories. Tom: 'nenhuma pergunta é boba'. CTA: 'Manda — pode virar o próximo post do feed.'","serie":"Pergunte à Dra. Paôla 🩺","mes":"Outubro"},
+  {"id":125,"linha":"Conversão","subtema":"Q&A & Engajamento","titulo":"Quiz: você me conhece bem?","formato":"Story · Quiz","funil":"FUNDO","objetivo":"Engajar seguidores antigos e novos com conteúdo leve sobre trajetória e especialidade","gancho":"Quiz rápido sobre mim — você me conhece?","orientacoes":"4 perguntas: especialidade principal / onde atendo / foco de tratamento (IC avançada e Tx) / série de conteúdo do perfil. Resultado: 'Você me conhece bem! / Tem muito mais pra descobrir — me segue 💙'. CTA: seguir.","serie":"—","mes":"Outubro"},
+  {"id":126,"linha":"Conversão","subtema":"Diferenciais & Especialidade","titulo":"IC avançada sem especialista? Você precisa ouvir isso","formato":"Story · Enquete","funil":"FUNDO","objetivo":"Qualificar pacientes com IC e gerar urgência de consulta especializada","gancho":"Para quem tem insuficiência cardíaca: você está sendo acompanhado por um especialista em IC?","orientacoes":"Enquete: 'Sim, tenho especialista ✅' / 'Não, só clínico ou cardiologista geral 😕'. Para quem votou Não: explicação urgente em 2 stories ('IC avançada exige protocolo específico — o Quarteto Fantástico salva vidas') + CTA direto de agendamento.","serie":"—","mes":"Agosto"},
+  {"id":127,"linha":"Conversão","subtema":"Onde Atendo & Agenda","titulo":"Dia Mundial do Coração: você já cuidou do seu?","formato":"Story · Enquete","funil":"FUNDO","objetivo":"Usar o Dia Mundial do Coração (29/set) para gerar CTA de agendamento com urgência emocional","gancho":"Hoje é o Dia Mundial do Coração. Eu preciso te perguntar:","orientacoes":"Enquete: 'Sim, estou cuidando do meu ❤️' / 'Ainda não agendei 😬'. Para quem não agendou: sequência 2 stories — motivo para não adiar + link de agendamento direto (Einstein, São Luiz Itaim, Dante Pazzanese). Publicar 29/set.","serie":"—","mes":"Setembro"},
+  {"id":128,"linha":"Conversão","subtema":"Q&A & Engajamento","titulo":"Qual sintoma do coração mais te preocupa?","formato":"Story · Caixinha","funil":"FUNDO","objetivo":"Qualificar leads com sintomas que demandam avaliação especializada e abrir canal de DM","gancho":"Você pode me contar? Qual sintoma relacionado ao coração mais te preocupa hoje?","orientacoes":"Caixinha aberta. Responder nos DMs com orientação individualizada + CTA para consulta. Tom: acolhedor, não alarmista. 'Nenhum sintoma deve ser ignorado — me conta que eu te oriento.'","serie":"—","mes":"Outubro"},
+  {"id":129,"linha":"Conversão","subtema":"Apresentação & Posicionamento","titulo":"Por que escolhi IC avançada — em 4 stories","formato":"Story · Sequência","funil":"FUNDO","objetivo":"Humanizar a marca e construir conexão emocional que motiva o agendamento","gancho":"Vou te contar a história por trás da minha especialidade.","orientacoes":"4 stories: 1) Trajetória pessoal (formação) 2) Momento de decisão pela IC avançada 3) O que me motiva ('cuidar de quem o coração não consegue mais sozinho') 4) Propósito + CTA: 'É por isso que estou aqui — e por isso vou cuidar de você.'","serie":"—","mes":"Novembro"},
+  {"id":130,"linha":"Conversão","subtema":"Onde Atendo & Agenda","titulo":"Você sabia onde me encontrar em SP?","formato":"Story · Sequência","funil":"FUNDO","objetivo":"Apresentar os hospitais como referências de confiança e facilitar o agendamento","gancho":"Deixa eu te mostrar onde você vai encontrar a Dra. Paôla:","orientacoes":"3 stories: Einstein → São Luiz Itaim → Dante Pazzanese. Cada story: foto do hospital + especialidade atendida + como agendar. CTA final: 'Qualquer dúvida, me manda mensagem — te ajudo a escolher o mais perto de você.'","serie":"—","mes":"Junho"},
+  {"id":131,"linha":"Conversão","subtema":"Onde Atendo & Agenda","titulo":"Agende seu checkup 2027 — agenda de janeiro abre agora","formato":"Story · Sequência","funil":"FUNDO","objetivo":"Criar urgência positiva de fim de ano para preencher agenda de janeiro 2027","gancho":"Dezembro chegou — e o coração trabalhou 365 dias sem parar.","orientacoes":"3 stories: 1) Dado sobre importância do checkup anual 2) O que é avaliado na consulta cardiovascular 3) CTA direto: 'Agende agora para janeiro — Einstein, São Luiz Itaim, Dante Pazzanese. Link na bio.'","serie":"—","mes":"Dezembro"},
+  {"id":132,"linha":"Conversão","subtema":"Q&A & Engajamento","titulo":"Sua família tem histórico cardíaco? Me conta","formato":"Story · Caixinha","funil":"FUNDO","objetivo":"Abrir conversa sobre histórico familiar e qualificar potenciais pacientes de rastreamento precoce","gancho":"Pergunta importante: alguém na sua família já teve infarto, IC ou transplante?","orientacoes":"Caixinha aberta. Responder com orientação: 'Quem tem histórico familiar de primeiro grau deve iniciar rastreamento 10 anos antes da idade do familiar afetado.' CTA: agendar avaliação. Tom: cuidado, não alarme.","serie":"—","mes":"Novembro"},
+  {"id":133,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Você é doador de órgãos?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Abrir conversa sobre doação e identificar a posição do público para segmentar próximos stories","gancho":"Uma pergunta que todo cardiologista deveria fazer:","orientacoes":"Enquete: 'Sim, sou doador ❤️' / 'Não sou / tenho dúvidas 🤔'. Para quem tem dúvidas: sequência desmistificando os medos mais comuns ('o médico vai me salvar mesmo sendo doador'). CTA: conversar com a família.","serie":"—","mes":"Setembro"},
+  {"id":134,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Mito ou Verdade: família pode bloquear doação no Brasil?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Corrigir desinformação crítica sobre o processo de doação de órgãos no Brasil","gancho":"Mito ou Verdade: família pode recusar a doação mesmo com a pessoa cadastrada como doadora?","orientacoes":"Enquete: '🤔 Verdade' / '❌ Mito'. Próximo story: VERDADE — no Brasil a decisão familiar prevalece. 'Por isso conversar com a família é o ato mais importante de ser doador.' CTA: ter essa conversa hoje.","serie":"Mito ou Verdade? 🫀","mes":"Setembro"},
+  {"id":135,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Você conhece alguém na fila de espera por um coração?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Criar conexão emocional com a realidade da fila de espera e motivar a conversa sobre doação","gancho":"No Brasil, centenas de pessoas esperam por um coração. Você sabe se conhece alguém assim?","orientacoes":"Enquete: 'Sim, conheço alguém 💔' / 'Não conheço diretamente'. Story de resposta: dados da fila de espera + apelo à doação. Tom: esperançoso, não pesado. CTA: compartilhar esse story.","serie":"—","mes":"Agosto"},
+  {"id":136,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Quiz: o que você sabe sobre doação de órgãos?","formato":"Story · Quiz","funil":"TOPO","objetivo":"Testar conhecimento e desmistificar crenças incorretas sobre doação de forma interativa","gancho":"Teste rápido: o que você sabe sobre doação de órgãos?","orientacoes":"Quiz 4 perguntas: 'Qual é a idade limite para doação?' / 'O que é morte encefálica?' / 'Quem decide a doação no Brasil?' / 'Quantos órgãos uma pessoa pode doar?'. Respostas com explicações em linguagem leiga.","serie":"—","mes":"Setembro"},
+  {"id":137,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Sequência: o caminho de um coração doado até o receptor","formato":"Story · Sequência","funil":"TOPO","objetivo":"Mostrar o processo de doação de forma emocional e educativa para valorizar cada decisão de doação","gancho":"Você sabe o que acontece nos minutos após a decisão de doar um coração?","orientacoes":"5 stories: 1) Diagnóstico de morte encefálica 2) Notificação da família 3) Registro no SNTC e busca do receptor 4) Transporte do órgão (tempo crítico) 5) Cirurgia de implante. Tom: reverente, científico e humanizado.","serie":"—","mes":"Junho"},
+  {"id":138,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"27/set — Dia da Doação: você já falou com sua família?","formato":"Story · Caixinha","funil":"TOPO","objetivo":"Mobilizar ação concreta no Dia Nacional da Doação de Órgãos (27/set)","gancho":"Hoje é o Dia Nacional da Doação de Órgãos. Eu tenho um pedido:","orientacoes":"Caixinha: 'Me conta — você já conversou com sua família sobre ser doador?' Responder com encorajamento + orientação de como ter essa conversa ('diga na próxima reunião de família'). Publicar 27/set.","serie":"—","mes":"Setembro"},
+  {"id":139,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Quiz: quantas pessoas esperam por um coração no Brasil?","formato":"Story · Quiz","funil":"TOPO","objetivo":"Gerar impacto emocional com dado real sobre a lista de espera e motivar empatia pela causa","gancho":"Você sabe quantas pessoas aguardam por um transplante de coração hoje?","orientacoes":"Quiz com 4 opções de número (verificar dado atualizado no SNTC). Resposta com dado atual + 'Cada doador salva até 8 vidas.' Tom: impactante mas esperançoso. CTA: compartilhar para ampliar a consciência.","serie":"—","mes":"Agosto"},
+  {"id":140,"linha":"Causa & Conscientização","subtema":"Doação de Órgãos","titulo":"Como você convenceria alguém a ser doador?","formato":"Story · Caixinha","funil":"TOPO","objetivo":"Engajar seguidores que já apoiam doação a multiplicar a mensagem para sua rede","gancho":"Se você precisasse convencer alguém a ser doador de órgãos, o que você diria?","orientacoes":"Caixinha aberta. Compartilhar as respostas mais inspiradoras nos próximos stories (com permissão). CTA: 'Compartilha esse story com quem você quer convencer — uma conversa pode salvar uma vida.'","serie":"—","mes":"Setembro"},
+  {"id":141,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Mito ou Verdade: transplante de coração é só para quem tem plano?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Combater desinformação sobre acesso ao transplante cardíaco pelo sistema público","gancho":"Mito ou Verdade: transplante de coração no Brasil é só para quem tem plano de saúde particular","orientacoes":"Enquete: '💰 Verdade' / '❤️ Mito'. Próximo story: MITO — 'o SUS realiza mais de 90% dos transplantes de coração no Brasil, com centros de referência como o Dante Pazzanese.' Dado de impacto + orgulho do sistema público.","serie":"Mito ou Verdade? 🫀","mes":"Outubro"},
+  {"id":142,"linha":"Causa & Conscientização","subtema":"Transplante Cardíaco","titulo":"Como é a vida depois do transplante de coração?","formato":"Story · Caixinha","funil":"MEIO","objetivo":"Mostrar que pós-transplante é vida plena e criar esperança para pacientes e familiares","gancho":"Você tem curiosidade sobre como é a vida de quem recebeu um coração novo?","orientacoes":"Caixinha: 'Me manda sua pergunta sobre vida pós-transplante.' Responder com histórias de qualidade de vida real (sem identificação de pacientes, conforme CFM). CTA: seguir para conteúdo sobre pós-Tx no feed.","serie":"—","mes":"Outubro"},
+  {"id":143,"linha":"Humanização","subtema":"Congresso / Bastidores","titulo":"Bastidores: eu estou aqui — vem ver","formato":"Story · Sequência","funil":"TOPO","objetivo":"Humanizar a marca mostrando a médica em contextos profissionais reais e reforçar atualização constante","gancho":"Hoje estou no [nome do congresso / ambulatório]. Vou te mostrar um pouco do que acontece aqui.","orientacoes":"3-4 stories de bastidores: chegada ao evento / painel ou sessão de casos / momento de aprendizado. Último story: aprendizado do dia em 1 frase acessível + CTA: 'Me segue para acompanhar os próximos congressos.'","serie":"—","mes":"Banco"},
+  {"id":144,"linha":"Humanização","subtema":"Corrida & Atividade Física","titulo":"Você toparia correr uma prova comigo?","formato":"Story · Enquete","funil":"TOPO","objetivo":"Engajar o público com lado humanizado da médica e reforçar lifestyle medicine como exemplo pessoal","gancho":"Eu corro. E acho que você também deveria. Vem comigo?","orientacoes":"Enquete: 'Sim, topo! 🏃' / 'Ainda não me vejo nisso 😅'. Para quem topou: próximo story com dicas de como começar a correr com segurança cardiológica ('sempre com avaliação antes'). Tom: motivador, não elitista.","serie":"—","mes":"Banco"},
+  {"id":145,"linha":"Humanização","subtema":"Bastidores & Humanização","titulo":"Qual pergunta você faria pra mim agora?","formato":"Story · Caixinha","funil":"TOPO","objetivo":"Criar conexão pessoal e coletar perguntas que retroalimentam o conteúdo do perfil","gancho":"Você tem 1 pergunta pra me fazer — do coração mesmo, nada é proibido.","orientacoes":"Caixinha aberta. Tom: leve, pessoal, acessível. Responder as perguntas mais interessantes nos próximos stories ou num Reels. Pode misturar profissional e pessoal — humaniza sem perder autoridade.","serie":"Pergunte à Dra. Paôla 🩺","mes":"Banco"},
+  {"id":146,"linha":"Humanização","subtema":"Congresso / Bastidores","titulo":"Aprendi algo hoje que todo mundo deveria saber","formato":"Story · Sequência","funil":"TOPO","objetivo":"Posicionar a Paôla como médica em constante atualização e compartilhar conhecimento de forma acessível","gancho":"Dia de congresso. Uma coisa que aprendi hoje e que muda como eu cuido dos meus pacientes:","orientacoes":"2-3 stories: 1) Contexto do evento em 1 frase 2) Aprendizado principal em linguagem leiga ('nova evidência sobre...') 3) Como isso impacta o cuidado com o paciente. CTA: 'Salva pra não esquecer.'","serie":"—","mes":"Banco"},
+  {"id":147,"linha":"Humanização","subtema":"Aniversário / Marco pessoal","titulo":"Quiz: você me conhece de verdade?","formato":"Story · Quiz","funil":"TOPO","objetivo":"Engajar seguidores com conteúdo leve e celebrar marco pessoal de forma autêntica","gancho":"Aniversário chegou — e eu quero saber se você me conhece mesmo 😄","orientacoes":"Quiz 5 perguntas sobre trajetória, especialidade, hábitos pessoais, hospitais onde atende. Resultado: 'Você arrasou! / Tem muito mais pra descobrir sobre mim 💙.' CTA: seguir para mais conteúdo. Tom: leveza, gratidão.","serie":"—","mes":"Banco"},
+  {"id":148,"linha":"Humanização","subtema":"Bastidores & Humanização","titulo":"Como você cuida do seu coração no dia a dia?","formato":"Story · Caixinha","funil":"TOPO","objetivo":"Coletar relatos reais do público e gerar conteúdo de comunidade e pertencimento","gancho":"Sem filtro: me conta um hábito que você faz todo dia que acha que faz bem pro coração.","orientacoes":"Caixinha aberta. Compartilhar os melhores (com permissão) em próximos stories com comentário cardiológico rápido ('ótimo hábito porque...'). Tom: comunidade, incentivo, pertencimento.","serie":"—","mes":"Banco"},
+  {"id":149,"linha":"Humanização","subtema":"Retrospectiva","titulo":"O que você aprendeu sobre seu coração em 2026?","formato":"Story · Caixinha","funil":"TOPO","objetivo":"Encerrar o ano criando engajamento emocional e reforçando a jornada do seguidor com a Paôla","gancho":"Fim de 2026. E eu quero saber: o que você aprendeu sobre cuidar do seu coração esse ano?","orientacoes":"Caixinha aberta. Compartilhar as respostas mais bonitas em stories de retrospectiva. CTA: 'Vejo você em 2027 — com mais saúde e mais coração. Obrigada por me acompanhar.' Tom: gratidão e calor humano.","serie":"—","mes":"Dezembro"}
+];
+
+/* =============================================
+   ESTADO
+   ============================================= */
+const selecionados  = new Set(); // ids numéricos dos temas selecionados
+let jaExistentes    = new Set(); // titulos que já estão no banco
+let filtroLinha     = "";        // "" = todos
+let temasFiltrados  = TEMAS_BANCO.slice();
+
+/* =============================================
+   BADGES
+   ============================================= */
+function linhaClass(l) {
+  if (l === "Medicina do Estilo de Vida") return "linha-mev";
+  if (l === "Conversão")                  return "linha-conv";
+  if (l === "Causa & Conscientização")    return "linha-causa";
+  return "linha-hum";
+}
+
+function funilClass(f) {
+  if (f === "TOPO")  return "funil-topo";
+  if (l === "MEIO")  return "funil-meio";
+  return "funil-fundo";
+}
+
+function linhaLabel(l) {
+  if (l === "Medicina do Estilo de Vida") return "MEV";
+  if (l === "Causa & Conscientização")    return "Causa";
+  return l;
+}
+
+/* =============================================
+   INICIALIZAÇÃO
+   ============================================= */
+document.addEventListener("DOMContentLoaded", async () => {
+  const usuario = await db.exigirLogin();
+  if (!usuario) return;
+
+  const clientes = await db.fetchClientes();
+  CLIENTES.length = 0;
+  clientes.forEach(c => CLIENTES.push(c));
+
+  const sel = document.getElementById("imp-cliente");
+  if (CLIENTES.length === 0) {
+    sel.innerHTML = '<option value="">Nenhum cliente cadastrado</option>';
+    return;
+  }
+
+  sel.innerHTML = CLIENTES.map(c =>
+    `<option value="${c.id}">${c.avatar} ${c.nome} (${c.handle})</option>`
+  ).join("");
+
+  const idAtivo = localStorage.getItem("hub_clienteAtivo");
+  if (idAtivo && CLIENTES.find(c => c.id === idAtivo)) sel.value = idAtivo;
+
+  sel.addEventListener("change", () => {
+    selecionados.clear();
+    jaExistentes.clear();
+    renderTabela();
+    atualizarFooter();
+  });
+
+  renderTabela();
+  atualizarFooter();
+});
+
+/* =============================================
+   FILTROS
+   ============================================= */
+function setFiltro(linha) {
+  filtroLinha = linha;
+  // Atualiza botões
+  ["fbTodos","fbMev","fbConv","fbCausa","fbHum"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.remove("ativo");
+  });
+  const btnMap = {
+    "":                           "fbTodos",
+    "Medicina do Estilo de Vida": "fbMev",
+    "Conversão":                  "fbConv",
+    "Causa & Conscientização":    "fbCausa",
+    "Humanização":                "fbHum"
+  };
+  const btnId = btnMap[linha];
+  if (btnId) document.getElementById(btnId)?.classList.add("ativo");
+
+  temasFiltrados = filtroLinha
+    ? TEMAS_BANCO.filter(t => t.linha === filtroLinha)
+    : TEMAS_BANCO.slice();
+
+  renderTabela();
+  _syncCbTodos();
+  atualizarFooter();
+}
+
+/* =============================================
+   RENDERIZAÇÃO
+   ============================================= */
+async function renderTabela() {
+  const tbody = document.getElementById("impTbody");
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#888">Verificando duplicatas...</td></tr>';
+
+  const clienteId = document.getElementById("imp-cliente")?.value;
+  jaExistentes.clear();
+
+  if (clienteId) {
+    for (const t of temasFiltrados) {
+      const existe = await db.postTituloJaExiste(clienteId, t.titulo);
+      if (existe) jaExistentes.add(t.titulo);
+    }
+  }
+
+  tbody.innerHTML = temasFiltrados.map(t => {
+    const isSel  = selecionados.has(t.id);
+    const existe = jaExistentes.has(t.titulo);
+    const lClass = linhaClass(t.linha);
+    const fClass = t.funil === "TOPO" ? "funil-topo" : t.funil === "MEIO" ? "funil-meio" : "funil-fundo";
+
+    return `
+      <tr data-tid="${t.id}" class="${isSel ? "selecionado" : ""} ${existe ? "ja-existe" : ""}">
+        <td>
+          <input type="checkbox"
+            ${isSel ? "checked" : ""}
+            ${existe ? 'title="Já existe no banco"' : ""}
+            onchange="toggleTema(${t.id}, this.checked)">
+        </td>
+        <td class="imp-mes">${t.mes}</td>
+        <td><span class="imp-badge ${lClass}">${_esc(linhaLabel(t.linha))}</span></td>
+        <td>
+          <div class="imp-titulo">${_esc(t.titulo)}</div>
+          <div class="imp-subtema">${_esc(t.subtema)}</div>
+          ${existe ? '<div style="font-size:11px;color:#CC6600;margin-top:1px">&#x26A0; Já existe no banco</div>' : ""}
+        </td>
+        <td><span class="imp-badge formato">${_esc(t.formato)}</span></td>
+        <td><span class="imp-badge ${fClass}">${t.funil}</span></td>
+      </tr>
+    `;
+  }).join("");
+
+  atualizarFooter();
+}
+
+/* =============================================
+   SELEÇÃO
+   ============================================= */
+function toggleTema(id, checked) {
+  if (checked) selecionados.add(id);
+  else selecionados.delete(id);
+  const tr = document.querySelector(`tr[data-tid="${id}"]`);
+  if (tr) tr.classList.toggle("selecionado", checked);
+  atualizarFooter();
+  _syncCbTodos();
+}
+
+function toggleTodos(checked) {
+  temasFiltrados.forEach(t => {
+    if (checked) selecionados.add(t.id);
+    else selecionados.delete(t.id);
+    const tr = document.querySelector(`tr[data-tid="${t.id}"]`);
+    if (tr) {
+      tr.classList.toggle("selecionado", checked);
+      const cb = tr.querySelector("input[type='checkbox']");
+      if (cb) cb.checked = checked;
+    }
+  });
+  atualizarFooter();
+}
+
+function _syncCbTodos() {
+  const cb = document.getElementById("cbTodos");
+  if (!cb) return;
+  const visiveis = temasFiltrados.length;
+  const selVisiveis = temasFiltrados.filter(t => selecionados.has(t.id)).length;
+  cb.checked = visiveis > 0 && selVisiveis === visiveis;
+  cb.indeterminate = selVisiveis > 0 && selVisiveis < visiveis;
+}
+
+function atualizarFooter() {
+  const n     = selecionados.size;
+  const badge = document.getElementById("impContagem");
+  const info  = document.getElementById("impFooterInfo");
+  const btn   = document.getElementById("btnImportar");
+  const total = TEMAS_BANCO.length;
+
+  if (badge) badge.textContent = `${n} selecionado${n !== 1 ? "s" : ""}`;
+  if (info) info.innerHTML = n === 0
+    ? `<strong>${total}</strong> temas disponíveis. Use os filtros e selecione os que deseja importar.`
+    : `<strong>${n}</strong> tema(s) selecionado(s). Clique em Importar para adicionar ao banco.`;
+  if (btn) btn.disabled = n === 0 || !document.getElementById("imp-cliente")?.value;
+  if (btn) btn.textContent = n > 0 ? `Importar ${n} tema${n !== 1 ? "s" : ""}` : "Importar selecionados";
+}
+
+/* =============================================
+   IMPORTAÇÃO
+   ============================================= */
+async function importar() {
+  const clienteId = document.getElementById("imp-cliente")?.value;
+  if (!clienteId || selecionados.size === 0) return;
+
+  const temasSel = TEMAS_BANCO.filter(t => selecionados.has(t.id));
+  const total    = temasSel.length;
+
+  document.getElementById("btnImportar").disabled = true;
+  document.getElementById("imp-cliente").disabled = true;
+  document.querySelector(".imp-table-wrap").style.pointerEvents = "none";
+  document.querySelector(".imp-table-wrap").style.opacity = ".6";
+
+  const progressWrap  = document.getElementById("progressWrap");
+  const progressFill  = document.getElementById("progressFill");
+  const progressLabel = document.getElementById("progressLabel");
+  progressWrap.classList.add("visivel");
+
+  let importados = 0;
+  let pulados    = 0;
+  let erros      = 0;
+
+  for (let i = 0; i < temasSel.length; i++) {
+    const t = temasSel[i];
+
+    progressLabel.textContent = `Importando ${i + 1}/${total}: ${t.titulo}`;
+    progressFill.style.width  = `${Math.round((i / total) * 100)}%`;
+
+    const existe = await db.postTituloJaExiste(clienteId, t.titulo);
+    if (existe) { pulados++; continue; }
+
+    // Mescla objetivo + orientacoes
+    const orientacoesFinal = t.objetivo
+      ? `Objetivo: ${t.objetivo}\n\n${t.orientacoes}`
+      : t.orientacoes;
+
+    const dados = {
+      clienteId,
+      titulo:      t.titulo,
+      linha:       t.linha,
+      subtema:     t.subtema,
+      formato:     t.formato,
+      funil:       t.funil,
+      serie:       t.serie,
+      mes:         t.mes,
+      status:      "Ideia",
+      likes:       0,
+      comentarios: 0,
+      data_publicacao: null,
+      gancho:      t.gancho,
+      orientacoes: orientacoesFinal
+    };
+
+    const resultado = await db.criarPost(dados);
+    if (resultado) importados++;
+    else erros++;
+  }
+
+  progressFill.style.width  = "100%";
+  progressLabel.textContent = "Concluído!";
+
+  const res = document.getElementById("impResultado");
+  res.classList.add("visivel");
+
+  document.getElementById("resIcon").textContent =
+    erros === 0 ? "\u2705" : "\u26A0\uFE0F";
+  document.getElementById("resTitulo").textContent =
+    erros === 0 ? "Importação concluída!" : "Importação com avisos";
+
+  const partes = [];
+  if (importados > 0) partes.push(`<strong>${importados}</strong> tema${importados !== 1 ? "s" : ""} importado${importados !== 1 ? "s" : ""} com sucesso`);
+  if (pulados    > 0) partes.push(`<strong>${pulados}</strong> já existia${pulados !== 1 ? "m" : ""} no banco e foi${pulados !== 1 ? "ram" : ""} pulado${pulados !== 1 ? "s" : ""}`);
+  if (erros      > 0) partes.push(`<strong>${erros}</strong> erro${erros !== 1 ? "s" : ""}`);
+
+  document.getElementById("resTexto").innerHTML = partes.join(" · ") +
+    "<br><br>Os temas importados aparecem com status <strong>Ideia</strong>. Ajuste mês, série e outros campos conforme necessário no Dashboard.";
+}
+
+/* =============================================
+   UTILITÁRIO
+   ============================================= */
+function _esc(str) {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+</script>
+
+</body>
+</html>

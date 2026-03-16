@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendário Mensal — Hub de Conteúdo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { font-family: 'Inter', -apple-system, sans-serif; }
+  </style>
+</head>
+<body>
+
+<div class="mes-layout">
+
+  <!-- ===== CABEÇALHO ===== -->
+  <header class="mes-header">
+
+    <!-- Voltar ao dashboard -->
+    <a href="index.html" class="mes-header-back">← Dashboard</a>
+
+    <!-- Nome do cliente ativo -->
+    <div class="mes-header-cliente">
+      <div class="mes-header-nome" id="mes-header-nome">—</div>
+      <div class="mes-header-handle" id="mes-header-handle">—</div>
+    </div>
+
+    <!-- Seletor de mês -->
+    <div class="mes-nav">
+      <button class="mes-nav-btn" onclick="navegarMes(-1)" title="Mês anterior">◀</button>
+      <div class="mes-nav-label" id="mes-nav-label">Abril 2026</div>
+      <button class="mes-nav-btn" onclick="navegarMes(1)" title="Próximo mês">▶</button>
+    </div>
+
+  </header>
+
+  <!-- ===== CONTEÚDO ===== -->
+  <div class="mes-content">
+
+    <!-- Objetivos do mês -->
+    <div class="obj-card" id="obj-card">
+      <!-- Renderizado por mes.js → renderObjetivos() -->
+    </div>
+
+    <!-- Posts atribuídos ao mês -->
+    <section class="mes-posts-section">
+      <h2>
+        Posts do mês
+        <span class="mes-posts-count" id="mes-posts-count">0</span>
+      </h2>
+      <div class="posts-grid" id="mes-posts-grid">
+        <!-- Renderizado por mes.js → renderPostsDoMes() -->
+      </div>
+    </section>
+
+    <!-- Banco de temas disponíveis -->
+    <div class="banco-section">
+      <button class="banco-toggle" id="banco-toggle" onclick="toggleBanco()">
+        <span>Banco de posts disponíveis</span>
+        <span class="banco-toggle-arrow">▼</span>
+      </button>
+      <div class="banco-lista" id="banco-lista">
+        <!-- Renderizado por mes.js → renderBanco() -->
+      </div>
+    </div>
+
+    <!-- ===== GUIA DE ANÚNCIOS ===== -->
+    <div class="ref-section">
+      <div class="ref-section-title">Guia de Anúncios</div>
+      <div class="ref-table-wrap">
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>Objetivo</th>
+              <th>Quando Usar</th>
+              <th>Conteúdo Ideal</th>
+              <th>Métricas Principais</th>
+              <th>Orçamento Mensal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Reconhecimento de Marca</strong></td>
+              <td>Alcançar novos públicos e aumentar seguidores qualificados</td>
+              <td>Lançamento (abr), aquecimento (ago), Mês do Coração (set)</td>
+              <td>Posts MEV de alto interesse geral (sono, exercício, dados de impacto)</td>
+              <td>Alcance · Impressões · CPM · Novos seguidores · Visitas ao perfil</td>
+              <td><strong>R$ 100–200/mês</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Engajamento</strong></td>
+              <td>Aumentar interações: curtidas, salvamentos, comentários</td>
+              <td>Posts de séries (Mito ou Verdade, Q&A) com alto potencial viral</td>
+              <td>Reels educativos, carrosséis informativos, Q&A</td>
+              <td>Taxa de engajamento · Salvamentos · Comentários · Compartilhamentos</td>
+              <td><strong>R$ 80–120/mês</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Tráfego</strong></td>
+              <td>Direcionar usuários para o link na bio (agendamento, site)</td>
+              <td>Meses de posicionamento e apresentação de serviços</td>
+              <td>Posts Conv com CTA claro para link na bio</td>
+              <td>CTR · Cliques no link · CPC · Visitas ao site/WhatsApp</td>
+              <td><strong>R$ 100–150/mês</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Mensagens (WhatsApp/DM)</strong></td>
+              <td>Gerar conversas diretas que convertam em consultas</td>
+              <td>Meses de conversão: jun, out, nov, dez</td>
+              <td>Posts Conv: onde atendo, primeira consulta, diferenciais</td>
+              <td>Mensagens iniciadas · CPL · Taxa DM → agendamento · CPC</td>
+              <td><strong>R$ 150–200/mês</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Campanha de Causa</strong></td>
+              <td>Ampliar alcance orgânico em datas simbólicas</td>
+              <td>Setembro: Mês do Coração, 27/set Doação, 29/set Dia Mundial</td>
+              <td>Posts de conscientização e doação de órgãos</td>
+              <td>Alcance · Impressões · Compartilhamentos · CPM</td>
+              <td><strong>R$ 200–300 (set. apenas)</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===== REFERÊNCIA DE KPIs ===== -->
+      <div class="ref-section-subtitle">Referência de KPIs</div>
+      <div class="ref-table-wrap">
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>KPI</th>
+              <th>Definição</th>
+              <th>Benchmark</th>
+              <th>Sinal de Alerta</th>
+              <th>Ação Corretiva</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>CPM</strong></td>
+              <td>Custo por Mil Impressões — quanto custa alcançar 1.000 pessoas</td>
+              <td class="kpi-bench">R$ 8–20 (saúde, SP)</td>
+              <td class="kpi-alert">CPM &gt; R$ 25</td>
+              <td class="kpi-action">Revisar segmentação de público; testar criativo diferente</td>
+            </tr>
+            <tr>
+              <td><strong>CTR</strong></td>
+              <td>Taxa de Cliques no Link — % de pessoas que viram e clicaram no CTA</td>
+              <td class="kpi-bench">1% – 3%</td>
+              <td class="kpi-alert">CTR &lt; 0,5%</td>
+              <td class="kpi-action">Melhorar o CTA; testar imagem ou texto de abertura diferentes</td>
+            </tr>
+            <tr>
+              <td><strong>CPC</strong></td>
+              <td>Custo por Clique — quanto custa cada clique no link ou botão</td>
+              <td class="kpi-bench">R$ 1–4</td>
+              <td class="kpi-alert">CPC &gt; R$ 6</td>
+              <td class="kpi-action">Ajustar público; testar objetivo de campanha diferente</td>
+            </tr>
+            <tr>
+              <td><strong>CPL</strong></td>
+              <td>Custo por Lead / Mensagem — quanto custa cada mensagem ou contato iniciado</td>
+              <td class="kpi-bench">R$ 15–50 (saúde especializada)</td>
+              <td class="kpi-alert">CPL &gt; R$ 70</td>
+              <td class="kpi-action">Revisar copy do post; testar público mais qualificado</td>
+            </tr>
+            <tr>
+              <td><strong>Taxa de Engajamento</strong></td>
+              <td>(Curtidas + Comentários + Salvamentos) ÷ Alcance</td>
+              <td class="kpi-bench">2% – 6% (perfil médico)</td>
+              <td class="kpi-alert">&lt; 1%</td>
+              <td class="kpi-action">Publicar em horários de pico; usar Reels para maior alcance</td>
+            </tr>
+            <tr>
+              <td><strong>Crescimento de Seguidores</strong></td>
+              <td>Seguidores novos por mês</td>
+              <td class="kpi-bench">+50–150/mês (fase inicial)</td>
+              <td class="kpi-alert">&lt; 20/mês ou perda</td>
+              <td class="kpi-action">Aumentar frequência de posts TOPO; revisar anúncios de alcance</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /ref-section -->
+
+  </div><!-- /mes-content -->
+
+</div><!-- /mes-layout -->
+
+<!-- ===== MODAL: OBJETIVO MENSAL ===== -->
+<div class="modal-overlay" id="modal-objetivo">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="obj-mes-titulo">Objetivo do Mês</h2>
+      <button class="modal-fechar" onclick="closeModal('modal-objetivo')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grupo">
+        <label for="obj-objetivo">Objetivo *</label>
+        <textarea id="obj-objetivo" rows="3" placeholder="Ex: Lançamento do perfil — apresentar a médica e gerar reconhecimento de marca em SP"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-grupo">
+          <label for="obj-orcamento">Orçamento de anúncios</label>
+          <input id="obj-orcamento" type="text" placeholder="Ex: R$ 150/mês">
+        </div>
+        <div class="form-grupo">
+          <label for="obj-tipo">Tipo de anúncio</label>
+          <input id="obj-tipo" type="text" placeholder="Ex: Reconhecimento de Marca">
+        </div>
+      </div>
+      <div class="form-grupo">
+        <label for="obj-datas">Datas importantes <span style="font-weight:400;color:#888">(separadas por vírgula)</span></label>
+        <input id="obj-datas" type="text" placeholder="Ex: 7/abr Dia Mundial da Saúde, 29/set Dia Mundial do Coração">
+      </div>
+      <div class="form-grupo">
+        <label>Distribuição de Funil <span style="font-weight:400;color:#888">(soma deve ser 100%)</span></label>
+        <div style="display:flex;gap:12px">
+          <div style="flex:1">
+            <label style="font-size:11px;color:#888;font-weight:400">Topo %</label>
+            <input id="obj-topo" type="number" min="0" max="100" value="50">
+          </div>
+          <div style="flex:1">
+            <label style="font-size:11px;color:#888;font-weight:400">Meio %</label>
+            <input id="obj-meio" type="number" min="0" max="100" value="30">
+          </div>
+          <div style="flex:1">
+            <label style="font-size:11px;color:#888;font-weight:400">Fundo %</label>
+            <input id="obj-fundo" type="number" min="0" max="100" value="20">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('modal-objetivo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarObjetivo()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== INDICADOR DE AUTO-SAVE ===== -->
+<div id="save-status" class="save-status"></div>
+
+<!-- ===== SCRIPTS (ordem importa!) ===== -->
+<!-- 1. Biblioteca Supabase (CDN — sem instalação) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- 2. Inicializa window.sb com URL e chave do projeto -->
+<script src="js/supabase.js"></script>
+<!-- 3. Funções async de banco -->
+<script src="js/db.js"></script>
+<!-- 4. Constantes e OBJETIVOS_MES -->
+<script src="js/data.js"></script>
+<!-- 5. Utilitários de UI -->
+<script src="js/ui.js"></script>
+<!-- 6. Lógica do calendário mensal -->
+<script src="js/mes.js"></script>
+
+</body>
+</html>

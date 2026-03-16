@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importar Posts do Instagram — Hub de Conteúdo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #F5F5F5; }
+
+    .imp-layout {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    .imp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .imp-title h1 { font-size: 20px; font-weight: 700; color: #111; }
+    .imp-title p  { font-size: 13px; color: #888; margin-top: 3px; }
+
+    .imp-config {
+      background: #FFFFFF;
+      border: 1px solid #DDDDDD;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .imp-config label { font-size: 13px; font-weight: 600; color: #333; white-space: nowrap; }
+
+    .imp-config select {
+      padding: 7px 12px;
+      border: 1px solid #DDD;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #FAFAFA;
+      min-width: 220px;
+    }
+
+    .imp-table-wrap {
+      background: #FFFFFF;
+      border: 1px solid #DDDDDD;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .imp-table-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #EEEEEE;
+      background: #FAFAFA;
+      flex-wrap: wrap;
+    }
+
+    .imp-table-toolbar label { font-size: 12px; color: #555; }
+
+    .imp-count-badge {
+      background: #111;
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .imp-table { width: 100%; border-collapse: collapse; }
+
+    .imp-table thead th {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #666;
+      padding: 9px 12px;
+      text-align: left;
+      border-bottom: 1px solid #EEEEEE;
+      background: #F7F7F7;
+      white-space: nowrap;
+    }
+
+    .imp-table tbody tr { border-bottom: 1px solid #F5F5F5; }
+    .imp-table tbody tr:last-child { border-bottom: none; }
+    .imp-table tbody tr:hover { background: #FAFAFA; }
+    .imp-table tbody tr.selecionado { background: #FFFCE0; }
+    .imp-table tbody tr.ja-existe { background: #F5F5F5; opacity: .6; }
+
+    .imp-table td {
+      padding: 9px 12px;
+      font-size: 13px;
+      color: #222;
+      vertical-align: middle;
+    }
+
+    .imp-caption {
+      max-width: 360px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+
+    .imp-caption-full { color: #888; font-size: 11px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px; }
+
+    .imp-tipo { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+    .imp-tipo.reels     { background: #E8DAEF; color: #6C3483; }
+    .imp-tipo.carrossel { background: #D6EAF8; color: #1A5276; }
+    .imp-tipo.post      { background: #D5F5E3; color: #1E8449; }
+
+    .imp-num { font-size: 12px; color: #AAAAAA; }
+    .imp-link { font-size: 11px; color: #0066CC; text-decoration: none; }
+    .imp-link:hover { text-decoration: underline; }
+
+    .imp-footer {
+      background: #FFFFFF;
+      border: 1px solid #DDD;
+      border-radius: 10px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .imp-footer-info { flex: 1; font-size: 13px; color: #555; }
+    .imp-footer-info strong { color: #111; }
+
+    /* Progresso */
+    .progress-wrap { display: none; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .progress-wrap.visivel { display: flex; }
+
+    .progress-bar-track {
+      width: 100%;
+      height: 8px;
+      background: #EEEEEE;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #111111;
+      border-radius: 4px;
+      transition: width .2s;
+      width: 0%;
+    }
+
+    .progress-label { font-size: 12px; color: #666; }
+
+    /* Resultado */
+    .imp-resultado {
+      display: none;
+      background: #FFFFFF;
+      border: 1px solid #DDD;
+      border-radius: 10px;
+      padding: 24px 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    .imp-resultado.visivel { display: block; }
+    .imp-resultado-icon { font-size: 40px; margin-bottom: 10px; }
+    .imp-resultado h2 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .imp-resultado p  { font-size: 13px; color: #666; line-height: 1.6; }
+    .imp-resultado .btn { margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+<div class="imp-layout">
+
+  <div class="imp-header">
+    <div class="imp-title">
+      <h1>Importar Posts do Instagram</h1>
+      <p>Posts históricos de @paolapreto — selecione quais importar para o banco</p>
+    </div>
+    <a href="index.html" class="btn btn-secondary">← Voltar ao Dashboard</a>
+  </div>
+
+  <!-- Seleção de cliente -->
+  <div class="imp-config">
+    <label for="imp-cliente">Importar para:</label>
+    <select id="imp-cliente">
+      <option value="">Carregando clientes...</option>
+    </select>
+  </div>
+
+  <!-- Tabela de posts -->
+  <div class="imp-table-wrap">
+    <div class="imp-table-toolbar">
+      <input type="checkbox" id="cbTodos" onchange="toggleTodos(this.checked)">
+      <label for="cbTodos">Selecionar todos</label>
+      <span class="imp-count-badge" id="impContagem">0 selecionados</span>
+      <span style="font-size:12px;color:#AAAAAA;margin-left:auto">
+        Posts riscados já existem no banco para o cliente selecionado
+      </span>
+    </div>
+    <table class="imp-table" id="impTabela">
+      <thead>
+        <tr>
+          <th style="width:32px"></th>
+          <th>Data</th>
+          <th>Legenda / Título</th>
+          <th>Tipo → Formato</th>
+          <th>Likes</th>
+          <th>Coment.</th>
+          <th>Link</th>
+        </tr>
+      </thead>
+      <tbody id="impTbody">
+        <!-- preenchido por JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Rodapé com botão de importar -->
+  <div class="imp-footer">
+    <div class="imp-footer-info" id="impFooterInfo">
+      Selecione os posts que deseja importar acima.
+    </div>
+    <button class="btn btn-primary" id="btnImportar" onclick="importar()" disabled>
+      Importar selecionados
+    </button>
+  </div>
+
+  <!-- Barra de progresso -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label" id="progressLabel">Preparando importação...</div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- Resultado final -->
+  <div class="imp-resultado" id="impResultado">
+    <div class="imp-resultado-icon" id="resIcon">✅</div>
+    <h2 id="resTitulo">Importação concluída!</h2>
+    <p id="resTexto"></p>
+    <a href="index.html" class="btn btn-primary">Ver posts no Dashboard</a>
+  </div>
+
+</div><!-- /imp-layout -->
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/db.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+
+<script>
+/* =============================================
+   DADOS DO INSTAGRAM — @paolapreto
+   Extraídos de dataset_instagram-post-scraper_2026-03-15
+   ============================================= */
+const POSTS_INSTAGRAM = [
+  { shortCode: "DSX0fxuDkQm", type: "Sidecar", timestamp: "2025-12-17T17:01:03.000Z", likesCount: -1,  commentsCount: 12, url: "https://www.instagram.com/p/DSX0fxuDkQm/", caption: "29.11.2025 Lembranças desse dia lindo! Casamento Gabi&Lincoln 💙" },
+  { shortCode: "DSAidVSDy2H", type: "Video",   timestamp: "2025-12-08T16:01:21.000Z", likesCount: 122,  commentsCount: 22, url: "https://www.instagram.com/p/DSAidVSDy2H/", caption: "Uma dúvida muito comum no consultório! 💭\n\nA nova Diretriz de Hipertensão fala em pressão acima de 120/80 para a pré-hipertensão. Mas o que isso significa na prática? 🤔\n\nDeixa aqui nos comentários a sua dúvida também!" },
+  { shortCode: "DRXe38nDkXy", type: "Sidecar", timestamp: "2025-11-22T17:20:43.000Z", likesCount: -1,  commentsCount: 12, url: "https://www.instagram.com/p/DRXe38nDkXy/", caption: "NYC 🍎" },
+  { shortCode: "DP9K_ACDk8d", type: "Sidecar", timestamp: "2025-10-18T15:35:16.000Z", likesCount: 235,  commentsCount: 15, url: "https://www.instagram.com/p/DP9K_ACDk8d/", caption: "A menina que sempre disse que seria médica entrou na faculdade aos 17 anos e não imaginava o que viveria nos anos seguintes! \n\nMe formei aos 23, no meio da pandemia, e logo iniciei a primeira residência, em Clínica Médica, na minha cidade natal - Curitiba! Em 2023, me mudei para São Paulo para fazer o que sempre sonhei: Cardiologia. Hoje sigo me especializando em Transplante Cardíaco, com a certeza que, apesar do caminho longo (11 anos até aqui), cuidar com zelo, empatia e conhecimento de verdade é o que nos faz continuar!!\n\nFeliz Dia do Médico!" },
+  { shortCode: "DPKZVYHjvnn", type: "Sidecar", timestamp: "2025-09-28T22:19:23.000Z", likesCount: -1,  commentsCount: 3,  url: "https://www.instagram.com/p/DPKZVYHjvnn/", caption: "Celebrando o amor! 💙 Isa&Rapha" },
+  { shortCode: "DPGzqLljHiK", type: "Image",   timestamp: "2025-09-27T12:52:28.000Z", likesCount: -1,  commentsCount: 4,  url: "https://www.instagram.com/p/DPGzqLljHiK/", caption: "Você pode ser o milagre que alguém espera! 💚\n\n💭 Você sabia que 80 mil pessoas esperam por transplante no Brasil, mas que ainda 45% das famílias recusam doar órgãos?? \n\n➡ Neste dia, lembramos a importância da doação de órgãos. Como doador, você pode salvar 8 vidas! Avise sua família que você é doador e faça a diferença! \n\n#DoeÓrgãos #DoeVida #SejaDoador #cardiologista #saopaulo #Curitiba" },
+  { shortCode: "DOV41MmDggj", type: "Sidecar", timestamp: "2025-09-08T12:54:52.000Z", likesCount: -1,  commentsCount: 16, url: "https://www.instagram.com/p/DOV41MmDggj/", caption: "06.09.2025 🤍🤍🤍" },
+  { shortCode: "DNVvhcUhCzY", type: "Sidecar", timestamp: "2025-08-14T15:02:08.000Z", likesCount: -1,  commentsCount: 15, url: "https://www.instagram.com/p/DNVvhcUhCzY/", caption: "Entre os compromissos de hoje, lembre que um coração saudável sustenta todos os nossos planos! \n\n📝 14/08 é data da fundação da SBC em 1943 e, desde 2007, Dia do Cardiologista. Uma data importante pra te lembrar de mexer o corpo, dormir bem, ficar fora de vícios e não adiar sua consulta preventiva! ⏳\n\nExistem hábitos que nos tranquilizam e aqueles que nos deixam de cabelo em pé! 🥹😅 Seguimos firmes na missão, com a certeza de que prevenir é a melhor escolha. \n\n#DiadoCardiologista #prevencao #saudecardiovascular" },
+  { shortCode: "DM6C0gFRYLK", type: "Sidecar", timestamp: "2025-08-03T20:52:01.000Z", likesCount: -1,  commentsCount: 8,  url: "https://www.instagram.com/p/DM6C0gFRYLK/", caption: "Uma honra viver conto de fadas ao lado desses perfeitos! E ainda reencontrar esse time! Que nunca nos falte amor 🧡" },
+  { shortCode: "DMtL-nvMbbQ", type: "Video",   timestamp: "2025-07-29T21:02:35.000Z", likesCount: -1,  commentsCount: 12, url: "https://www.instagram.com/p/DMtL-nvMbbQ/", caption: "A conta não fecha: a fila por transplantes cresce, mas o número de doadores ainda é pequeno. 💔\n\n💡Quer mudar esse cenário? Comece hoje! Fale com sua família e amigos e deixe claro o seu desejo de doar.\n\nCada órgão doado é um recomeço. Doar é um ato de amor e solidariedade, capaz de salvar até 10 vidas! \n\nComo cardiologista, estou à disposição para tirar dúvidas e ajudar você a dizer sim para a doação! Conte comigo! ❤️\n\n#cardiologista #doeorgaos  #DoacaoDeOrgaos #transplantecardiaco" },
+  { shortCode: "DMdoP0yxUlP", type: "Sidecar", timestamp: "2025-07-23T20:01:05.000Z", likesCount: -1,  commentsCount: 8,  url: "https://www.instagram.com/p/DMdoP0yxUlP/", caption: "Ser, apesar. 🖤🤍" },
+  { shortCode: "DL-M1eLP6XZ", type: "Sidecar", timestamp: "2025-07-11T15:05:06.000Z", likesCount: -1,  commentsCount: 5,  url: "https://www.instagram.com/p/DL-M1eLP6XZ/", caption: "🦸‍♀️ Quando o inimigo é a IC, entram em ação os 4 heróis do tratamento! Você sabe quem eles são? 🤔\n\nA Insuficiência Cardíaca é o resultado da progressão de diversas doenças cardíacas, como infartos, hipertensão, arritmias ou doenças valvares. \n\nE, assim como no cinema, também temos um Quarteto Fantástico do tratamento dessa doença! São 4 classes de medicamentos que agem nos mecanismos de ação da IC, reduzindo sintomas, hospitalizações e mortalidade! 👀😱\n\nSe vai assistir ao novo filme, lembre também que seu coração também precisa de um time poderoso do seu lado! 🫀❤️‍🔥\n\nEstou aqui para conversarmos sobre sua saúde! \n\n#InsuficiênciaCardíaca #QuartetoFantastico #IC #SaudeCardiovascular #Cardiologista" },
+  { shortCode: "DLqIWbYBFKS", type: "Video",   timestamp: "2025-07-03T20:01:41.000Z", likesCount: -1,  commentsCount: 2,  url: "https://www.instagram.com/p/DLqIWbYBFKS/", caption: "Metade do ano já foi!\nEntre altos e baixos, a gente viveu — e como viveu!\nNão cumpriu todas as metas? Calma, ainda temos 6 meses inteirinhos... pra recomeçar, tentar de novo e se superar.\nPreparados pro segundo tempo?" },
+  { shortCode: "DLS9SwUBGVM", type: "Video",   timestamp: "2025-06-24T20:02:58.000Z", likesCount: -1,  commentsCount: 27, url: "https://www.instagram.com/p/DLS9SwUBGVM/", caption: "Cada litro de aumento de VO2 importa! 🏃🏼‍♀️💨\n\nO exercício físico regular é um dos remédios mais potentes e efetivos que eu prescrevo para pessoas com e sem doenças cardiovasculares. \n\nEle provoca um aumento do VO2, e isso está relacionado a redução da mortalidade! - além da melhora no bem estar físico e emocional. \n\nO que falta para você também praticar? Lembre-se: a orientação médica para começar é fundamental! 🫀👩‍⚕️🩺\n\nCompartilhe com alguém que precisa aumentar o fôlego! 😀😉\n\n#exerciciofisico #saudecardiovascular #cardiologista #vo2max" },
+  { shortCode: "DLNam3WsRXt", type: "Sidecar", timestamp: "2025-06-22T16:22:39.000Z", likesCount: -1,  commentsCount: 16, url: "https://www.instagram.com/p/DLNam3WsRXt/", caption: "que experiência incrível e desafiadora viver a Meia Maratona do Rio! só agradecer pelo apoio da @velocetreinamento e companhia de quem esteve comigo nessa loucura! desafio concluído com sucesso e feriado muito bem aproveitado!" },
+  { shortCode: "DK0Knz1vmE0", type: "Video",   timestamp: "2025-06-12T21:03:06.000Z", likesCount: -1,  commentsCount: 26, url: "https://www.instagram.com/p/DK0Knz1vmE0/", caption: "Dra., existe síndrome do coração partido? 💔\n\nSim… e ela tem nome: Síndrome de Takotsubo.\n\nTambém chamada de Cardiomiopatia por Estresse, é uma condição em que o coração muda de forma e funcionamento de maneira temporária — muitas vezes após um evento emocional intenso. É como se o coração sentisse demais, literalmente!\n\n🐙 O nome "Takotsubo" vem de potes japoneses usados para capturar polvos - e o formato do coração durante essa síndrome se parece muito com esses instrumentos.\n\n💬 No vídeo, explico de forma simples o que é essa síndrome, como ela acontece e por que ela tem esse apelido tão curioso. Uma conversa sobre emoção, saúde e recuperação.\n\nAssista até o fim e compartilhe com quem você acha que precisa ouvir isso hoje. ❤️\n\n#síndromedetakotsubo #coraçãopartido #cardiologia #saudecardiovascular #Takotsubo" },
+  { shortCode: "DH_mP0rxXEX", type: "Sidecar", timestamp: "2025-04-03T18:00:00.000Z", likesCount: 175, commentsCount: 8,  url: "https://www.instagram.com/p/DH_mP0rxXEX/", caption: "Fotos desse último final de semana pra ficarem na memória! \n\nA paleta de cores, os looks, essa luz natural maravilhosa (e com um toque especial)… o conjunto ficou demais!" },
+  { shortCode: "DGtzU_yMuvm", type: "Sidecar", timestamp: "2025-03-02T23:37:24.000Z", likesCount: 351, commentsCount: 24, url: "https://www.instagram.com/p/DGtzU_yMuvm/", caption: "Finalmente Cardiologista pelo Instituto Dante Pazzanese de Cardiologia! Foram 2 anos intensos - só quem viveu sabe - mas gratificantes e recompensadores! Obrigada a quem esteve comigo em mais essa caminhada!" },
+  { shortCode: "DEXmNEix3ou", type: "Sidecar", timestamp: "2025-01-03T15:36:38.000Z", likesCount: -1,  commentsCount: 15, url: "https://www.instagram.com/p/DEXmNEix3ou/", caption: "Viver a São Silvestre foi algo incrível! 🤩 \n\nTeve música, teve interação, teve cerveja no último km e teve linha de chegada junto com minha mãe e minha vó 💕 que venha 2025!" },
+  { shortCode: "DBHunR6xwqY", type: "Sidecar", timestamp: "2024-10-14T22:08:05.000Z", likesCount: -1,  commentsCount: 18, url: "https://www.instagram.com/p/DBHunR6xwqY/", caption: "Um mundo rosa e uma corrida que foi minha cara (será? Kkk) 💕💕 que fase boa!" },
+  { shortCode: "C_3zdvXSE7u", type: "Sidecar", timestamp: "2024-09-13T21:11:14.000Z", likesCount: -1,  commentsCount: 5,  url: "https://www.instagram.com/p/C_3zdvXSE7u/", caption: "06.09.2024 - um compiladinho do aniver com direito a comemoração tripla e muita surpresa. amo vocês. 💕" },
+  { shortCode: "C7AjgLCsLXi", type: "Sidecar", timestamp: "2024-05-16T00:07:57.000Z", likesCount: -1,  commentsCount: 1,  url: "https://www.instagram.com/p/C7AjgLCsLXi/", caption: "Laguna Humantay & Montaña 7 Colores & Lima. Que país incrível!" },
+  { shortCode: "C69xtKpsQPA", type: "Sidecar", timestamp: "2024-05-14T22:14:20.000Z", likesCount: -1,  commentsCount: 9,  url: "https://www.instagram.com/p/C69xtKpsQPA/", caption: "Machu Picchu & Vale Sagrado 🇵🇪 que energia!" },
+  { shortCode: "C6ljrBvrfXa", type: "Sidecar", timestamp: "2024-05-05T12:29:56.000Z", likesCount: -1,  commentsCount: 4,  url: "https://www.instagram.com/p/C6ljrBvrfXa/", caption: "10.03.2024\nLembrança da viagem de aniver da mamis porque nosso próximo destino tá logo aí! 🤩 Amo viver a vida com você 🫶" }
+];
+
+/* =============================================
+   MAPEAMENTO
+   ============================================= */
+function tipoParaFormato(tipo) {
+  if (tipo === "Video")   return "Reels";
+  if (tipo === "Sidecar") return "Carrossel";
+  return "Post único";
+}
+
+function tituloDoCaption(caption) {
+  if (!caption) return "(sem legenda)";
+  const primeiraLinha = caption.split("\n")[0].trim();
+  return primeiraLinha.length > 80
+    ? primeiraLinha.slice(0, 77) + "..."
+    : primeiraLinha || "(sem legenda)";
+}
+
+function formatarData(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+function dataParaBanco(iso) {
+  return iso.slice(0, 10); // "YYYY-MM-DD"
+}
+
+/* =============================================
+   ESTADO
+   ============================================= */
+const selecionados = new Set();
+let jaExistentes   = new Set(); // shortCodes que já estão no banco
+
+/* =============================================
+   INICIALIZAÇÃO
+   ============================================= */
+document.addEventListener("DOMContentLoaded", async () => {
+  const usuario = await db.exigirLogin();
+  if (!usuario) return;
+
+  const clientes = await db.fetchClientes();
+  CLIENTES.length = 0;
+  clientes.forEach(c => CLIENTES.push(c));
+
+  const sel = document.getElementById("imp-cliente");
+  if (CLIENTES.length === 0) {
+    sel.innerHTML = '<option value="">Nenhum cliente cadastrado</option>';
+    return;
+  }
+
+  sel.innerHTML = CLIENTES.map(c =>
+    `<option value="${c.id}">${c.avatar} ${c.nome} (${c.handle})</option>`
+  ).join("");
+
+  // Restaura cliente ativo
+  const idAtivo = localStorage.getItem("hub_clienteAtivo");
+  if (idAtivo && CLIENTES.find(c => c.id === idAtivo)) {
+    sel.value = idAtivo;
+  }
+
+  sel.addEventListener("change", () => {
+    selecionados.clear();
+    jaExistentes.clear();
+    renderTabela();
+    atualizarFooter();
+  });
+
+  renderTabela();
+  atualizarFooter();
+});
+
+/* =============================================
+   RENDERIZAÇÃO DA TABELA
+   ============================================= */
+async function renderTabela() {
+  const tbody = document.getElementById("impTbody");
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#888">Verificando duplicatas...</td></tr>';
+
+  // Verifica quais datas já existem no banco para o cliente selecionado
+  const clienteId = document.getElementById("imp-cliente")?.value;
+  jaExistentes.clear();
+
+  if (clienteId) {
+    // Verifica em paralelo (até 5 por vez para não sobrecarregar)
+    const checks = POSTS_INSTAGRAM.map(p => ({ post: p, data: dataParaBanco(p.timestamp) }));
+    for (const { post, data } of checks) {
+      const existe = await db.postJaExiste(clienteId, data);
+      if (existe) jaExistentes.add(post.shortCode);
+    }
+  }
+
+  tbody.innerHTML = POSTS_INSTAGRAM.map((p, i) => {
+    const formato   = tipoParaFormato(p.type);
+    const titulo    = tituloDoCaption(p.caption);
+    const data      = formatarData(p.timestamp);
+    const likes     = p.likesCount > 0 ? p.likesCount : "—";
+    const isSel     = selecionados.has(p.shortCode);
+    const existe    = jaExistentes.has(p.shortCode);
+    const tipoClass = formato === "Reels" ? "reels" : formato === "Carrossel" ? "carrossel" : "post";
+
+    return `
+      <tr data-short="${p.shortCode}" class="${isSel ? "selecionado" : ""} ${existe ? "ja-existe" : ""}">
+        <td>
+          <input type="checkbox"
+            ${isSel ? "checked" : ""}
+            ${existe ? 'title="Já existe no banco"' : ""}
+            onchange="togglePost('${p.shortCode}', this.checked)">
+        </td>
+        <td class="imp-num">${data}</td>
+        <td>
+          <div class="imp-caption" title="${_escImp(p.caption)}">${_escImp(titulo)}</div>
+          ${existe ? '<div class="imp-caption-full" style="color:#CC6600">⚠ Já existe no banco</div>' : ""}
+        </td>
+        <td><span class="imp-tipo ${tipoClass}">${formato}</span></td>
+        <td class="imp-num">${likes}</td>
+        <td class="imp-num">${p.commentsCount}</td>
+        <td><a href="${p.url}" target="_blank" rel="noopener" class="imp-link">↗ Ver</a></td>
+      </tr>
+    `;
+  }).join("");
+
+  atualizarFooter();
+}
+
+/* =============================================
+   SELEÇÃO
+   ============================================= */
+function togglePost(shortCode, checked) {
+  if (checked) selecionados.add(shortCode);
+  else selecionados.delete(shortCode);
+
+  const tr = document.querySelector(`tr[data-short="${shortCode}"]`);
+  if (tr) tr.classList.toggle("selecionado", checked);
+
+  atualizarFooter();
+  _syncCbTodos();
+}
+
+function toggleTodos(checked) {
+  POSTS_INSTAGRAM.forEach(p => {
+    if (checked) selecionados.add(p.shortCode);
+    else selecionados.delete(p.shortCode);
+    const tr = document.querySelector(`tr[data-short="${p.shortCode}"]`);
+    if (tr) tr.classList.toggle("selecionado", checked);
+    const cb = tr?.querySelector("input[type='checkbox']");
+    if (cb) cb.checked = checked;
+  });
+  atualizarFooter();
+}
+
+function _syncCbTodos() {
+  const cb = document.getElementById("cbTodos");
+  if (cb) cb.checked = selecionados.size === POSTS_INSTAGRAM.length;
+}
+
+function atualizarFooter() {
+  const n      = selecionados.size;
+  const badge  = document.getElementById("impContagem");
+  const info   = document.getElementById("impFooterInfo");
+  const btn    = document.getElementById("btnImportar");
+  const total  = POSTS_INSTAGRAM.length;
+
+  if (badge) badge.textContent = `${n} selecionado${n !== 1 ? "s" : ""}`;
+  if (info)  info.innerHTML = n === 0
+    ? `<strong>${total}</strong> posts disponíveis. Selecione os que deseja importar.`
+    : `<strong>${n}</strong> post(s) selecionado(s). Clique em Importar para adicionar ao banco.`;
+  if (btn) btn.disabled = n === 0 || !document.getElementById("imp-cliente")?.value;
+  if (btn) btn.textContent = n > 0 ? `Importar ${n} post${n !== 1 ? "s" : ""}` : "Importar selecionados";
+}
+
+/* =============================================
+   IMPORTAÇÃO
+   ============================================= */
+async function importar() {
+  const clienteId = document.getElementById("imp-cliente")?.value;
+  if (!clienteId || selecionados.size === 0) return;
+
+  const postsSel = POSTS_INSTAGRAM.filter(p => selecionados.has(p.shortCode));
+  const total    = postsSel.length;
+
+  // Esconde botão, mostra progresso
+  document.getElementById("btnImportar").disabled = true;
+  document.getElementById("imp-cliente").disabled = true;
+  document.querySelector(".imp-table-wrap").style.pointerEvents = "none";
+  document.querySelector(".imp-table-wrap").style.opacity = ".6";
+
+  const progressWrap = document.getElementById("progressWrap");
+  const progressFill = document.getElementById("progressFill");
+  const progressLabel = document.getElementById("progressLabel");
+  progressWrap.classList.add("visivel");
+
+  let importados = 0;
+  let pulados    = 0;
+  let erros      = 0;
+
+  for (let i = 0; i < postsSel.length; i++) {
+    const p    = postsSel[i];
+    const data = dataParaBanco(p.timestamp);
+
+    progressLabel.textContent = `Importando ${i + 1}/${total}: ${tituloDoCaption(p.caption)}`;
+    progressFill.style.width  = `${Math.round(((i) / total) * 100)}%`;
+
+    // Verifica duplicata (pode ter mudado desde a checagem inicial)
+    const existe = await db.postJaExiste(clienteId, data);
+    if (existe) {
+      pulados++;
+      continue;
+    }
+
+    const dados = {
+      clienteId,
+      titulo:          tituloDoCaption(p.caption),
+      linha:           "",
+      subtema:         p.url,   // guarda o link do Instagram aqui como referência
+      formato:         tipoParaFormato(p.type),
+      funil:           "TOPO",
+      serie:           "—",
+      mes:             "Banco",
+      status:          "Publicado",
+      likes:           p.likesCount > 0 ? p.likesCount : 0,
+      comentarios:     p.commentsCount,
+      data_publicacao: data,
+      gancho:          "",
+      orientacoes:     ""
+    };
+
+    const resultado = await db.criarPost(dados);
+    if (resultado) importados++;
+    else erros++;
+  }
+
+  progressFill.style.width = "100%";
+  progressLabel.textContent = "Concluído!";
+
+  // Exibe resultado
+  const res = document.getElementById("impResultado");
+  res.classList.add("visivel");
+
+  const icon   = document.getElementById("resIcon");
+  const titulo = document.getElementById("resTitulo");
+  const texto  = document.getElementById("resTexto");
+
+  if (erros === 0) {
+    icon.textContent   = "✅";
+    titulo.textContent = "Importação concluída!";
+  } else {
+    icon.textContent   = "⚠️";
+    titulo.textContent = "Importação com avisos";
+  }
+
+  const partes = [];
+  if (importados > 0) partes.push(`<strong>${importados}</strong> post${importados !== 1 ? "s" : ""} importado${importados !== 1 ? "s" : ""} com sucesso`);
+  if (pulados    > 0) partes.push(`<strong>${pulados}</strong> já existia${pulados !== 1 ? "m" : ""} no banco e foi${pulados !== 1 ? "ram" : ""} pulado${pulados !== 1 ? "s" : ""}`);
+  if (erros      > 0) partes.push(`<strong>${erros}</strong> erro${erros !== 1 ? "s" : ""}`);
+
+  texto.innerHTML = partes.join(" · ") +
+    "<br><br>Os posts importados aparecem com status <strong>Publicado</strong>, formato mapeado automaticamente e linha/funil em branco — preencha conforme a estratégia editorial.";
+}
+
+/* =============================================
+   UTILITÁRIO: escape HTML
+   ============================================= */
+function _escImp(str) {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub de Conteúdo — Instagram</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { font-family: 'Inter', -apple-system, sans-serif; }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>📱 Hub de Conteúdo</h1>
+      <p>Gerenciador de Instagram</p>
+    </div>
+    <div class="sidebar-section-label">Clientes</div>
+    <div class="sidebar-clientes" id="sidebar-clientes">
+      <!-- Renderizado por app.js → renderSidebar() -->
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn-novo-cliente" onclick="abrirModalNovoCliente()">
+        + Novo Cliente
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+  <main class="main">
+
+    <!-- Cabeçalho do cliente ativo -->
+    <div id="client-header" class="client-header">
+      <!-- Renderizado por app.js → renderClienteHeader() -->
+    </div>
+
+    <!-- Cards de métricas -->
+    <div id="metrics-cards" class="metrics-row">
+      <!-- Renderizado por app.js → renderMetrics() -->
+    </div>
+
+    <!-- Barra de ferramentas -->
+    <div id="toolbar" class="toolbar">
+      <!-- Renderizado por app.js → renderToolbar() -->
+    </div>
+
+    <!-- Tabela de posts -->
+    <div id="table-wrap" class="table-wrap">
+      <!-- Renderizado por app.js → renderTabela() -->
+    </div>
+
+  </main>
+</div>
+
+<!-- ===== FAB DO CARRINHO ===== -->
+<button class="cart-fab" id="cartFab" onclick="openCart()">
+  🛒 <span class="cart-fab-count" id="cartFabCount">0</span>
+</button>
+
+<!-- ===== DRAWER DO CARRINHO ===== -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-hdr">
+    <h3>🛒 Caixinha do mês</h3>
+    <button class="cart-fechar" onclick="closeCart()">×</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <!-- Renderizado por ui.js → _renderCart() -->
+  </div>
+  <div class="cart-foot">
+    <div class="cart-foot-label">Atribuir seleção ao mês:</div>
+    <div class="cart-assign-row">
+      <select id="cartMesSelect">
+        <!-- Opções preenchidas dinamicamente abaixo -->
+      </select>
+      <button class="btn btn-primary" onclick="assignToMonth()">Aplicar</button>
+    </div>
+    <button class="btn-limpar-cart" onclick="clearSelection()">✕ Limpar seleção</button>
+  </div>
+</div>
+
+<!-- ===== MODAL: NOVO / EDITAR POST ===== -->
+<div class="modal-overlay" id="modal-post">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="modal-post-titulo-h">Novo Post</h2>
+      <button class="modal-fechar" onclick="closeModal('modal-post')">×</button>
+    </div>
+    <div class="modal-body" id="modal-post-body">
+      <!-- Renderizado por app.js → _preencherModalPost() -->
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('modal-post')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPost()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: NOVO CLIENTE ===== -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>Novo Cliente</h2>
+      <button class="modal-fechar" onclick="closeModal('modal-cliente')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grupo">
+        <label for="nc-nome">Nome completo *</label>
+        <input id="nc-nome" type="text" placeholder="Ex: Dra. Maria Silva">
+      </div>
+      <div class="form-row">
+        <div class="form-grupo">
+          <label for="nc-handle">Handle do Instagram *</label>
+          <input id="nc-handle" type="text" placeholder="@handle">
+        </div>
+        <div class="form-grupo">
+          <label for="nc-avatar">Emoji avatar</label>
+          <input id="nc-avatar" type="text" placeholder="🩺" maxlength="4">
+        </div>
+      </div>
+      <div class="form-grupo">
+        <label for="nc-espec">Especialidade</label>
+        <input id="nc-espec" type="text" placeholder="Ex: Cardiologia">
+      </div>
+      <div class="form-grupo">
+        <label for="nc-meta">Meta de posts por mês</label>
+        <input id="nc-meta" type="number" min="1" max="20" value="4">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('modal-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCliente()">Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== INDICADOR DE AUTO-SAVE ===== -->
+<div id="save-status" class="save-status"></div>
+
+<!-- ===== SCRIPTS (ordem importa!) ===== -->
+<!-- 1. Biblioteca Supabase (CDN — sem instalação) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- 2. Inicializa window.sb com URL e chave do projeto -->
+<script src="js/supabase.js"></script>
+<!-- 3. Funções async de banco (fetchClientes, criarPost, etc.) -->
+<script src="js/db.js"></script>
+<!-- 4. Constantes e OBJETIVOS_MES -->
+<script src="js/data.js"></script>
+<!-- 5. Utilitários de UI (badges, toast, carrinho) -->
+<script src="js/ui.js"></script>
+<!-- 6. Lógica do dashboard -->
+<script src="js/app.js"></script>
+
+</body>
+</html>

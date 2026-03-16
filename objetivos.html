@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Objetivos Mês a Mês · @paolapreto · 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#F0F4F8;color:#1A202C;font-size:14px;line-height:1.6}
+
+/* ── HEADER ─────────────────────────────────────────────────────── */
+.header{background:#1A3A4A;color:#fff;padding:14px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,.3);position:sticky;top:0;z-index:100}
+.header-title{flex:1}
+.header h1{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.header .tag{font-size:11px;color:#90CDF4;font-weight:400;margin-top:1px}
+.btn-back{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:600;background:rgba(255,255,255,.12);color:#90CDF4;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
+.btn-back:hover{background:rgba(255,255,255,.2);color:#fff}
+
+/* ── LAYOUT ─────────────────────────────────────────────────────── */
+.content{max-width:960px;margin:0 auto;padding:28px 20px 60px}
+.section-title{font-size:18px;font-weight:700;color:#1A3A4A;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #BEE3F8}
+.section{margin-bottom:48px}
+
+/* ── MONTH CARDS ─────────────────────────────────────────────────── */
+.months-grid{display:flex;flex-direction:column;gap:12px}
+.month-card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);border:1px solid #E2E8F0;transition:.15s}
+.month-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.month-card.star{border-color:#F6AD55;box-shadow:0 1px 4px rgba(246,173,85,.2)}
+.month-card.star:hover{box-shadow:0 2px 12px rgba(246,173,85,.3)}
+
+.month-header{padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:12px;user-select:none;background:#2E6B8A;color:#fff;transition:.1s}
+.month-card.star .month-header{background:linear-gradient(135deg,#C05621,#DD6B20)}
+.month-header:hover{filter:brightness(1.05)}
+.month-seq{font-size:11px;font-weight:700;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0}
+.month-name{font-size:15px;font-weight:700;flex:1}
+.month-star-badge{font-size:13px;flex-shrink:0}
+.month-arrow{font-size:12px;opacity:.7;flex-shrink:0;transition:.2s}
+.month-card.open .month-arrow{transform:rotate(180deg)}
+
+.month-body{display:none;padding:18px 20px;border-top:1px solid #E2E8F0}
+.month-card.open .month-body{display:block}
+.month-card.star .month-body{background:#FFFAF0}
+
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.meta-item{background:#F7FAFC;border-radius:8px;padding:10px 12px}
+.meta-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#718096;margin-bottom:4px}
+.meta-value{font-size:13px;color:#2D3748;font-weight:500}
+
+.obj-block{margin-bottom:14px}
+.obj-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#718096;margin-bottom:5px}
+.obj-text{font-size:13px;color:#2D3748;line-height:1.65;background:#F7FAFC;padding:10px 12px;border-radius:8px;border-left:3px solid #2E6B8A}
+.month-card.star .obj-text{border-left-color:#DD6B20}
+
+.posts-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.posts-list li{font-size:13px;color:#2D3748;padding:7px 12px;background:#F7FAFC;border-radius:7px;display:flex;gap:8px;align-items:flex-start}
+.posts-list li .post-num{font-weight:700;color:#2E6B8A;flex-shrink:0;min-width:18px}
+.month-card.star .posts-list li .post-num{color:#DD6B20}
+.posts-list li.bonus{background:#FFF3CD;border:1px solid #F6AD55}
+.posts-list li.bonus .post-num{color:#9C4221}
+
+.ad-block{font-size:13px;color:#2D3748;background:#EBF8FF;border-radius:8px;padding:10px 12px;line-height:1.65;border-left:3px solid #63B3ED}
+.month-card.star .ad-block{background:#FFF3CD;border-left-color:#F6AD55}
+
+.kpi-tags{display:flex;flex-wrap:wrap;gap:6px}
+.kpi-tag{font-size:11px;font-weight:600;background:#EBF8FF;color:#2B6CB0;padding:3px 10px;border-radius:999px}
+.month-card.star .kpi-tag{background:#FEEBC8;color:#9C4221}
+
+.dates-list{display:flex;flex-wrap:wrap;gap:6px}
+.date-chip{font-size:12px;font-weight:600;background:#D5F5E3;color:#1E8449;padding:3px 10px;border-radius:999px}
+.date-chip.red{background:#FDEDEC;color:#922B21}
+
+.lines-tags{display:flex;flex-wrap:wrap;gap:6px}
+.line-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
+.lt-mev{background:#D6EAF8;color:#1A5276}
+.lt-conv{background:#FDEDEC;color:#922B21}
+.lt-causa{background:#D5F5E3;color:#1E8449}
+.lt-hum{background:#F4ECF7;color:#76448A}
+
+.funnel-badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 12px;border-radius:999px;background:#EBF8FF;color:#2B6CB0}
+
+/* ── AD TABLE ────────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+table.data-table{width:100%;border-collapse:collapse;background:#fff;font-size:13px}
+table.data-table thead tr{background:#2E6B8A}
+table.data-table thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+table.data-table tbody tr{border-bottom:1px solid #EDF2F7;transition:.1s}
+table.data-table tbody tr:hover{background:#F7FAFC}
+table.data-table tbody tr:last-child{border-bottom:none}
+table.data-table tbody td{padding:10px 12px;vertical-align:top;color:#2D3748;line-height:1.5}
+table.data-table tbody td:first-child{font-weight:700;color:#1A3A4A;white-space:nowrap}
+
+/* KPIs table special styling */
+.kpi-bench{font-weight:700;color:#276749}
+.kpi-alert{color:#9B2C2C;font-size:12px}
+.kpi-action{font-size:12px;color:#4A5568}
+
+/* ── BANCO TEMAS SECTION ─────────────────────────────────────────── */
+.banco-section{margin-top:14px;padding:12px 14px;background:#F0FFF4;border-radius:8px;border:1px solid #9AE6B4}
+.banco-section-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#276749;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.banco-count-badge{background:#276749;color:#fff;border-radius:999px;font-size:10px;padding:1px 7px;font-weight:700}
+.banco-item{display:flex;align-items:flex-start;gap:8px;padding:6px 8px;background:#fff;border-radius:6px;margin-bottom:5px;border:1px solid #C6F6D5}
+.banco-item:last-child{margin-bottom:0}
+.banco-item-num{font-weight:700;color:#276749;flex-shrink:0;min-width:20px;font-size:12px}
+.banco-item-info{flex:1;min-width:0}
+.banco-item-titulo{font-size:12px;font-weight:600;color:#1A202C;line-height:1.4;margin-bottom:3px}
+.banco-item-meta{font-size:11px;color:#718096;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.banco-empty{font-size:12px;color:#718096;font-style:italic;padding:4px 0}
+.btn-refresh{font-size:11px;background:rgba(255,255,255,.2);color:#90CDF4;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;transition:.15s}
+.btn-refresh:hover{background:rgba(255,255,255,.3);color:#fff}
+
+/* ── UTILS ───────────────────────────────────────────────────────── */
+.divider{height:1px;background:#E2E8F0;margin:16px 0}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">
+    <h1>Objetivos Mês a Mês · @paolapreto</h1>
+    <div class="tag">Calendário Editorial 2026 — Abril a Dezembro</div>
+  </div>
+  <a class="btn-back" href="banco_temas.html">← Banco de Temas</a>
+  <button class="btn-refresh" onclick="renderMonths()" title="Recarregar temas do banco">↺ Atualizar</button>
+</div>
+
+<div class="content">
+
+  <!-- ── SECTION 1: Calendário ─────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">Calendário Editorial 2026</div>
+    <div class="months-grid" id="monthsGrid"></div>
+  </div>
+
+  <!-- ── SECTION 2: Guia de Anúncios ──────────────────────────── -->
+  <div class="section">
+    <div class="section-title">Guia de Anúncios</div>
+
+    <div class="table-wrap" style="margin-bottom:28px">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Objetivo</th>
+            <th>Quando Usar</th>
+            <th>Conteúdo Ideal</th>
+            <th>Métricas Principais</th>
+            <th>Orçamento Mensal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Reconhecimento de Marca</td>
+            <td>Alcançar novos públicos e aumentar seguidores qualificados</td>
+            <td>Lançamento (abr), aquecimento (ago), Mês do Coração (set)</td>
+            <td>Posts MEV de alto interesse geral (sono, exercício, dados de impacto)</td>
+            <td>Alcance · Impressões · CPM · Novos seguidores · Visitas ao perfil</td>
+            <td><strong>R$ 100–200/mês</strong></td>
+          </tr>
+          <tr>
+            <td>Engajamento</td>
+            <td>Aumentar interações: curtidas, salvamentos, comentários</td>
+            <td>Posts de séries (Mito ou Verdade, Q&A) com alto potencial viral</td>
+            <td>Reels educativos, carrosséis informativos, Q&A</td>
+            <td>Taxa de engajamento · Salvamentos · Comentários · Compartilhamentos</td>
+            <td><strong>R$ 80–120/mês</strong></td>
+          </tr>
+          <tr>
+            <td>Tráfego</td>
+            <td>Direcionar usuários para o link na bio (agendamento, site)</td>
+            <td>Meses de posicionamento e apresentação de serviços</td>
+            <td>Posts Conv com CTA claro para link na bio</td>
+            <td>CTR · Cliques no link · CPC · Visitas ao site/WhatsApp</td>
+            <td><strong>R$ 100–150/mês</strong></td>
+          </tr>
+          <tr>
+            <td>Mensagens (WhatsApp/DM)</td>
+            <td>Gerar conversas diretas que convertam em consultas</td>
+            <td>Meses de conversão: jun, out, nov, dez</td>
+            <td>Posts Conv: onde atendo, primeira consulta, diferenciais</td>
+            <td>Mensagens iniciadas · CPL · Taxa DM → agendamento · CPC</td>
+            <td><strong>R$ 150–200/mês</strong></td>
+          </tr>
+          <tr>
+            <td>Campanha de Causa</td>
+            <td>Ampliar alcance orgânico em datas simbólicas</td>
+            <td>Setembro: Mês do Coração, 27/set Doação, 29/set Dia Mundial</td>
+            <td>Posts de conscientização e doação de órgãos</td>
+            <td>Alcance · Impressões · Compartilhamentos · CPM</td>
+            <td><strong>R$ 200–300 (set. apenas)</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="font-size:15px;margin-bottom:12px">Referência de KPIs</div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>KPI</th>
+            <th>Definição</th>
+            <th>Benchmark</th>
+            <th>Sinal de Alerta</th>
+            <th>Ação Corretiva</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CPM</td>
+            <td>Custo por Mil Impressões — quanto custa alcançar 1.000 pessoas</td>
+            <td class="kpi-bench">R$ 8–20 (saúde, SP)</td>
+            <td class="kpi-alert">CPM &gt; R$ 25</td>
+            <td class="kpi-action">Revisar segmentação de público; testar criativo diferente</td>
+          </tr>
+          <tr>
+            <td>CTR</td>
+            <td>Taxa de Cliques no Link — % de pessoas que viram e clicaram no CTA</td>
+            <td class="kpi-bench">1% – 3%</td>
+            <td class="kpi-alert">CTR &lt; 0,5%</td>
+            <td class="kpi-action">Melhorar o CTA; testar imagem ou texto de abertura diferentes</td>
+          </tr>
+          <tr>
+            <td>CPC</td>
+            <td>Custo por Clique — quanto custa cada clique no link ou botão</td>
+            <td class="kpi-bench">R$ 1–4</td>
+            <td class="kpi-alert">CPC &gt; R$ 6</td>
+            <td class="kpi-action">Ajustar público; testar objetivo de campanha diferente</td>
+          </tr>
+          <tr>
+            <td>CPL</td>
+            <td>Custo por Lead / Mensagem — quanto custa cada mensagem ou contato iniciado</td>
+            <td class="kpi-bench">R$ 15–50 (saúde especializada)</td>
+            <td class="kpi-alert">CPL &gt; R$ 70</td>
+            <td class="kpi-action">Revisar copy do post; testar público mais qualificado</td>
+          </tr>
+          <tr>
+            <td>Taxa de Engajamento</td>
+            <td>(Curtidas + Comentários + Salvamentos) ÷ Alcance</td>
+            <td class="kpi-bench">2% – 6% (bom para perfil médico)</td>
+            <td class="kpi-alert">&lt; 1%</td>
+            <td class="kpi-action">Publicar em horários de pico; usar formatos de maior alcance (Reels)</td>
+          </tr>
+          <tr>
+            <td>Crescimento de Seguidores</td>
+            <td>Seguidores novos por mês</td>
+            <td class="kpi-bench">+50–150/mês (fase inicial)</td>
+            <td class="kpi-alert">&lt; 20/mês ou perda</td>
+            <td class="kpi-action">Aumentar frequência de posts TOPO; revisar estratégia de anúncios de alcance</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const MONTHS_DATA = [
+  {
+    id: "abril",
+    name: "Abril",
+    seq: "1º mês",
+    star: false,
+    objetivo: "Lançamento do perfil renovado + Prevenção cardiovascular. Estreia com apresentação em SP ancorada no Dia Mundial da Saúde (7/abr). Estabelecer voz, identidade e localização.",
+    posts: [
+      {num:"1", text:"Apresentação — nova fase em SP", linha:"conv"},
+      {num:"2", text:"Checkup cardiovascular: quem precisa fazer?", linha:"mev"},
+      {num:"3", text:"MAPA: quando a pressão no consultório engana", linha:"mev"},
+      {num:"4", text:"Meus diferenciais: IC avançada e transplante", linha:"conv"},
+    ],
+    linhas: [{label:"MEV (2)",cls:"lt-mev"},{label:"Conv (2)",cls:"lt-conv"}],
+    datas: [{text:"7/abr — Dia Mundial da Saúde",red:false}],
+    funil: "TOPO + FUNDO",
+    anuncio: "Objetivo: reconhecimento de marca (lançamento). Impulsionar post 1 (Conv) + post 2 (MEV) por 7–10 dias cada. Público: mulheres e homens 40–70 anos, SP capital + raio 30 km, interesses: saúde, cardiologia, bem-estar. Orçamento sugerido: R$ 250–350 (lançamento).",
+    kpis: ["Alcance e impressões","Novos seguidores","Visitas ao perfil","CPM (meta: < R$ 20)","Taxa de engajamento"],
+  },
+  {
+    id: "maio",
+    name: "Maio",
+    seq: "2º mês",
+    star: false,
+    objetivo: "Saúde cardiovascular da mulher + Dia das Mães. Usar o gancho emocional do Dia das Mães (10/mai) para conectar cuidado e saúde cardíaca. Incorporar temas de estresse e lifestyle previstos para fevereiro.",
+    posts: [
+      {num:"1", text:"Saúde cardiovascular da mulher", linha:"mev"},
+      {num:"2", text:"Arritmias e IC — sintomas a não ignorar", linha:"mev"},
+      {num:"3", text:"Cuidar da saúde = o melhor presente para quem você ama", linha:"conv"},
+      {num:"4", text:"Congresso / corrida com gancho cardiovascular (se houver evento)", linha:"hum"},
+    ],
+    linhas: [{label:"MEV (2)",cls:"lt-mev"},{label:"Conv (1)",cls:"lt-conv"},{label:"Hum (1)",cls:"lt-hum"}],
+    datas: [{text:"10/mai — Dia das Mães",red:false}],
+    funil: "TOPO + FUNDO",
+    anuncio: "Objetivo: alcance + tráfego. Impulsionar post 3 (Conv — Dia das Mães) próximo a 10/mai. Público: mulheres 35–65, SP, + públicos semelhantes a seguidores atuais. Orçamento sugerido: R$ 150–200.",
+    kpis: ["Alcance orgânico vs pago","Cliques no link da bio","CTR (meta: > 1%)","Novos seguidores","Compartilhamentos"],
+  },
+  {
+    id: "junho",
+    name: "Junho",
+    seq: "3º mês",
+    star: false,
+    objetivo: "Exercício físico e cardiologia. Posicionar exercício como prescrição médica cardiovascular. Gancho do inverno (retomada de atividade). Apresentar VO2max e qualidade de vida pós-Tx.",
+    posts: [
+      {num:"1", text:"Por que cardiologista prescreve exercício?", linha:"mev"},
+      {num:"2", text:"VO2max: o número que prevê sua longevidade", linha:"mev"},
+      {num:"3", text:"Qualidade de vida pós-transplante", linha:"causa"},
+      {num:"4", text:"Onde atendo em SP e como agendar sua consulta", linha:"conv"},
+    ],
+    linhas: [{label:"MEV (2)",cls:"lt-mev"},{label:"Causa (1)",cls:"lt-causa"},{label:"Conv (1)",cls:"lt-conv"}],
+    datas: [{text:"—",red:false}],
+    funil: "TOPO + MEIO + FUNDO",
+    anuncio: "Objetivo: tráfego / mensagens. Impulsionar post 4 (Conv — como agendar) com objetivo 'Mensagens'. Público: pessoas que interagiram com o perfil nos últimos 60 dias + semelhantes a quem clicou no link. Orçamento sugerido: R$ 150–200.",
+    kpis: ["Mensagens iniciadas","CPC (meta: < R$ 3)","CPL — custo por lead","Cliques no link da bio","Salvamentos (qualidade)"],
+  },
+  {
+    id: "julho",
+    name: "Julho",
+    seq: "4º mês",
+    star: false,
+    objetivo: "Posicionamento profissional + IC avançada. Consolidar autoridade na especialidade de IC avançada e transplante. Aproveitar congresso para humanização com gancho médico.",
+    posts: [
+      {num:"1", text:"IC avançada: o Quarteto Fantástico", linha:"mev"},
+      {num:"2", text:"Colesterol e aterosclerose: a placa que se forma em silêncio", linha:"mev"},
+      {num:"3", text:"O que esperar da sua primeira consulta comigo", linha:"conv"},
+      {num:"4", text:"Congresso / bastidores do ambulatório pós-Tx (se houver)", linha:"hum"},
+    ],
+    linhas: [{label:"MEV (2)",cls:"lt-mev"},{label:"Conv (1)",cls:"lt-conv"},{label:"Hum (1)",cls:"lt-hum"}],
+    datas: [{text:"Verificar: SOCESP / CBC",red:false}],
+    funil: "TOPO + MEIO + FUNDO",
+    anuncio: "Objetivo: reconhecimento de marca (especialidade). Impulsionar post 1 (IC avançada) para alcançar pacientes com IC. Público: pessoas com interesse em 'insuficiência cardíaca', 'transplante', 50–75 anos, SP. Orçamento sugerido: R$ 100–150.",
+    kpis: ["Alcance segmentado","CPM","Salvamentos","Visitas ao perfil","Novos seguidores qualificados"],
+  },
+  {
+    id: "agosto",
+    name: "Agosto",
+    seq: "5º mês",
+    star: false,
+    objetivo: "Fatores de risco cardiovascular + aquecimento para Setembro. Resgatar temas de hipertensão, diabetes, sono e dieta previstos para fev/mar. Preparar audiência para a campanha de setembro.",
+    posts: [
+      {num:"1", text:"Dieta DASH: a mais recomendada por cardiologistas", linha:"mev"},
+      {num:"2", text:"Sono e o coração: 7 a 9 horas não é luxo", linha:"mev"},
+      {num:"3", text:"Fila de espera pelo transplante — dados reais", linha:"causa"},
+      {num:"4", text:"Por que consultar especialista em IC avançada?", linha:"conv"},
+    ],
+    linhas: [{label:"MEV (2)",cls:"lt-mev"},{label:"Causa (1)",cls:"lt-causa"},{label:"Conv (1)",cls:"lt-conv"}],
+    datas: [{text:"—",red:false}],
+    funil: "TOPO + MEIO + FUNDO",
+    anuncio: "Objetivo: alcance + aquecimento de público. Impulsionar post MEV de maior apelo (sono ou dieta) para ampliar audiência antes de set. Criar público personalizado de remarketing para usar em setembro. Orçamento sugerido: R$ 100–150.",
+    kpis: ["Alcance","Impressões","Taxa de engajamento","Crescimento de seguidores","Público de remarketing gerado"],
+  },
+  {
+    id: "setembro",
+    name: "Setembro",
+    seq: "6º mês — CAMPANHA MÁXIMA",
+    star: true,
+    objetivo: "CAMPANHA: Mês do Coração — maior mês do ano. Concentração máxima de causa e conscientização. Pico de alcance orgânico. 5 posts (bônus de engajamento). Ancoragem nas datas mais importantes do calendário cardiovascular.",
+    posts: [
+      {num:"1", text:"Abertura Mês do Coração — dados de mortalidade cardiovascular", linha:"causa"},
+      {num:"2", text:"Como preservar o coração: guia prático", linha:"mev"},
+      {num:"3", text:"27/set — Dia Nacional de Doação de Órgãos", linha:"causa"},
+      {num:"4", text:"29/set — Dia Mundial do Coração: agende sua avaliação", linha:"conv"},
+      {num:"BÔNUS", text:"'Você é doador?' — post de engajamento", linha:"causa", bonus:true},
+    ],
+    linhas: [{label:"Causa (3)",cls:"lt-causa"},{label:"MEV (1)",cls:"lt-mev"},{label:"Conv (1)",cls:"lt-conv"}],
+    datas: [
+      {text:"27/set — Dia Nacional de Doação de Órgãos",red:true},
+      {text:"29/set — Dia Mundial do Coração",red:true},
+    ],
+    funil: "TOPO + FUNDO",
+    anuncio: "INVESTIMENTO MÁXIMO DO ANO. Impulsionar TODOS os posts da campanha. Estratégia dupla: Posts de Causa (27/set e abertura): objetivo Alcance — público amplo SP. Post Conv (29/set): objetivo Mensagens — público quente (remarketing de ago+set). Público frio: interesse em doação de órgãos, cardiologia, saúde — SP. Orçamento sugerido: R$ 400–600 (mês inteiro).",
+    kpis: ["Alcance total da campanha","Impressões","CPM (eficiência)","Mensagens iniciadas","CPL — custo por lead","Crescimento de seguidores","Visitas ao perfil"],
+  },
+  {
+    id: "outubro",
+    name: "Outubro",
+    seq: "7º mês",
+    star: false,
+    objetivo: "Reconversão pós-campanha. Aproveitar o aquecimento de setembro para converter novos seguidores em pacientes. Aprofundar temas técnicos e abrir espaço para Q&A.",
+    posts: [
+      {num:"1", text:"Miocardiopatias: quando o músculo do coração adoece", linha:"mev"},
+      {num:"2", text:"Medicamentos cardiológicos: dúvidas frequentes", linha:"mev"},
+      {num:"3", text:"Resultados do transplante cardíaco: dados reais", linha:"causa"},
+      {num:"4", text:"Q&A: respondendo suas dúvidas sobre o coração", linha:"conv"},
+    ],
+    linhas: [{label:"MEV (2)",cls:"lt-mev"},{label:"Causa (1)",cls:"lt-causa"},{label:"Conv (1)",cls:"lt-conv"}],
+    datas: [{text:"—",red:false}],
+    funil: "MEIO + FUNDO",
+    anuncio: "Objetivo: conversão / mensagens. Impulsionar post 4 (Q&A — Conv) com objetivo Mensagens. Público: remarketing de quem interagiu em setembro + semelhantes. Orçamento sugerido: R$ 150–200.",
+    kpis: ["Mensagens iniciadas","CPL","Taxa comentários (Q&A)","CPC","Conversão DM → consulta"],
+  },
+  {
+    id: "novembro",
+    name: "Novembro",
+    seq: "8º mês",
+    star: false,
+    objetivo: "Prevenção — saúde preventiva. Mês de reforço preventivo. Tabagismo realocado de março. Humanização com aniversário ou congresso se houver. Reafirmar diferenciais antes do encerramento.",
+    posts: [
+      {num:"1", text:"Tabagismo e o coração", linha:"mev"},
+      {num:"2", text:"Teste ergométrico: por que o médico pediu a esteira?", linha:"mev"},
+      {num:"3", text:"Aniversário da Paôla ou congresso (se aplicável)", linha:"hum"},
+      {num:"4", text:"Por que me escolher como sua cardiologista", linha:"conv"},
+    ],
+    linhas: [{label:"MEV (2)",cls:"lt-mev"},{label:"Hum (1)",cls:"lt-hum"},{label:"Conv (1)",cls:"lt-conv"}],
+    datas: [{text:"Verificar: Congresso Medicina do Estilo de Vida",red:false}],
+    funil: "TOPO + FUNDO",
+    anuncio: "Objetivo: conversão. Impulsionar post 4 (Conv — por que me escolher) com objetivo Mensagens. Público: seguidores há mais de 30 dias que ainda não interagiram com Conv. Orçamento sugerido: R$ 150–200.",
+    kpis: ["Mensagens iniciadas","CPC","CPL","Taxa de conversão DM → agendamento","Custo por consulta agendada"],
+  },
+  {
+    id: "dezembro",
+    name: "Dezembro",
+    seq: "9º mês",
+    star: false,
+    objetivo: "Fechamento do ano + cuidados nas festas. Encerrar 2026 com conteúdo prático para as festas, humanização (retrospectiva) e CTA de agendamento para 2027.",
+    posts: [
+      {num:"1", text:"Coração nas festas: álcool, sal e estresse", linha:"mev"},
+      {num:"2", text:"Coração artificial como ponte para o transplante", linha:"causa"},
+      {num:"3", text:"Retrospectiva 2026", linha:"hum"},
+      {num:"4", text:"Agende seu checkup cardiovascular para 2027", linha:"conv"},
+    ],
+    linhas: [{label:"MEV (1)",cls:"lt-mev"},{label:"Causa (1)",cls:"lt-causa"},{label:"Hum (1)",cls:"lt-hum"},{label:"Conv (1)",cls:"lt-conv"}],
+    datas: [{text:"Festas de fim de ano",red:false}],
+    funil: "TOPO + FUNDO",
+    anuncio: "Objetivo: conversão / agendamentos jan/2027. Impulsionar post 4 (Conv — checkup 2027) com objetivo Mensagens na última semana de dez. Público: todas as pessoas que interagiram com o perfil em 2026. Orçamento sugerido: R$ 150–200.",
+    kpis: ["Mensagens iniciadas (meta: agendamentos para jan)","CPL","CPC","ROAS geral do ano (opcional)","Crescimento de seguidores 2026"],
+  },
+];
+
+function linhaClass(l) {
+  const m = {mev:'lt-mev',conv:'lt-conv',causa:'lt-causa',hum:'lt-hum'};
+  return m[l] || '';
+}
+
+function linhaKey(nome) {
+  const m = {
+    "Medicina do Estilo de Vida":"mev",
+    "Conversão":"conv",
+    "Causa & Conscientização":"causa",
+    "Humanização":"hum"
+  };
+  return m[nome] || 'mev';
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getBancoTemas(monthName) {
+  try {
+    const raw = localStorage.getItem('paola_temas_v2');
+    if (!raw) return [];
+    return JSON.parse(raw).filter(t => t.mes === monthName);
+  } catch(e) { return []; }
+}
+
+function renderMonths() {
+  const grid = document.getElementById('monthsGrid');
+  // remember which cards were open before re-render
+  const wasOpen = new Set(
+    Array.from(document.querySelectorAll('.month-card.open')).map(el => el.id.replace('card-',''))
+  );
+
+  grid.innerHTML = MONTHS_DATA.map(m => {
+    const starClass = m.star ? ' star' : '';
+    const starBadge = m.star ? '<span class="month-star-badge">⭐ Mês de maior investimento</span>' : '';
+    const datesHtml = m.datas.map(d =>
+      d.text === '—' ? '' : `<span class="date-chip${d.red?' red':''}">${d.text}</span>`
+    ).filter(Boolean).join('');
+    const datesBlock = datesHtml
+      ? `<div class="obj-block"><div class="obj-label">Datas Importantes</div><div class="dates-list">${datesHtml}</div></div>`
+      : '';
+    const postsHtml = m.posts.map(p => {
+      const cls = linhaClass(p.linha);
+      return `<li${p.bonus?' class="bonus"':''}>
+        <span class="post-num">${p.num}</span>
+        <span>${p.text} <span class="line-tag ${cls}" style="font-size:10px;padding:1px 7px;">${p.linha.toUpperCase()}</span></span>
+      </li>`;
+    }).join('');
+    const linesHtml = m.linhas.map(l => `<span class="line-tag ${l.cls}">${l.label}</span>`).join('');
+    const kpisHtml = m.kpis.map(k => `<span class="kpi-tag">${k}</span>`).join('');
+
+    // ── Temas do banco de temas (localStorage) ────────────────────
+    const bancoTemas = getBancoTemas(m.name);
+    const bancoSection = `
+      <div class="banco-section">
+        <div class="banco-section-label">
+          Temas selecionados do banco
+          <span class="banco-count-badge">${bancoTemas.length}</span>
+        </div>
+        ${bancoTemas.length === 0
+          ? '<div class="banco-empty">Nenhum tema atribuído a este mês ainda. Use a Caixinha do Mês no Banco de Temas.</div>'
+          : bancoTemas.map((t, i) => {
+              const lk = linhaKey(t.linha);
+              const fmt = t.formato || '';
+              const isStory = fmt.startsWith('Story');
+              return `<div class="banco-item">
+                <div class="banco-item-num">${i+1}</div>
+                <div class="banco-item-info">
+                  <div class="banco-item-titulo">${escHtml(t.titulo)}</div>
+                  <div class="banco-item-meta">
+                    <span class="line-tag ${linhaClass(lk)}" style="font-size:10px;padding:1px 7px;">${t.linha}</span>
+                    <span style="color:#4A5568">${escHtml(fmt)}</span>
+                    <span style="font-weight:600;color:${t.funil==='FUNDO'?'#9C4221':t.funil==='MEIO'?'#2B6CB0':'#276749'}">${t.funil}</span>
+                    ${isStory ? '<span style="background:#FCE4EC;color:#880E4F;border-radius:999px;font-size:10px;padding:1px 7px;font-weight:600;">Story</span>' : ''}
+                  </div>
+                </div>
+              </div>`;
+            }).join('')
+        }
+      </div>`;
+
+    return `
+    <div class="month-card${starClass}" id="card-${m.id}">
+      <div class="month-header" onclick="toggleCard('${m.id}')">
+        <span class="month-seq">${m.seq}</span>
+        <span class="month-name">${m.name}${m.star ? ' ⭐' : ''}</span>
+        ${starBadge}
+        <span class="month-arrow">▼</span>
+      </div>
+      <div class="month-body">
+        <div class="obj-block">
+          <div class="obj-label">Objetivo do Mês</div>
+          <div class="obj-text">${m.objetivo}</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Linhas Editoriais</div>
+            <div class="lines-tags">${linesHtml}</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Funil Dominante</div>
+            <div class="funnel-badge">${m.funil}</div>
+          </div>
+        </div>
+
+        ${datesBlock}
+
+        <div class="obj-block">
+          <div class="obj-label">Posts Planejados (base)</div>
+          <ul class="posts-list">${postsHtml}</ul>
+        </div>
+
+        ${bancoSection}
+
+        <div class="obj-block">
+          <div class="obj-label">Estratégia de Anúncio</div>
+          <div class="ad-block">${m.anuncio}</div>
+        </div>
+
+        <div class="obj-block" style="margin-bottom:0">
+          <div class="obj-label">KPIs Prioritários</div>
+          <div class="kpi-tags">${kpisHtml}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Restore open state; open September by default on first load
+  if (wasOpen.size > 0) {
+    wasOpen.forEach(id => {
+      const card = document.getElementById('card-' + id);
+      if (card) card.classList.add('open');
+    });
+  } else {
+    toggleCard('setembro');
+  }
+}
+
+function toggleCard(id) {
+  const card = document.getElementById('card-' + id);
+  if (!card) return;
+  card.classList.toggle('open');
+}
+
+renderMonths();
+</script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Hub de Conteúdo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #F5F5F5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-card {
+      background: #FFFFFF;
+      border: 1px solid #DDDDDD;
+      border-radius: 12px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .login-logo-icon {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .login-logo h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111111;
+    }
+
+    .login-logo p {
+      font-size: 13px;
+      color: #888888;
+      margin-top: 4px;
+    }
+
+    .form-grupo {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+
+    .form-grupo label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #444444;
+    }
+
+    .form-grupo input {
+      padding: 10px 12px;
+      border: 1px solid #DDDDDD;
+      border-radius: 7px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #111111;
+      background: #FAFAFA;
+      transition: border-color .15s;
+    }
+
+    .form-grupo input:focus {
+      outline: none;
+      border-color: #888888;
+      background: #FFFFFF;
+    }
+
+    .btn-principal {
+      width: 100%;
+      padding: 11px;
+      background: #111111;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background .15s;
+    }
+
+    .btn-principal:hover { background: #333333; }
+    .btn-principal:disabled { background: #888888; cursor: not-allowed; }
+
+    .erro-msg {
+      background: #FFF5F5;
+      border: 1px solid #FED7D7;
+      border-radius: 7px;
+      color: #9B2C2C;
+      font-size: 13px;
+      padding: 10px 12px;
+      margin-top: 14px;
+      display: none;
+    }
+
+    .erro-msg.visivel { display: block; }
+
+    .sucesso-msg {
+      background: #F0FFF4;
+      border: 1px solid #C6F6D5;
+      border-radius: 7px;
+      color: #276749;
+      font-size: 13px;
+      padding: 10px 12px;
+      margin-top: 14px;
+      display: none;
+    }
+
+    .sucesso-msg.visivel { display: block; }
+
+    .link-alternar {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #666666;
+    }
+
+    .link-alternar a {
+      color: #111111;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .link-alternar a:hover { text-decoration: underline; }
+
+    .tela { display: none; }
+    .tela.ativa { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+
+  <div class="login-logo">
+    <span class="login-logo-icon">📱</span>
+    <h1>Hub de Conteúdo</h1>
+    <p>Gerenciador de Instagram</p>
+  </div>
+
+  <!-- ===== TELA DE LOGIN ===== -->
+  <div class="tela ativa" id="tela-login">
+
+    <form onsubmit="fazerLogin(event)">
+
+      <div class="form-grupo">
+        <label for="login-email">E-mail</label>
+        <input id="login-email" type="email" placeholder="seu@email.com" required autocomplete="email">
+      </div>
+
+      <div class="form-grupo">
+        <label for="login-senha">Senha</label>
+        <input id="login-senha" type="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+
+      <button class="btn-principal" type="submit" id="btn-entrar">Entrar</button>
+
+      <div class="erro-msg" id="erro-login"></div>
+
+    </form>
+
+    <div class="link-alternar">
+      Não tem conta? <a onclick="mostrarTela('cadastro')">Criar conta</a>
+    </div>
+
+  </div>
+
+  <!-- ===== TELA DE CADASTRO ===== -->
+  <div class="tela" id="tela-cadastro">
+
+    <form onsubmit="fazerCadastro(event)">
+
+      <div class="form-grupo">
+        <label for="cad-email">E-mail</label>
+        <input id="cad-email" type="email" placeholder="seu@email.com" required autocomplete="email">
+      </div>
+
+      <div class="form-grupo">
+        <label for="cad-senha">Senha</label>
+        <input id="cad-senha" type="password" placeholder="mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
+      </div>
+
+      <div class="form-grupo">
+        <label for="cad-confirmar">Confirmar senha</label>
+        <input id="cad-confirmar" type="password" placeholder="repita a senha" required autocomplete="new-password" minlength="6">
+      </div>
+
+      <button class="btn-principal" type="submit" id="btn-cadastrar">Criar conta</button>
+
+      <div class="erro-msg"    id="erro-cadastro"></div>
+      <div class="sucesso-msg" id="sucesso-cadastro"></div>
+
+    </form>
+
+    <div class="link-alternar">
+      Já tem conta? <a onclick="mostrarTela('login')">Entrar</a>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+  // Se já estiver logado, vai direto para o dashboard
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session) window.location.href = "index.html";
+  });
+
+  /* Alterna entre as telas de login e cadastro */
+  function mostrarTela(qual) {
+    document.querySelectorAll(".tela").forEach(el => el.classList.remove("ativa"));
+    document.getElementById("tela-" + qual).classList.add("ativa");
+    // Limpa mensagens de erro ao trocar de tela
+    document.querySelectorAll(".erro-msg, .sucesso-msg").forEach(el => el.classList.remove("visivel"));
+  }
+
+  /* Login */
+  async function fazerLogin(event) {
+    event.preventDefault();
+
+    const email = document.getElementById("login-email").value.trim();
+    const senha = document.getElementById("login-senha").value;
+    const btn   = document.getElementById("btn-entrar");
+    const erro  = document.getElementById("erro-login");
+
+    btn.disabled = true;
+    btn.textContent = "Entrando...";
+    erro.classList.remove("visivel");
+
+    const { error } = await sb.auth.signInWithPassword({ email, password: senha });
+
+    if (error) {
+      const msgs = {
+        "Invalid login credentials": "E-mail ou senha incorretos.",
+        "Email not confirmed":       "Confirme seu e-mail antes de entrar.",
+        "Too many requests":         "Muitas tentativas. Aguarde alguns minutos."
+      };
+      erro.textContent = msgs[error.message] || error.message;
+      erro.classList.add("visivel");
+      btn.disabled = false;
+      btn.textContent = "Entrar";
+      return;
+    }
+
+    window.location.href = "index.html";
+  }
+
+  /* Cadastro */
+  async function fazerCadastro(event) {
+    event.preventDefault();
+
+    const email     = document.getElementById("cad-email").value.trim();
+    const senha     = document.getElementById("cad-senha").value;
+    const confirmar = document.getElementById("cad-confirmar").value;
+    const btn       = document.getElementById("btn-cadastrar");
+    const erro      = document.getElementById("erro-cadastro");
+    const sucesso   = document.getElementById("sucesso-cadastro");
+
+    erro.classList.remove("visivel");
+    sucesso.classList.remove("visivel");
+
+    if (senha !== confirmar) {
+      erro.textContent = "As senhas não coincidem.";
+      erro.classList.add("visivel");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Criando conta...";
+
+    const { data, error } = await sb.auth.signUp({ email, password: senha });
+
+    btn.disabled = false;
+    btn.textContent = "Criar conta";
+
+    if (error) {
+      const msgs = {
+        "User already registered": "Este e-mail já está cadastrado.",
+        "Password should be at least 6 characters": "A senha precisa ter pelo menos 6 caracteres.",
+        "Too many requests": "Muitas tentativas. Aguarde alguns minutos."
+      };
+      erro.textContent = msgs[error.message] || error.message;
+      erro.classList.add("visivel");
+      return;
+    }
+
+    // Se o Supabase tiver confirmação de email desativada, a sessão já existe
+    if (data.session) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    // Com confirmação ativada: mostrar mensagem e aguardar o clique no email
+    sucesso.textContent = "Conta criada! Verifique seu e-mail para ativar o acesso, depois volte aqui para entrar.";
+    sucesso.classList.add("visivel");
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Credenciais e segredos
+client_secret*.json
+*.env
+.env*
+
+# Dados brutos do scraper (grandes, não versionados)
+dataset_instagram-*.json
+
+# Arquivos do macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Planilhas geradas (podem ser regeneradas pelos scripts)
+*.xlsx
+
+# Instruções internas do Claude
+CLAUDE.md
