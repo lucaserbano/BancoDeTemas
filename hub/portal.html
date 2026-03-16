@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal da Cliente</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+<!-- Banner de preview (visível apenas para admin em modo ?preview=1) -->
+<div id="preview-banner" class="preview-banner" style="display:none">
+  <!-- Preenchido por portal.js → _renderBannerPreview() -->
+</div>
+
+<!-- Estado de carregamento -->
+<div id="portal-loading" class="portal-loading" style="display:flex">
+  <div class="portal-loading-spinner"></div>
+  <span>Carregando seu planejamento...</span>
+</div>
+
+<!-- Estado de erro -->
+<div id="portal-erro" class="portal-erro" style="display:none">
+  <div class="portal-erro-icon">🚫</div>
+  <div class="portal-erro-titulo" id="portal-erro-titulo">Erro</div>
+  <div class="portal-erro-texto" id="portal-erro-texto"></div>
+</div>
+
+<!-- Conteúdo principal do portal -->
+<div id="portal-content" style="display:none">
+  <div class="portal-wrap">
+
+    <!-- Cabeçalho da cliente -->
+    <div id="portal-header" class="portal-header">
+      <!-- Preenchido por portal.js → _renderHeader() -->
+    </div>
+
+    <!-- ==========================================
+         BLOCO 1 — OBJETIVOS MENSAIS
+    ========================================== -->
+    <section class="portal-section">
+      <div class="portal-section-title">Bloco 1</div>
+      <div class="portal-section-heading">Objetivos dos próximos meses</div>
+      <p style="font-size:14px;color:#6B7280;margin-bottom:20px;margin-top:4px">
+        O foco estratégico de cada mês do seu calendário editorial.
+      </p>
+      <div id="bloco-objetivos">
+        <!-- Preenchido por portal.js → _renderBloco1_Objetivos() -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         BLOCO 2 — ORÇAMENTO DE ANÚNCIOS
+    ========================================== -->
+    <section class="portal-section">
+      <div class="portal-section-title">Bloco 2</div>
+      <div class="portal-section-heading">Orçamento de anúncios</div>
+      <p style="font-size:14px;color:#6B7280;margin-bottom:20px;margin-top:4px">
+        Investimento previsto em tráfego pago para cada mês.
+      </p>
+      <div id="bloco-orcamento">
+        <!-- Preenchido por portal.js → _renderBloco2_Orcamento() -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         BLOCO 3 — CALENDÁRIO VISUAL
+    ========================================== -->
+    <section class="portal-section">
+      <div class="portal-section-title">Bloco 3</div>
+      <div class="portal-section-heading">Calendário visual</div>
+      <p style="font-size:14px;color:#6B7280;margin-bottom:20px;margin-top:4px">
+        Visão geral das publicações programadas, coloridas por status.
+        Clique em uma publicação para ver os detalhes abaixo.
+      </p>
+      <div id="bloco-calendario">
+        <!-- Preenchido por portal.js → _renderBloco3_Calendario() -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         BLOCO 4 — LISTA DETALHADA
+    ========================================== -->
+    <section class="portal-section">
+      <div class="portal-section-title">Bloco 4</div>
+      <div class="portal-section-heading">Publicações detalhadas</div>
+      <p style="font-size:14px;color:#6B7280;margin-bottom:20px;margin-top:4px">
+        Clique em qualquer publicação para ver o gancho, o roteiro e deixar seu comentário.
+      </p>
+      <div id="bloco-lista">
+        <!-- Preenchido por portal.js → _renderBloco4_Lista() -->
+      </div>
+    </section>
+
+  </div><!-- /.portal-wrap -->
+</div><!-- /#portal-content -->
+
+<!-- Toast de feedback -->
+<div id="portal-toast" class="portal-toast"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<!-- 1. Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- 2. Cliente Supabase (define window.sb) -->
+<script src="js/supabase.js"></script>
+<!-- 3. Constantes globais (MESES_ANO, STATUS, LINHAS etc.) -->
+<script src="js/data.js"></script>
+<!-- 4. Funções de banco do portal -->
+<script src="js/portal-db.js"></script>
+<!-- 5. Lógica da página -->
+<script src="js/portal.js"></script>
+
+</body>
+</html>

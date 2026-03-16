@@ -136,6 +136,7 @@ function renderClienteHeader() {
     <div class="client-header-actions">
       <a href="mes.html" class="btn btn-secondary">📅 Ver Calendário</a>
       <a href="calendario.html" class="btn btn-secondary">🗓️ Cal. Visual</a>
+      <a href="portal.html?client_id=${c.id}&preview=1" class="btn btn-secondary" target="_blank" title="Ver como a cliente visualiza o portal">👁 Ver Portal</a>
     </div>
   `;
 }

@@ -1,0 +1,609 @@
+/* =============================================
+   PORTAL.CSS — Estilos do Portal da Cliente
+   Design limpo, elegante, sem o visual denso do hub interno.
+   ============================================= */
+
+/* -----------------------------------------------
+   RESET E BASE
+----------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #F8F9FB;
+  color: #1A1D23;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* -----------------------------------------------
+   BANNER DE PREVIEW (admin apenas)
+----------------------------------------------- */
+.preview-banner {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #FEF3C7;
+  border-bottom: 1px solid #F59E0B;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #92400E;
+}
+.preview-banner-icon { font-size: 16px; }
+.preview-banner-text { flex: 1; font-weight: 500; }
+.preview-banner-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #92400E;
+  opacity: 0.7;
+  line-height: 1;
+  padding: 0 4px;
+}
+.preview-banner-close:hover { opacity: 1; }
+
+/* -----------------------------------------------
+   LAYOUT GERAL
+----------------------------------------------- */
+.portal-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* -----------------------------------------------
+   CABEÇALHO DO PORTAL
+----------------------------------------------- */
+.portal-header {
+  margin-bottom: 48px;
+}
+.portal-header-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.portal-avatar {
+  font-size: 40px;
+  line-height: 1;
+}
+.portal-header-nome {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1A1D23;
+  letter-spacing: -0.3px;
+}
+.portal-header-handle {
+  font-size: 14px;
+  color: #6B7280;
+  margin-top: 2px;
+}
+.portal-header-sub {
+  font-size: 14px;
+  color: #9CA3AF;
+  margin-top: 12px;
+}
+
+/* -----------------------------------------------
+   SEÇÕES DO PORTAL
+----------------------------------------------- */
+.portal-section {
+  margin-bottom: 56px;
+}
+.portal-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #9CA3AF;
+  margin-bottom: 16px;
+}
+.portal-section-heading {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1A1D23;
+  margin-bottom: 4px;
+}
+
+/* -----------------------------------------------
+   GRID DE 3 COLUNAS (Blocos 1 e 2)
+----------------------------------------------- */
+.portal-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 700px) {
+  .portal-3col { grid-template-columns: 1fr; }
+}
+
+/* -----------------------------------------------
+   CARD GENÉRICO
+----------------------------------------------- */
+.portal-card {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 20px;
+  transition: box-shadow 0.15s;
+}
+.portal-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.portal-card-mes {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #9CA3AF;
+  margin-bottom: 12px;
+}
+.portal-card-vazio {
+  background: #F9FAFB;
+  border: 1px dashed #E5E7EB;
+  color: #9CA3AF;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+}
+
+/* -----------------------------------------------
+   BLOCO 1 — OBJETIVOS
+----------------------------------------------- */
+.obj-objetivo {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1A1D23;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.obj-foco {
+  font-size: 13px;
+  color: #4B5563;
+  margin-bottom: 12px;
+}
+.obj-datas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.obj-data-pill {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+/* -----------------------------------------------
+   BLOCO 2 — ORÇAMENTO
+----------------------------------------------- */
+.orc-valor {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1A1D23;
+  margin-bottom: 4px;
+}
+.orc-obs {
+  font-size: 13px;
+  color: #6B7280;
+  margin-bottom: 14px;
+}
+.funil-bar-wrap {
+  display: flex;
+  height: 6px;
+  border-radius: 4px;
+  overflow: hidden;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+.funil-seg-topo  { background: #60A5FA; }
+.funil-seg-meio  { background: #818CF8; }
+.funil-seg-fundo { background: #F472B6; }
+.funil-legenda {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  color: #6B7280;
+}
+.funil-legenda-item { display: flex; align-items: center; gap: 4px; }
+.funil-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.funil-dot-topo  { background: #60A5FA; }
+.funil-dot-meio  { background: #818CF8; }
+.funil-dot-fundo { background: #F472B6; }
+
+/* -----------------------------------------------
+   BLOCO 3 — CALENDÁRIO VISUAL
+----------------------------------------------- */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 700px) {
+  .cal-grid { grid-template-columns: 1fr; }
+}
+
+.cal-mes-col {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.cal-mes-header {
+  background: #F3F4F6;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #374151;
+  border-bottom: 1px solid #E5E7EB;
+}
+.cal-mes-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cal-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.1s;
+  border: 1px solid transparent;
+}
+.cal-chip:hover { opacity: 0.85; }
+.cal-chip-data {
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 28px;
+  text-align: center;
+  opacity: 0.75;
+}
+.cal-chip-titulo {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cal-chip-comentado {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #1A1D23;
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+.cal-sem-posts {
+  padding: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: #D1D5DB;
+}
+
+/* Cores dos chips por status */
+.cal-chip-emproducao  { background: #FFFBEB; border-color: #FDE68A; color: #92400E; }
+.cal-chip-aprovado    { background: #ECFDF5; border-color: #A7F3D0; color: #065F46; }
+.cal-chip-reprovado   { background: #FEF2F2; border-color: #FECACA; color: #991B1B; }
+.cal-chip-publicado   { background: #EDE9FE; border-color: #DDD6FE; color: #4C1D95; }
+.cal-chip-neutro      { background: #F3F4F6; border-color: #E5E7EB; color: #374151; }
+
+/* Legenda de status */
+.cal-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+.cal-legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6B7280;
+}
+.cal-legenda-dot {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.cal-legenda-dot-emproducao { background: #FCD34D; }
+.cal-legenda-dot-aprovado   { background: #34D399; }
+.cal-legenda-dot-reprovado  { background: #F87171; }
+.cal-legenda-dot-publicado  { background: #A78BFA; }
+.cal-legenda-dot-outro      { background: #D1D5DB; }
+
+/* -----------------------------------------------
+   BLOCO 4 — LISTA DETALHADA
+----------------------------------------------- */
+.lista-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lista-post-card {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+.lista-post-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.lista-post-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.lista-post-header:hover .lista-post-titulo { color: #4338CA; }
+.lista-post-meta {
+  flex: 1;
+  min-width: 0;
+}
+.lista-post-titulo {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1A1D23;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  transition: color 0.1s;
+}
+.lista-post-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.lista-post-data {
+  font-size: 12px;
+  color: #9CA3AF;
+}
+.lista-post-expand-icon {
+  font-size: 18px;
+  color: #D1D5DB;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  margin-top: 2px;
+}
+.lista-post-card.aberto .lista-post-expand-icon { transform: rotate(180deg); }
+
+.lista-post-body {
+  border-top: 1px solid #F3F4F6;
+  padding: 20px;
+  display: none;
+}
+.lista-post-card.aberto .lista-post-body { display: block; }
+
+.lista-campo {
+  margin-bottom: 16px;
+}
+.lista-campo-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9CA3AF;
+  margin-bottom: 6px;
+}
+.lista-campo-valor {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Indicador de comentários no header */
+.lista-comentario-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #6B7280;
+  background: #F3F4F6;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.lista-comentario-badge.tem-comentario {
+  background: #EFF6FF;
+  color: #1D4ED8;
+}
+
+/* -----------------------------------------------
+   SEÇÃO DE COMENTÁRIOS
+----------------------------------------------- */
+.comentarios-wrap {
+  border-top: 1px solid #F3F4F6;
+  padding-top: 20px;
+  margin-top: 8px;
+}
+.comentarios-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4B5563;
+  margin-bottom: 14px;
+}
+.comentarios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.comentario-item {
+  background: #F9FAFB;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.comentario-data {
+  font-size: 11px;
+  color: #9CA3AF;
+  margin-bottom: 4px;
+}
+.comentario-corpo {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.comentarios-vazio {
+  font-size: 13px;
+  color: #D1D5DB;
+  margin-bottom: 16px;
+}
+
+.comentario-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.comentario-textarea {
+  width: 100%;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1A1D23;
+  resize: vertical;
+  min-height: 72px;
+  transition: border-color 0.15s;
+  background: #fff;
+}
+.comentario-textarea:focus {
+  outline: none;
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+.comentario-textarea::placeholder { color: #D1D5DB; }
+.comentario-btn {
+  align-self: flex-end;
+  background: #6366F1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.comentario-btn:hover { background: #4F46E5; }
+.comentario-btn:disabled { background: #C7D2FE; cursor: not-allowed; }
+
+/* -----------------------------------------------
+   BADGES DE STATUS (reutilizáveis no portal)
+----------------------------------------------- */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-status-emproducao { background: #FFF3CD; color: #856404; }
+.badge-status-aprovado   { background: #D1FAE5; color: #065F46; }
+.badge-status-reprovado  { background: #FEE2E2; color: #991B1B; }
+.badge-status-publicado  { background: #EDE9FE; color: #4C1D95; }
+.badge-neutro            { background: #F3F4F6; color: #6B7280; }
+
+.badge-formato-reels       { background: #FEE2E2; color: #9B1C1C; }
+.badge-formato-carrossel   { background: #EDE9FE; color: #4C1D95; }
+.badge-formato-postunico   { background: #D1FAE5; color: #065F46; }
+.badge-formato-story       { background: #FEF3C7; color: #92400E; }
+
+/* -----------------------------------------------
+   ESTADO DE CARREGAMENTO E ERRO
+----------------------------------------------- */
+.portal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  color: #9CA3AF;
+  font-size: 15px;
+}
+.portal-loading-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid #E5E7EB;
+  border-top-color: #6366F1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.portal-erro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 12px;
+  text-align: center;
+}
+.portal-erro-icon { font-size: 40px; }
+.portal-erro-titulo {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1A1D23;
+}
+.portal-erro-texto {
+  font-size: 14px;
+  color: #6B7280;
+  max-width: 320px;
+}
+
+/* -----------------------------------------------
+   TOAST
+----------------------------------------------- */
+.portal-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #1A1D23;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transition: transform 0.25s, opacity 0.25s;
+  white-space: nowrap;
+}
+.portal-toast.visivel {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* -----------------------------------------------
+   RESPONSIVO
+----------------------------------------------- */
+@media (max-width: 600px) {
+  .portal-wrap { padding: 24px 16px 60px; }
+  .portal-header-nome { font-size: 20px; }
+  .orc-valor { font-size: 18px; }
+}

@@ -415,12 +415,17 @@ th.sortable.sort-asc  .sort-icon::after { content: "▲"; opacity: 1; }
 th.sortable.sort-desc .sort-icon::after { content: "▼"; opacity: 1; }
 th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: "⇅"; }
 
-/* Status — COM COR */
+/* Status — COM COR (status antigos) */
 .badge-status-ideia     { background: #EEEEEE; color: #444444; }
 .badge-status-roteiro   { background: #EBF8FF; color: #2B6CB0; }
 .badge-status-gravado   { background: #FDEBD0; color: #784212; }
 .badge-status-editado   { background: #E8DAEF; color: #6C3483; }
 .badge-status-publicado { background: #D5F5E3; color: #1E8449; }
+
+/* Status — novos status do Portal da Cliente */
+.badge-status-emproducao { background: #FFF3CD; color: #856404; }
+.badge-status-aprovado   { background: #D1FAE5; color: #065F46; }
+.badge-status-reprovado  { background: #FEE2E2; color: #991B1B; }
 
 /* =============================================
    FAB — CARRINHO FLUTUANTE
