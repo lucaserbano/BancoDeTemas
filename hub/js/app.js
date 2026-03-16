@@ -293,7 +293,7 @@ function _linhaPost(p, num) {
     <tr data-id="${p.id}" class="${isSel ? "selecionada" : ""}">
       <td><input type="checkbox" ${isSel ? "checked" : ""} onchange="toggleSelect('${p.id}', this.checked)"></td>
       <td class="col-num">${num}</td>
-      <td class="col-titulo"><span class="col-titulo-text" title="${_esc(p.titulo)}">${p.titulo}</span></td>
+      <td class="col-titulo"><span class="col-titulo-text" title="${_esc(p.titulo)}" onclick="abrirModalEditarPost('${p.id}')" style="cursor:pointer">${p.titulo}</span></td>
       <td>${badgeHTML("linha", linhaAbrev(p.linha))}</td>
       <td>${badgeHTML("formato", p.formato)}</td>
       <td>${badgeHTML("funil", p.funil)}</td>

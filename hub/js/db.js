@@ -98,7 +98,7 @@ const db = {
       seguidores:     dados.seguidores || 0,
       meta_posts_mes: dados.meta_posts_mes || 4,
       ano:            dados.ano || 2026,
-      meses_ativos:   dados.meses_ativos || MESES_ANO.slice()
+      meses_ativos:   dados.meses_ativos || MESES_ANO.slice(3) // Abril–Dezembro por padrão
     };
 
     const { data, error } = await sb
