@@ -366,7 +366,8 @@ function _mapPost(row) {
     comentarios:     row.comentarios || 0,
     data_publicacao: row.data_publicacao || null,
     gancho:          row.gancho || "",
-    orientacoes:     row.orientacoes || ""
+    orientacoes:     row.orientacoes || "",
+    roteiro:         row.roteiro || ""
   };
 }
 
@@ -389,6 +390,7 @@ function _postParaBanco(dados) {
   if (dados.data_publicacao!== undefined) payload.data_publicacao = dados.data_publicacao;
   if (dados.gancho         !== undefined) payload.gancho          = dados.gancho;
   if (dados.orientacoes    !== undefined) payload.orientacoes     = dados.orientacoes;
+  if (dados.roteiro        !== undefined) payload.roteiro         = dados.roteiro;
   return payload;
 }
 

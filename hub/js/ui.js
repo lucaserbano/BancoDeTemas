@@ -37,7 +37,7 @@ function badgeHTML(tipo, valor) {
   let cls = "badge-neutro";
 
   if (tipo === "formato") {
-    const chave = _chaveCSS(valor);
+    const chave = valor.toLowerCase().startsWith("story") ? "story" : _chaveCSS(valor);
     cls = `badge-formato-${chave}`;
   } else if (tipo === "status") {
     const chave = _chaveCSS(valor);

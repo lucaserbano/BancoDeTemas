@@ -10,7 +10,9 @@ const STATE = {
   mesFiltro:    "Todos",
   statusFiltro: "Todos",
   linhaFiltro:  "Todas",
-  editandoId:   null   // ID do post sendo editado (null = novo post)
+  editandoId:   null,  // ID do post sendo editado (null = novo post)
+  sortCampo:    null,  // campo de ordenação ativo
+  sortDir:      1      // 1 = asc, -1 = desc
 };
 
 /* -----------------------------------------------
@@ -212,12 +214,31 @@ function aplicarFiltros() {
 }
 
 function _postsFiltrados() {
-  return POSTS.filter(p => {
+  let posts = POSTS.filter(p => {
     if (STATE.mesFiltro    !== "Todos"  && p.mes    !== STATE.mesFiltro)    return false;
     if (STATE.statusFiltro !== "Todos"  && p.status !== STATE.statusFiltro) return false;
     if (STATE.linhaFiltro  !== "Todas"  && p.linha  !== STATE.linhaFiltro)  return false;
     return true;
   });
+  if (STATE.sortCampo) {
+    const c = STATE.sortCampo, d = STATE.sortDir;
+    posts = posts.slice().sort((a, b) => {
+      const va = (a[c] || "").toString().toLowerCase();
+      const vb = (b[c] || "").toString().toLowerCase();
+      return va < vb ? -d : va > vb ? d : 0;
+    });
+  }
+  return posts;
+}
+
+function toggleSort(campo) {
+  if (STATE.sortCampo === campo) {
+    STATE.sortDir = STATE.sortDir === 1 ? -1 : 1;
+  } else {
+    STATE.sortCampo = campo;
+    STATE.sortDir   = 1;
+  }
+  renderTabela();
 }
 
 /* -----------------------------------------------
@@ -238,12 +259,24 @@ function renderTabela() {
     return;
   }
 
+  const _th = (label, campo) => {
+    const ativo = STATE.sortCampo === campo;
+    const dir   = ativo ? (STATE.sortDir === 1 ? "sort-asc" : "sort-desc") : "";
+    return `<th class="sortable ${dir}" onclick="toggleSort('${campo}')">${label}<span class="sort-icon"></span></th>`;
+  };
+
   el.innerHTML = `
     <table>
       <thead>
         <tr>
-          <th></th><th>#</th><th>Título</th><th>Linha</th><th>Formato</th>
-          <th>Funil</th><th>Mês</th><th>Status</th><th>Likes</th><th>Coment.</th><th>Ações</th>
+          <th></th><th>#</th>
+          ${_th("Título",  "titulo")}
+          ${_th("Linha",   "linha")}
+          ${_th("Formato", "formato")}
+          ${_th("Funil",   "funil")}
+          ${_th("Mês",     "mes")}
+          ${_th("Status",  "status")}
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -266,8 +299,6 @@ function _linhaPost(p, num) {
       <td>${badgeHTML("funil", p.funil)}</td>
       <td>${badgeHTML("mes", p.mes)}</td>
       <td>${badgeHTML("status", p.status)}</td>
-      <td class="col-metricas">${publicado ? formatarNumero(p.likes) : "—"}</td>
-      <td class="col-metricas">${publicado ? formatarNumero(p.comentarios) : "—"}</td>
       <td>
         <div class="acoes">
           <button class="btn-icon" onclick="abrirModalEditarPost('${p.id}')" title="Editar">✏️</button>
@@ -359,20 +390,11 @@ function _preencherModalPost(post, cliente) {
         </select>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-grupo">
-        <label for="fp-serie">Série</label>
-        <select id="fp-serie">
-          ${SERIES.map(s => `<option value="${s}" ${post?.serie===s?"selected":""}>${s}</option>`).join("")}
-        </select>
-      </div>
-      <div class="form-grupo" id="fp-metricas-wrap" style="${post?.status==='Publicado' ? '' : 'display:none'}">
-        <label>Likes / Comentários</label>
-        <div style="display:flex;gap:8px">
-          <input id="fp-likes"       type="number" min="0" placeholder="Likes"   value="${post ? (post.likes||0) : 0}" style="flex:1">
-          <input id="fp-comentarios" type="number" min="0" placeholder="Coment." value="${post ? (post.comentarios||0) : 0}" style="flex:1">
-        </div>
-      </div>
+    <div class="form-grupo">
+      <label for="fp-serie">Série</label>
+      <select id="fp-serie">
+        ${SERIES.map(s => `<option value="${s}" ${post?.serie===s?"selected":""}>${s}</option>`).join("")}
+      </select>
     </div>
     <div class="form-grupo">
       <label for="fp-gancho">Gancho (hook)</label>
@@ -382,15 +404,11 @@ function _preencherModalPost(post, cliente) {
       <label for="fp-orient">Orientações de produção</label>
       <textarea id="fp-orient" rows="3" placeholder="Instruções para criação do conteúdo">${post ? _esc(post.orientacoes) : ""}</textarea>
     </div>
+    <div class="form-grupo">
+      <label for="fp-roteiro">Roteiro</label>
+      <textarea id="fp-roteiro" rows="6" placeholder="Escreva o roteiro do post aqui...">${post ? _esc(post.roteiro || "") : ""}</textarea>
+    </div>
   `;
-
-  const fpStatus = document.getElementById("fp-status");
-  if (fpStatus) {
-    fpStatus.addEventListener("change", () => {
-      const wrap = document.getElementById("fp-metricas-wrap");
-      if (wrap) wrap.style.display = fpStatus.value === "Publicado" ? "" : "none";
-    });
-  }
 
   // Auto-save: só ativa ao editar post existente (não ao criar)
   if (STATE.editandoId) {
@@ -420,11 +438,10 @@ async function salvarPost() {
     mes:             document.getElementById("fp-mes")?.value      || "Banco",
     status:          statusVal,
     serie:           document.getElementById("fp-serie")?.value    || "—",
-    likes:           parseInt(document.getElementById("fp-likes")?.value) || 0,
-    comentarios:     parseInt(document.getElementById("fp-comentarios")?.value) || 0,
     data_publicacao: statusVal === "Publicado" ? new Date().toISOString().slice(0,10) : null,
     gancho:          document.getElementById("fp-gancho")?.value.trim()  || "",
-    orientacoes:     document.getElementById("fp-orient")?.value.trim()  || ""
+    orientacoes:     document.getElementById("fp-orient")?.value.trim()  || "",
+    roteiro:         document.getElementById("fp-roteiro")?.value.trim() || ""
   };
 
   // Feedback visual enquanto salva
@@ -589,10 +606,9 @@ const _autoSavePost = _debounce(async function() {
     mes:         document.getElementById("fp-mes")?.value         || "Banco",
     status:      statusVal,
     serie:       document.getElementById("fp-serie")?.value       || "—",
-    likes:       parseInt(document.getElementById("fp-likes")?.value)       || 0,
-    comentarios: parseInt(document.getElementById("fp-comentarios")?.value) || 0,
     gancho:      document.getElementById("fp-gancho")?.value.trim()  || "",
-    orientacoes: document.getElementById("fp-orient")?.value.trim()  || ""
+    orientacoes: document.getElementById("fp-orient")?.value.trim()  || "",
+    roteiro:     document.getElementById("fp-roteiro")?.value.trim() || ""
   };
 
   setSaveStatus("salvando");

@@ -17,7 +17,7 @@ const LINHAS = [
   "Humanização"
 ];
 
-const FORMATOS = ["Reels", "Carrossel", "Post único"];
+const FORMATOS = ["Reels", "Carrossel", "Post único", "Story · Enquete", "Story · Quiz", "Story · Caixinha", "Story · Slider", "Story · Sequência"];
 const FUNIS    = ["TOPO", "MEIO", "FUNDO"];
 const STATUS   = ["Ideia", "Roteiro", "Gravado", "Editado", "Publicado"];
 const SERIES   = ["—", "Mito ou Verdade? 🫀", "Pergunte à Dra."];
