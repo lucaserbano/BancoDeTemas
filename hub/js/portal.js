@@ -216,10 +216,26 @@ function _renderBloco1_Objetivos() {
 
   const cards = PORTAL_STATE.meses.map(mes => {
     const obj = _getObjetivo(mes);
+    const objData = PORTAL_STATE.objetivos.find(o => o.mes === mes);
+    const comentario = objData?.comentario_objetivos || "";
+    const comentarioHtml = `
+      <div class="obj-comentario-wrap">
+        <div class="obj-comentario-label">Seu comentário</div>
+        <textarea class="obj-comentario-textarea"
+                  id="comentario-obj-${_esc(mes)}"
+                  placeholder="Deixe aqui seu comentário sobre este objetivo...">${_esc(comentario)}</textarea>
+        <button class="obj-comentario-btn"
+                id="btn-com-obj-${_esc(mes)}"
+                onclick="salvarComentarioBloco('${_esc(mes)}', 'objetivos')">Salvar</button>
+      </div>
+    `;
+
     if (!obj) {
       return `
-        <div class="portal-card portal-card-vazio">
-          <span>${_esc(mes)}</span>
+        <div class="portal-card portal-card-vazio" style="flex-direction:column;align-items:flex-start;padding:20px">
+          <div class="portal-card-mes">${_esc(mes)}</div>
+          <div style="font-size:13px;color:#9CA3AF;margin-bottom:4px">Objetivo ainda não configurado</div>
+          ${comentarioHtml}
         </div>
       `;
     }
@@ -234,6 +250,7 @@ function _renderBloco1_Objetivos() {
         <div class="obj-objetivo">${_esc(obj.objetivo)}</div>
         ${obj.tipo_anuncio ? `<div class="obj-foco">📌 ${_esc(obj.tipo_anuncio)}</div>` : ""}
         ${datas ? `<div class="obj-datas">${datas}</div>` : ""}
+        ${comentarioHtml}
       </div>
     `;
   }).join("");
@@ -250,11 +267,26 @@ function _renderBloco2_Orcamento() {
 
   const cards = PORTAL_STATE.meses.map(mes => {
     const obj = _getObjetivo(mes);
+    const objData = PORTAL_STATE.objetivos.find(o => o.mes === mes);
+    const comentario = objData?.comentario_orcamento || "";
+    const comentarioHtml = `
+      <div class="obj-comentario-wrap">
+        <div class="obj-comentario-label">Seu comentário</div>
+        <textarea class="obj-comentario-textarea"
+                  id="comentario-orc-${_esc(mes)}"
+                  placeholder="Deixe aqui seu comentário sobre este orçamento...">${_esc(comentario)}</textarea>
+        <button class="obj-comentario-btn"
+                id="btn-com-orc-${_esc(mes)}"
+                onclick="salvarComentarioBloco('${_esc(mes)}', 'orcamento')">Salvar</button>
+      </div>
+    `;
 
     if (!obj || !obj.orcamento_anuncios) {
       return `
-        <div class="portal-card portal-card-vazio">
-          <span>${_esc(mes)} — sem orçamento definido</span>
+        <div class="portal-card portal-card-vazio" style="flex-direction:column;align-items:flex-start;padding:20px">
+          <div class="portal-card-mes">${_esc(mes)}</div>
+          <div style="font-size:13px;color:#9CA3AF;margin-bottom:4px">Orçamento ainda não definido</div>
+          ${comentarioHtml}
         </div>
       `;
     }
@@ -284,6 +316,7 @@ function _renderBloco2_Orcamento() {
             <span class="funil-dot funil-dot-fundo"></span> Fundo ${fundo}%
           </span>
         </div>
+        ${comentarioHtml}
       </div>
     `;
   }).join("");
@@ -308,11 +341,9 @@ function _renderBloco3_Calendario() {
   el.innerHTML = `
     <div class="pcal-wrap">${mesesHtml}</div>
     <div class="cal-legenda">
-      <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-emproducao"></span> Em produção</span>
-      <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-aprovado"></span> Aprovado</span>
-      <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-reprovado"></span> Reprovado</span>
-      <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-publicado"></span> Publicado</span>
-      <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-outro"></span> Outro status</span>
+      <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-neutro"></span> Aguardando aprovação</span>
+      <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-aprovado"></span> Roteiro aprovado</span>
+      <span class="cal-legenda-item"><span class="cal-legenda-dot cal-legenda-dot-reprovado"></span> Roteiro reprovado</span>
     </div>
   `;
 }
@@ -578,6 +609,45 @@ function _atualizarCardStatus(postId, novoStatus) {
 }
 
 /* -----------------------------------------------
+   COMENTÁRIOS NOS OBJETIVOS / ORÇAMENTO
+----------------------------------------------- */
+
+/** Salva o comentário da cliente sobre objetivos ou orçamento de um mês. */
+async function salvarComentarioBloco(mes, campo) {
+  const inputId = campo === "objetivos" ? `comentario-obj-${mes}` : `comentario-orc-${mes}`;
+  const btnId   = campo === "objetivos" ? `btn-com-obj-${mes}`    : `btn-com-orc-${mes}`;
+  const textarea = document.getElementById(inputId);
+  const btn      = document.getElementById(btnId);
+  if (!textarea) return;
+
+  const texto = textarea.value.trim();
+  if (btn) { btn.disabled = true; btn.textContent = "Salvando..."; }
+
+  const ok = await portalDb.salvarComentarioObjetivo(
+    PORTAL_STATE.clienteId, mes, campo, texto
+  );
+
+  if (ok) {
+    let objData = PORTAL_STATE.objetivos.find(o => o.mes === mes);
+    if (objData) {
+      if (campo === "objetivos") objData.comentario_objetivos = texto;
+      else                       objData.comentario_orcamento = texto;
+    } else {
+      PORTAL_STATE.objetivos.push({
+        mes,
+        comentario_objetivos: campo === "objetivos" ? texto : "",
+        comentario_orcamento: campo === "orcamento" ? texto : ""
+      });
+    }
+    _toastPortal("✓ Comentário salvo!");
+  } else {
+    _toastPortal("Erro ao salvar comentário. Tente novamente.");
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = "Salvar"; }
+}
+
+/* -----------------------------------------------
    COMENTÁRIOS
 ----------------------------------------------- */
 
@@ -794,8 +864,9 @@ function _chaveStatusCal(status) {
   const s = status.toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
-  const mapa = { emproducao: "emproducao", aprovado: "aprovado", reprovado: "reprovado", publicado: "publicado" };
-  return mapa[s] || "neutro";
+  if (s === "aprovado")  return "aprovado";
+  if (s === "reprovado") return "reprovado";
+  return "neutro";
 }
 
 /** Converte o status para a chave CSS usada nos badges (mesma lógica). */

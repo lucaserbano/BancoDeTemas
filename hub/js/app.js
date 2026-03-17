@@ -133,7 +133,7 @@ function renderClienteHeader() {
           ${c.nome}
           <button class="btn-editar-cliente" onclick="abrirModalEditarCliente()" title="Editar cliente">✏️</button>
         </div>
-        <div class="client-header-handle">${c.handle} · ${c.seguidores.toLocaleString("pt-BR")} seguidores</div>
+        <div class="client-header-handle">${c.handle}</div>
         <div class="client-header-espec">${c.especialidade}</div>
       </div>
     </div>

@@ -222,6 +222,33 @@ const portalDb = {
   },
 
   /**
+   * Salva o comentário da cliente sobre objetivos ou orçamento de um mês.
+   * @param {string} clienteId
+   * @param {string} mes — ex: "Abril"
+   * @param {"objetivos"|"orcamento"} campo
+   * @param {string} texto
+   */
+  async salvarComentarioObjetivo(clienteId, mes, campo, texto) {
+    const ano = new Date().getFullYear();
+    const updateField = campo === "objetivos"
+      ? { comentario_objetivos: texto }
+      : { comentario_orcamento: texto };
+
+    const { error } = await sb
+      .from("objetivos_mes")
+      .upsert(
+        { cliente_id: clienteId, mes, ano, ...updateField },
+        { onConflict: "cliente_id,mes,ano" }
+      );
+
+    if (error) {
+      console.error("Erro ao salvar comentário de objetivo:", error.message);
+      return false;
+    }
+    return true;
+  },
+
+  /**
    * Atualiza o status de um post (aprovado / reprovado / em produção / publicado).
    * @param {string} postId
    * @param {string} status

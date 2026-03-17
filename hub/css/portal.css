@@ -211,6 +211,55 @@ body {
   padding: 3px 8px;
   border-radius: 20px;
 }
+.obj-comentario-wrap {
+  margin-top: 16px;
+  border-top: 1px solid #F3F4F6;
+  padding-top: 14px;
+}
+.obj-comentario-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9CA3AF;
+  margin-bottom: 8px;
+}
+.obj-comentario-textarea {
+  width: 100%;
+  min-height: 70px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #374151;
+  resize: vertical;
+  outline: none;
+  background: #FAFAFA;
+  transition: border-color 0.15s, background 0.15s;
+}
+.obj-comentario-textarea:focus {
+  border-color: #6366F1;
+  background: #fff;
+}
+.obj-comentario-btn {
+  margin-top: 8px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #F3F4F6;
+  color: #374151;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.obj-comentario-btn:hover:not(:disabled) {
+  background: #6366F1;
+  color: #fff;
+  border-color: #6366F1;
+}
+.obj-comentario-btn:disabled { opacity: 0.5; cursor: default; }
 
 /* -----------------------------------------------
    BLOCO 2 — ORÇAMENTO
@@ -353,11 +402,9 @@ body {
   border-radius: 3px;
   flex-shrink: 0;
 }
-.cal-legenda-dot-emproducao { background: #FCD34D; }
+.cal-legenda-dot-neutro     { background: #D1D5DB; }
 .cal-legenda-dot-aprovado   { background: #34D399; }
 .cal-legenda-dot-reprovado  { background: #F87171; }
-.cal-legenda-dot-publicado  { background: #A78BFA; }
-.cal-legenda-dot-outro      { background: #D1D5DB; }
 
 /* -----------------------------------------------
    BLOCO 4 — LISTA DETALHADA
@@ -551,10 +598,9 @@ body {
   font-size: 11px;
   font-weight: 600;
 }
-.badge-status-emproducao { background: #FFF3CD; color: #856404; }
 .badge-status-aprovado   { background: #D1FAE5; color: #065F46; }
 .badge-status-reprovado  { background: #FEE2E2; color: #991B1B; }
-.badge-status-publicado  { background: #EDE9FE; color: #4C1D95; }
+.badge-status-neutro     { background: #F3F4F6; color: #6B7280; }
 .badge-neutro            { background: #F3F4F6; color: #6B7280; }
 
 .badge-formato-reels       { background: #FEE2E2; color: #9B1C1C; }
