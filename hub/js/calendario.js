@@ -173,10 +173,8 @@ function abrirModalAtribuir(dataStr, dia) {
   const c       = getClienteAtivo();
   const mesNome = _mesAtualCal(c);
 
-  // Posts do mês ainda sem data de publicação
-  const disponiveis = POSTS.filter(p =>
-    p.mes === mesNome && !p.data_publicacao
-  );
+  // Todos os posts do mês (com ou sem data)
+  const disponiveis = POSTS.filter(p => p.mes === mesNome);
 
   const listEl = document.getElementById("cal-modal-lista");
   if (!listEl) return;
@@ -189,22 +187,28 @@ function abrirModalAtribuir(dataStr, dia) {
 
   if (disponiveis.length === 0) {
     listEl.innerHTML = `<div style="padding:16px;color:#888;font-size:13px">
-      Todos os posts de ${mesNome} já têm data de publicação.<br>
-      Para reposicionar, clique no post no calendário para removê-lo primeiro.
+      Nenhum post atribuído a ${mesNome} ainda.
     </div>`;
   } else {
-    listEl.innerHTML = disponiveis.map(p => `
-      <div class="cal-modal-item" onclick="atribuirDia('${p.id}')">
-        <div class="cal-modal-item-titulo">${_escCal(p.titulo)}</div>
-        <div class="cal-modal-item-meta">
-          <span>${p.linha}</span>
-          <span>·</span>
-          <span>${p.formato}</span>
-          <span>·</span>
-          <span>${p.status}</span>
+    listEl.innerHTML = disponiveis.map(p => {
+      const jaTemData = !!p.data_publicacao;
+      const dataLabel = jaTemData
+        ? `<span style="color:#F59E0B;font-weight:600">· já agendado em ${p.data_publicacao.split("-").reverse().join("/")} — será reagendado</span>`
+        : "";
+      return `
+        <div class="cal-modal-item" onclick="atribuirDia('${p.id}')">
+          <div class="cal-modal-item-titulo">${_escCal(p.titulo)}</div>
+          <div class="cal-modal-item-meta">
+            <span>${p.linha}</span>
+            <span>·</span>
+            <span>${p.formato}</span>
+            <span>·</span>
+            <span>${p.status}</span>
+            ${dataLabel}
+          </div>
         </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
   }
 
   openModal("modal-cal-atribuir");
