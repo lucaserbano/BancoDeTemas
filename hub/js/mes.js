@@ -382,6 +382,7 @@ function _cardPost(p) {
         ${badgeHTML("formato", p.formato)}
         ${p.funil ? badgeHTML("funil", p.funil) : ""}
       </div>
+      ${p.data_publicacao ? `<div class="post-card-data-agendada">📅 ${p.data_publicacao.split("-").reverse().join("/")}</div>` : `<div class="post-card-data-agendada sem-data">📅 Não agendado</div>`}
       ${p.gancho ? `<div class="post-card-gancho">${p.gancho}</div>` : ""}
       <div class="post-card-footer">
         <div>
