@@ -199,7 +199,7 @@ function renderToolbar() {
         ${["Todos",...STATUS].map(s => `<option value="${s}" ${s === STATE.statusFiltro ? "selected":""}>${s}</option>`).join("")}
       </select>
       <select id="filtroLinha" onchange="aplicarFiltros()">
-        ${["Todas",...LINHAS].map(l => `<option value="${l}" ${l === STATE.linhaFiltro ? "selected":""}>${l}</option>`).join("")}
+        ${["Todas",..._linhasDoCliente()].map(l => `<option value="${l}" ${l === STATE.linhaFiltro ? "selected":""}>${l}</option>`).join("")}
       </select>
     </div>
     <button class="btn btn-primary" onclick="abrirModalNovoPost()">+ Novo Post</button>
@@ -338,6 +338,7 @@ function abrirModalEditarPost(id) {
 
 function _preencherModalPost(post, cliente) {
   const meses = [...(cliente?.meses_ativos || MESES_ANO), "Banco"];
+  const linhas = _linhasDoCliente();
   const isNovo = !post;
   const tituloEl = document.getElementById("modal-post-titulo-h");
   if (tituloEl) tituloEl.textContent = isNovo ? "Novo Post" : "Editar Post";
@@ -353,9 +354,12 @@ function _preencherModalPost(post, cliente) {
     <div class="form-row">
       <div class="form-grupo">
         <label for="fp-linha">Linha editorial</label>
-        <select id="fp-linha">
-          ${LINHAS.map(l => `<option value="${l}" ${post?.linha===l?"selected":""}>${l}</option>`).join("")}
-        </select>
+        <input id="fp-linha" list="fp-linha-list" type="text"
+               placeholder="Selecione ou escreva uma nova linha"
+               value="${post ? _esc(post.linha) : _esc(linhas[0] || '')}">
+        <datalist id="fp-linha-list">
+          ${linhas.map(l => `<option value="${_esc(l)}">`).join("")}
+        </datalist>
       </div>
       <div class="form-grupo">
         <label for="fp-subtema">Subtema</label>
@@ -428,10 +432,11 @@ async function salvarPost() {
   const c = getClienteAtivo();
   const statusVal = document.getElementById("fp-status")?.value || STATUS[0];
 
+  const linhaVal = (document.getElementById("fp-linha")?.value || "").trim() || _linhasDoCliente()[0];
   const dados = {
     clienteId:       c.id,
     titulo,
-    linha:           document.getElementById("fp-linha")?.value    || LINHAS[0],
+    linha:           linhaVal,
     subtema:         document.getElementById("fp-subtema")?.value.trim() || "",
     formato:         document.getElementById("fp-formato")?.value  || FORMATOS[0],
     funil:           document.getElementById("fp-funil")?.value    || FUNIS[0],
@@ -466,6 +471,19 @@ async function salvarPost() {
   }
 
   if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = "Salvar"; }
+
+  // Se a linha digitada é nova, adiciona ao perfil do cliente
+  if (dados.linha) {
+    const linhasAtuais = _linhasDoCliente();
+    if (!linhasAtuais.includes(dados.linha)) {
+      const novasLinhas = [...linhasAtuais, dados.linha];
+      const clienteAtualizado = await db.atualizarCliente(c.id, { linhas_editoriais: novasLinhas });
+      if (clienteAtualizado) {
+        const idx = CLIENTES.findIndex(cl => cl.id === c.id);
+        if (idx !== -1) CLIENTES[idx] = clienteAtualizado;
+      }
+    }
+  }
 
   if (STATE.editandoId) setSaveStatus("salvo");
   closeModal("modal-post");
@@ -513,6 +531,8 @@ function abrirModalNovoCliente() {
   });
   const meta = document.getElementById("nc-meta");
   if (meta) meta.value = "4";
+  const linhasEl = document.getElementById("nc-linhas");
+  if (linhasEl) linhasEl.value = "";
 
   openModal("modal-cliente");
 }
@@ -535,6 +555,8 @@ function abrirModalEditarCliente() {
   set("nc-espec",  c.especialidade);
   const metaEl = document.getElementById("nc-meta");
   if (metaEl) metaEl.value = c.meta_posts_mes || 4;
+  const linhasEl = document.getElementById("nc-linhas");
+  if (linhasEl) linhasEl.value = (c.linhas_editoriais || []).join("\n");
 
   openModal("modal-cliente");
 }
@@ -547,14 +569,18 @@ async function salvarCliente() {
   const btnSalvar = document.querySelector("#modal-cliente .btn-primary");
   if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.textContent = "Salvando..."; }
 
+  const linhasRaw = document.getElementById("nc-linhas")?.value || "";
+  const linhas_editoriais = linhasRaw.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+
   if (STATE.editandoClienteId) {
     // ── Editar cliente existente ──
     const dados = {
       nome,
-      handle:         handle.startsWith("@") ? handle : "@" + handle,
-      especialidade:  document.getElementById("nc-espec")?.value.trim() || "",
-      avatar:         document.getElementById("nc-avatar")?.value.trim() || "👤",
-      meta_posts_mes: parseInt(document.getElementById("nc-meta")?.value) || 4,
+      handle:            handle.startsWith("@") ? handle : "@" + handle,
+      especialidade:     document.getElementById("nc-espec")?.value.trim() || "",
+      avatar:            document.getElementById("nc-avatar")?.value.trim() || "👤",
+      meta_posts_mes:    parseInt(document.getElementById("nc-meta")?.value) || 4,
+      linhas_editoriais,
     };
     const atualizado = await db.atualizarCliente(STATE.editandoClienteId, dados);
     if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = "Salvar"; }
@@ -571,13 +597,14 @@ async function salvarCliente() {
     // ── Novo cliente ──
     const dados = {
       nome,
-      handle:         handle.startsWith("@") ? handle : "@" + handle,
-      especialidade:  document.getElementById("nc-espec")?.value.trim() || "",
-      avatar:         document.getElementById("nc-avatar")?.value.trim() || "👤",
-      meta_posts_mes: parseInt(document.getElementById("nc-meta")?.value) || 4,
-      seguidores:     0,
-      ano:            2026,
-      meses_ativos:   MESES_ANO.slice()
+      handle:            handle.startsWith("@") ? handle : "@" + handle,
+      especialidade:     document.getElementById("nc-espec")?.value.trim() || "",
+      avatar:            document.getElementById("nc-avatar")?.value.trim() || "👤",
+      meta_posts_mes:    parseInt(document.getElementById("nc-meta")?.value) || 4,
+      seguidores:        0,
+      ano:               2026,
+      meses_ativos:      MESES_ANO.slice(),
+      linhas_editoriais,
     };
     const novoCliente = await db.criarCliente(dados);
     if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = "Cadastrar"; }
@@ -665,7 +692,7 @@ const _autoSavePost = _debounce(async function() {
   const statusVal = document.getElementById("fp-status")?.value || STATUS[0];
   const dados = {
     titulo,
-    linha:       document.getElementById("fp-linha")?.value       || LINHAS[0],
+    linha:       (document.getElementById("fp-linha")?.value || "").trim() || _linhasDoCliente()[0],
     subtema:     document.getElementById("fp-subtema")?.value.trim() || "",
     formato:     document.getElementById("fp-formato")?.value     || FORMATOS[0],
     funil:       document.getElementById("fp-funil")?.value       || FUNIS[0],
@@ -688,14 +715,4 @@ const _autoSavePost = _debounce(async function() {
   }
 }, 1000);
 
-/* -----------------------------------------------
-   UTILITÁRIO: escape HTML
------------------------------------------------ */
-function _esc(str) {
-  if (!str) return "";
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
+// _esc está definido em ui.js (compartilhado)

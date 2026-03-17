@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendário Mensal — Hub de Conteúdo</title>
+  <title>Calendário Mensal — Hub - Enxerga</title>
+  <link rel="icon" type="image/png" href="../Assets/logo-apenas.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -191,6 +192,23 @@
   </div><!-- /mes-content -->
 
 </div><!-- /mes-layout -->
+
+<!-- ===== MODAL: EDITAR POST ===== -->
+<div class="modal-overlay" id="modal-post">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="modal-post-titulo-h">Editar Post</h2>
+      <button class="modal-fechar" onclick="closeModal('modal-post')">×</button>
+    </div>
+    <div class="modal-body" id="modal-post-body">
+      <!-- Preenchido por mes.js → _preencherModalPost() -->
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('modal-post')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPost()">Salvar</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===== MODAL: OBJETIVO MENSAL ===== -->
 <div class="modal-overlay" id="modal-objetivo">

@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hub de Conteúdo — Instagram</title>
+  <title>Hub - Enxerga</title>
+  <link rel="icon" type="image/png" href="../Assets/logo-apenas.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -18,7 +19,7 @@
   <!-- ===== SIDEBAR ===== -->
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <h1>📱 Hub de Conteúdo</h1>
+      <h1><img src="../Assets/logo-apenas.png" class="sidebar-logo-img" alt=""> Hub - Enxerga</h1>
       <p>Gerenciador de Instagram</p>
     </div>
     <div class="sidebar-section-label">Clientes</div>
@@ -134,6 +135,10 @@
       <div class="form-grupo">
         <label for="nc-meta">Meta de posts por mês</label>
         <input id="nc-meta" type="number" min="1" max="20" value="4">
+      </div>
+      <div class="form-grupo">
+        <label for="nc-linhas">Linhas editoriais <span style="font-weight:400;color:#888">(uma por linha — deixe vazio para usar o padrão)</span></label>
+        <textarea id="nc-linhas" rows="4" placeholder="Ex:&#10;Medicina do Estilo de Vida&#10;Conversão&#10;Causa &amp; Conscientização&#10;Humanização"></textarea>
       </div>
     </div>
     <div class="modal-foot">

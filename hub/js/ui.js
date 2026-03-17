@@ -281,6 +281,28 @@ function _debounce(fn, delay) {
 }
 
 /* -----------------------------------------------
+   ESCAPE HTML
+----------------------------------------------- */
+function _esc(str) {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/* -----------------------------------------------
+   LINHAS EDITORIAIS DO CLIENTE ATIVO
+   Retorna as linhas do cliente ou o fallback global.
+----------------------------------------------- */
+function _linhasDoCliente() {
+  const c = getClienteAtivo();
+  const linhas = c?.linhas_editoriais;
+  return (linhas && linhas.length > 0) ? linhas : LINHAS;
+}
+
+/* -----------------------------------------------
    CONSTRUTOR DE SELECT DE MÊS (reutilizado em modais e carrinho)
 ----------------------------------------------- */
 function selectMesesHTML(id, mesesAtivos, valorSelecionado, incluirBanco) {

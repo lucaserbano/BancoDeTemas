@@ -104,15 +104,16 @@ const db = {
     if (!user) return null;
 
     const payload = {
-      user_id:        user.id,
-      nome:           dados.nome,
-      handle:         dados.handle,
-      especialidade:  dados.especialidade || null,
-      avatar:         dados.avatar || "👤",
-      seguidores:     dados.seguidores || 0,
-      meta_posts_mes: dados.meta_posts_mes || 4,
-      ano:            dados.ano || 2026,
-      meses_ativos:   dados.meses_ativos || MESES_ANO.slice(3) // Abril–Dezembro por padrão
+      user_id:           user.id,
+      nome:              dados.nome,
+      handle:            dados.handle,
+      especialidade:     dados.especialidade || null,
+      avatar:            dados.avatar || "👤",
+      seguidores:        dados.seguidores || 0,
+      meta_posts_mes:    dados.meta_posts_mes || 4,
+      ano:               dados.ano || 2026,
+      meses_ativos:      dados.meses_ativos || MESES_ANO.slice(3), // Abril–Dezembro por padrão
+      linhas_editoriais: dados.linhas_editoriais || []
     };
 
     const { data, error } = await sb
@@ -132,13 +133,14 @@ const db = {
    */
   async atualizarCliente(id, dados) {
     const payload = {};
-    if (dados.nome          !== undefined) payload.nome           = dados.nome;
-    if (dados.handle        !== undefined) payload.handle         = dados.handle;
-    if (dados.especialidade !== undefined) payload.especialidade  = dados.especialidade;
-    if (dados.avatar        !== undefined) payload.avatar         = dados.avatar;
-    if (dados.seguidores    !== undefined) payload.seguidores     = dados.seguidores;
-    if (dados.meta_posts_mes!== undefined) payload.meta_posts_mes = dados.meta_posts_mes;
-    if (dados.meses_ativos  !== undefined) payload.meses_ativos   = dados.meses_ativos;
+    if (dados.nome               !== undefined) payload.nome               = dados.nome;
+    if (dados.handle             !== undefined) payload.handle             = dados.handle;
+    if (dados.especialidade      !== undefined) payload.especialidade      = dados.especialidade;
+    if (dados.avatar             !== undefined) payload.avatar             = dados.avatar;
+    if (dados.seguidores         !== undefined) payload.seguidores         = dados.seguidores;
+    if (dados.meta_posts_mes     !== undefined) payload.meta_posts_mes     = dados.meta_posts_mes;
+    if (dados.meses_ativos       !== undefined) payload.meses_ativos       = dados.meses_ativos;
+    if (dados.linhas_editoriais  !== undefined) payload.linhas_editoriais  = dados.linhas_editoriais;
 
     const { data, error } = await sb
       .from("clientes")
@@ -347,17 +349,18 @@ const db = {
  */
 function _mapCliente(row) {
   return {
-    id:             row.id,
-    user_id:        row.user_id,
-    nome:           row.nome,
-    handle:         row.handle,
-    especialidade:  row.especialidade || "",
-    avatar:         row.avatar || "👤",
-    seguidores:     row.seguidores || 0,
-    posts_publicados: 0,        // calculado localmente a partir dos posts
-    meta_posts_mes: row.meta_posts_mes || 4,
-    ano:            row.ano || 2026,
-    meses_ativos:   row.meses_ativos || MESES_ANO.slice()
+    id:                 row.id,
+    user_id:            row.user_id,
+    nome:               row.nome,
+    handle:             row.handle,
+    especialidade:      row.especialidade || "",
+    avatar:             row.avatar || "👤",
+    seguidores:         row.seguidores || 0,
+    posts_publicados:   0,        // calculado localmente a partir dos posts
+    meta_posts_mes:     row.meta_posts_mes || 4,
+    ano:                row.ano || 2026,
+    meses_ativos:       row.meses_ativos || MESES_ANO.slice(),
+    linhas_editoriais:  row.linhas_editoriais || []
   };
 }
 

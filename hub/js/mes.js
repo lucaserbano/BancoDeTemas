@@ -7,9 +7,10 @@
    ESTADO DA PÁGINA
 ----------------------------------------------- */
 const MES_STATE = {
-  mesIndex:      0,
-  bancoAberto:   false,
-  bancoPendentes: new Set()
+  mesIndex:       0,
+  bancoAberto:    false,
+  bancoPendentes: new Set(),
+  editandoPostId: null
 };
 
 // Objetivos carregados do banco (complementa/substitui OBJETIVOS_MES hardcoded)
@@ -62,6 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderHeader();
   renderConteudo();
   inicializarModaisObjetivo();
+  inicializarModalPost();
 });
 
 /* -----------------------------------------------
@@ -371,7 +373,8 @@ function renderPostsDoMes() {
 function _cardPost(p) {
   const pub = p.status === "Publicado";
   return `
-    <div class="post-card ${pub ? "publicado" : ""}" data-id="${p.id}">
+    <div class="post-card ${pub ? "publicado" : ""}" data-id="${p.id}"
+         onclick="abrirModalEditarPost('${p.id}')" style="cursor:pointer">
       <div class="post-card-status">${badgeHTML("status", p.status)}</div>
       <div class="post-card-titulo">${p.titulo}</div>
       <div class="post-card-badges">
@@ -384,7 +387,7 @@ function _cardPost(p) {
         <div>
           ${pub ? `<span style="font-size:11px;color:#888">❤️ ${formatarNumero(p.likes)}  💬 ${formatarNumero(p.comentarios)}</span>` : ""}
         </div>
-        <button class="btn-remover-mes" onclick="removerDoMes('${p.id}')">× Remover</button>
+        <button class="btn-remover-mes" onclick="event.stopPropagation(); removerDoMes('${p.id}')">× Remover</button>
       </div>
     </div>
   `;
@@ -512,3 +515,198 @@ function toggleBanco() {
   if (lista)  lista.classList.toggle("aberta", MES_STATE.bancoAberto);
   if (toggle) toggle.classList.toggle("aberto", MES_STATE.bancoAberto);
 }
+
+/* -----------------------------------------------
+   MODAL DE EDITAR POST
+----------------------------------------------- */
+function inicializarModalPost() {
+  const overlay = document.getElementById("modal-post");
+  if (overlay) {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeModal("modal-post");
+    });
+  }
+}
+
+function abrirModalEditarPost(id) {
+  const post = POSTS.find(p => p.id === id);
+  if (!post) return;
+  MES_STATE.editandoPostId = id;
+  const c = getClienteAtivo();
+  _preencherModalPost(post, c);
+  openModal("modal-post");
+}
+
+function _preencherModalPost(post, cliente) {
+  const meses  = [...(cliente?.meses_ativos || MESES_ANO), "Banco"];
+  const linhas = _linhasDoCliente();
+
+  const tituloEl = document.getElementById("modal-post-titulo-h");
+  if (tituloEl) tituloEl.textContent = "Editar Post";
+
+  const body = document.getElementById("modal-post-body");
+  if (!body) return;
+
+  body.innerHTML = `
+    <div class="form-grupo">
+      <label for="fp-titulo">Título *</label>
+      <input id="fp-titulo" type="text" placeholder="Título do post" value="${_esc(post.titulo)}">
+    </div>
+    <div class="form-row">
+      <div class="form-grupo">
+        <label for="fp-linha">Linha editorial</label>
+        <input id="fp-linha" list="fp-linha-list" type="text"
+               placeholder="Selecione ou escreva uma nova linha"
+               value="${_esc(post.linha)}">
+        <datalist id="fp-linha-list">
+          ${linhas.map(l => `<option value="${_esc(l)}">`).join("")}
+        </datalist>
+      </div>
+      <div class="form-grupo">
+        <label for="fp-subtema">Subtema</label>
+        <input id="fp-subtema" type="text" placeholder="Ex: Exercício Físico" value="${_esc(post.subtema)}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-grupo">
+        <label for="fp-formato">Formato</label>
+        <select id="fp-formato">
+          ${FORMATOS.map(f => `<option value="${f}" ${post.formato===f?"selected":""}>${f}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-grupo">
+        <label for="fp-funil">Funil</label>
+        <select id="fp-funil">
+          ${FUNIS.map(f => `<option value="${f}" ${post.funil===f?"selected":""}>${f}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-grupo">
+        <label for="fp-mes">Mês</label>
+        <select id="fp-mes">
+          ${meses.map(m => `<option value="${m}" ${post.mes===m?"selected":""}>${m}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-grupo">
+        <label for="fp-status">Status</label>
+        <select id="fp-status">
+          ${STATUS.map(s => `<option value="${s}" ${post.status===s?"selected":""}>${s}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <div class="form-grupo">
+      <label for="fp-serie">Série</label>
+      <select id="fp-serie">
+        ${SERIES.map(s => `<option value="${s}" ${post.serie===s?"selected":""}>${s}</option>`).join("")}
+      </select>
+    </div>
+    <div class="form-grupo">
+      <label for="fp-gancho">Gancho (hook)</label>
+      <textarea id="fp-gancho" rows="2" placeholder="Primeira frase que prende a atenção">${_esc(post.gancho)}</textarea>
+    </div>
+    <div class="form-grupo">
+      <label for="fp-orient">Orientações de produção</label>
+      <textarea id="fp-orient" rows="3" placeholder="Instruções para criação do conteúdo">${_esc(post.orientacoes)}</textarea>
+    </div>
+    <div class="form-grupo">
+      <label for="fp-roteiro">Roteiro</label>
+      <textarea id="fp-roteiro" rows="6" placeholder="Escreva o roteiro do post aqui...">${_esc(post.roteiro || "")}</textarea>
+    </div>
+  `;
+
+  // Auto-save ao editar
+  document.querySelectorAll("#modal-post-body input, #modal-post-body select, #modal-post-body textarea")
+    .forEach(el => {
+      el.addEventListener("input",  _autoSavePost);
+      el.addEventListener("change", _autoSavePost);
+    });
+  setSaveStatus(null);
+}
+
+async function salvarPost() {
+  const titulo = document.getElementById("fp-titulo")?.value.trim();
+  if (!titulo) { alert("O título é obrigatório."); return; }
+
+  const linhaVal = (document.getElementById("fp-linha")?.value || "").trim() || _linhasDoCliente()[0];
+  const statusVal = document.getElementById("fp-status")?.value || STATUS[0];
+
+  const dados = {
+    titulo,
+    linha:       linhaVal,
+    subtema:     document.getElementById("fp-subtema")?.value.trim()  || "",
+    formato:     document.getElementById("fp-formato")?.value         || FORMATOS[0],
+    funil:       document.getElementById("fp-funil")?.value           || FUNIS[0],
+    mes:         document.getElementById("fp-mes")?.value             || "Banco",
+    status:      statusVal,
+    serie:       document.getElementById("fp-serie")?.value           || "—",
+    gancho:      document.getElementById("fp-gancho")?.value.trim()   || "",
+    orientacoes: document.getElementById("fp-orient")?.value.trim()   || "",
+    roteiro:     document.getElementById("fp-roteiro")?.value.trim()  || ""
+  };
+
+  const btnSalvar = document.querySelector("#modal-post .btn-primary");
+  if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.textContent = "Salvando..."; }
+
+  const postAtualizado = await db.atualizarPost(MES_STATE.editandoPostId, dados);
+
+  if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = "Salvar"; }
+
+  if (!postAtualizado) return;
+
+  // Atualiza array local
+  const idx = POSTS.findIndex(p => p.id === MES_STATE.editandoPostId);
+  if (idx !== -1) POSTS[idx] = { ...POSTS[idx], ...postAtualizado };
+
+  // Se a linha é nova, persiste no cliente
+  const c = getClienteAtivo();
+  if (dados.linha) {
+    const linhasAtuais = _linhasDoCliente();
+    if (!linhasAtuais.includes(dados.linha)) {
+      const clienteAtualizado = await db.atualizarCliente(c.id, {
+        linhas_editoriais: [...linhasAtuais, dados.linha]
+      });
+      if (clienteAtualizado) {
+        const ci = CLIENTES.findIndex(cl => cl.id === c.id);
+        if (ci !== -1) CLIENTES[ci] = clienteAtualizado;
+      }
+    }
+  }
+
+  setSaveStatus("salvo");
+  closeModal("modal-post");
+  renderConteudo();
+  showToast("✓ Post atualizado");
+  MES_STATE.editandoPostId = null;
+}
+
+const _autoSavePost = _debounce(async function() {
+  if (!MES_STATE.editandoPostId) return;
+  const titulo = document.getElementById("fp-titulo")?.value.trim();
+  if (!titulo) return;
+
+  const linhaVal = (document.getElementById("fp-linha")?.value || "").trim() || _linhasDoCliente()[0];
+  const dados = {
+    titulo,
+    linha:       linhaVal,
+    subtema:     document.getElementById("fp-subtema")?.value.trim()  || "",
+    formato:     document.getElementById("fp-formato")?.value         || FORMATOS[0],
+    funil:       document.getElementById("fp-funil")?.value           || FUNIS[0],
+    mes:         document.getElementById("fp-mes")?.value             || "Banco",
+    status:      document.getElementById("fp-status")?.value          || STATUS[0],
+    serie:       document.getElementById("fp-serie")?.value           || "—",
+    gancho:      document.getElementById("fp-gancho")?.value.trim()   || "",
+    orientacoes: document.getElementById("fp-orient")?.value.trim()   || "",
+    roteiro:     document.getElementById("fp-roteiro")?.value.trim()  || ""
+  };
+
+  setSaveStatus("salvando");
+  const resultado = await db.atualizarPost(MES_STATE.editandoPostId, dados);
+  if (resultado) {
+    const idx = POSTS.findIndex(p => p.id === MES_STATE.editandoPostId);
+    if (idx !== -1) POSTS[idx] = { ...POSTS[idx], ...resultado };
+    setSaveStatus("salvo");
+  } else {
+    setSaveStatus("erro");
+  }
+}, 1000);

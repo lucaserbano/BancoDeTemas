@@ -17,6 +17,36 @@ body {
 }
 
 /* -----------------------------------------------
+   CABEÇALHO DO SITE
+----------------------------------------------- */
+.site-header {
+  background: #111111;
+  color: #FFFFFF;
+  padding: 0 24px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+
+.site-header-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.site-header-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.1px;
+}
+
+/* -----------------------------------------------
    BANNER DE PREVIEW (admin apenas)
 ----------------------------------------------- */
 .preview-banner {
