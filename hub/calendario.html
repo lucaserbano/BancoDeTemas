@@ -69,6 +69,11 @@
       <!-- Renderizado por calendario.js -->
     </div>
 
+    <!-- Lista de posts do mês -->
+    <div id="cal-lista-mes" class="cal-lista-mes">
+      <!-- Renderizado por calendario.js → _renderListaMes() -->
+    </div>
+
   </div><!-- /cal-content -->
 
 </div><!-- /cal-layout -->
@@ -106,6 +111,23 @@
     <div class="modal-foot">
       <button class="btn btn-secondary" onclick="closeModal('modal-cal-remover')">Cancelar</button>
       <button class="btn btn-primary" style="background:#CC0000" onclick="confirmarRemoverDia()">Remover data</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: EDITAR POST ===== -->
+<div class="modal-overlay" id="modal-cal-post">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>Editar Post</h2>
+      <button class="modal-fechar" onclick="closeModal('modal-cal-post')">×</button>
+    </div>
+    <div class="modal-body" id="modal-cal-post-body">
+      <!-- Preenchido por calendario.js → _preencherModalPostCal() -->
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('modal-cal-post')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPostCal()">Salvar</button>
     </div>
   </div>
 </div>

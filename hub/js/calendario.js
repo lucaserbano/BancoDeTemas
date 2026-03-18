@@ -5,7 +5,8 @@
 
 const CAL_STATE = {
   mesIndex: 0,
-  diaSelecionado: null  // { ano, mes (1-12), dia }
+  diaSelecionado: null,  // { ano, mes (1-12), dia }
+  editandoPostId: null
 };
 
 /* -----------------------------------------------
@@ -124,10 +125,12 @@ function _renderCalendar() {
 
     const chipsHtml = posts.map(p => {
       const cls = _linhaClassCal(p.linha);
-      const titulo = p.titulo.length > 20 ? p.titulo.slice(0, 19) + "…" : p.titulo;
+      const titulo = p.titulo.length > 16 ? p.titulo.slice(0, 15) + "…" : p.titulo;
+      const fmt = _formatoAbrev(p.formato);
       return `<span class="cal-post-chip ${cls}"
-                    title="${_escCal(p.titulo)}"
-                    onclick="event.stopPropagation();abrirModalRemover('${p.id}',${dia},'${_escCal(p.titulo)}')">${titulo}</span>`;
+                    title="${_escCal(p.titulo)} · ${_escCal(p.formato)}"
+                    onclick="event.stopPropagation();abrirModalRemover('${p.id}',${dia},'${_escCal(p.titulo)}')"
+              ><span class="cal-fmt-tag">${fmt}</span>${titulo}</span>`;
     }).join("");
 
     const dataStr = `${ano}-${String(mesNum).padStart(2,"0")}-${String(dia).padStart(2,"0")}`;
@@ -145,6 +148,8 @@ function _renderCalendar() {
   // Título do mês
   const tituloEl = document.getElementById("cal-titulo");
   if (tituloEl) tituloEl.textContent = `${mesNome} ${ano}`;
+
+  _renderListaMes();
 }
 
 function _linhaClassCal(linha) {
@@ -160,6 +165,73 @@ function _linhaClassCal(linha) {
 function _escCal(s) {
   if (!s) return "";
   return s.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function _formatoAbrev(formato) {
+  if (!formato) return "?";
+  if (formato.startsWith("Story")) return "S";
+  if (formato === "Reels")        return "R";
+  if (formato === "Carrossel")    return "C";
+  if (formato === "Post único")   return "P";
+  return formato[0];
+}
+
+/* -----------------------------------------------
+   LISTA DE POSTS DO MÊS (abaixo do calendário)
+----------------------------------------------- */
+function _renderListaMes() {
+  const el = document.getElementById("cal-lista-mes");
+  if (!el) return;
+
+  const c       = getClienteAtivo();
+  const mesNome = _mesAtualCal(c);
+  const ano     = c?.ano || 2026;
+  const mesIdx  = MESES_ANO.indexOf(mesNome);
+  const mesNum  = mesIdx + 1;
+
+  const postsMes = POSTS.filter(p => p.mes === mesNome);
+
+  if (postsMes.length === 0) {
+    el.innerHTML = `<div class="cal-lista-vazio">Nenhum post atribuído a ${mesNome}.</div>`;
+    return;
+  }
+
+  // Posts com data ordenados cronologicamente, depois os sem data
+  const comData  = postsMes.filter(p => p.data_publicacao)
+                            .sort((a, b) => a.data_publicacao.localeCompare(b.data_publicacao));
+  const semData  = postsMes.filter(p => !p.data_publicacao);
+  const ordenados = [...comData, ...semData];
+
+  const diasSemana = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+
+  const itensHtml = ordenados.map(p => {
+    const cls = _linhaClassCal(p.linha);
+    const fmt = _formatoAbrev(p.formato);
+
+    let dataHtml;
+    if (p.data_publicacao) {
+      const d = new Date(p.data_publicacao + "T12:00:00");
+      dataHtml = `<div class="cal-lista-data">${diasSemana[d.getDay()]} ${d.getDate()}</div>`;
+    } else {
+      dataHtml = `<div class="cal-lista-data sem-data">A agendar</div>`;
+    }
+
+    return `
+      <div class="cal-lista-item ${cls}" onclick="abrirModalEditarPostCal('${p.id}')">
+        ${dataHtml}
+        <span class="cal-lista-fmt">${fmt}</span>
+        <div class="cal-lista-titulo">${_escCal(p.titulo)}</div>
+        <div class="cal-lista-linha">${linhaAbrev(p.linha)}</div>
+        ${badgeHTML("status", p.status)}
+      </div>`;
+  }).join("");
+
+  el.innerHTML = `
+    <div class="cal-lista-header">
+      <span>Posts de ${mesNome}</span>
+      <span class="cal-lista-count">${postsMes.length}</span>
+    </div>
+    <div class="cal-lista-items">${itensHtml}</div>`;
 }
 
 /* -----------------------------------------------
@@ -251,6 +323,171 @@ async function confirmarRemoverDia() {
   _renderCalendar();
   showToast("✓ Data removida do post");
 }
+
+/* -----------------------------------------------
+   MODAL — EDITAR POST (a partir da lista do mês)
+----------------------------------------------- */
+function abrirModalEditarPostCal(id) {
+  const post = POSTS.find(p => p.id === id);
+  if (!post) return;
+  CAL_STATE.editandoPostId = id;
+  const c = getClienteAtivo();
+  _preencherModalPostCal(post, c);
+  openModal("modal-cal-post");
+}
+
+function _preencherModalPostCal(post, cliente) {
+  const meses  = [...(cliente?.meses_ativos || MESES_ANO), "Banco"];
+  const linhas = _linhasDoCliente();
+
+  const body = document.getElementById("modal-cal-post-body");
+  if (!body) return;
+
+  body.innerHTML = `
+    <div class="form-grupo">
+      <label for="cp-titulo">Título *</label>
+      <input id="cp-titulo" type="text" placeholder="Título do post" value="${_esc(post.titulo)}">
+    </div>
+    <div class="form-row">
+      <div class="form-grupo">
+        <label for="cp-linha">Linha editorial</label>
+        <input id="cp-linha" list="cp-linha-list" type="text"
+               placeholder="Selecione ou escreva uma nova linha"
+               value="${_esc(post.linha)}">
+        <datalist id="cp-linha-list">
+          ${linhas.map(l => `<option value="${_esc(l)}">`).join("")}
+        </datalist>
+      </div>
+      <div class="form-grupo">
+        <label for="cp-subtema">Subtema</label>
+        <input id="cp-subtema" type="text" placeholder="Ex: Exercício Físico" value="${_esc(post.subtema || '')}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-grupo">
+        <label for="cp-formato">Formato</label>
+        <select id="cp-formato">
+          ${FORMATOS.map(f => `<option value="${f}" ${post.formato===f?"selected":""}>${f}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-grupo">
+        <label for="cp-funil">Funil</label>
+        <select id="cp-funil">
+          ${FUNIS.map(f => `<option value="${f}" ${post.funil===f?"selected":""}>${f}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-grupo">
+        <label for="cp-mes">Mês</label>
+        <select id="cp-mes">
+          ${meses.map(m => `<option value="${m}" ${post.mes===m?"selected":""}>${m}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-grupo">
+        <label for="cp-status">Status</label>
+        <select id="cp-status">
+          ${STATUS.map(s => `<option value="${s}" ${post.status===s?"selected":""}>${s}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <div class="form-grupo">
+      <label for="cp-serie">Série</label>
+      <select id="cp-serie">
+        ${SERIES.map(s => `<option value="${s}" ${post.serie===s?"selected":""}>${s}</option>`).join("")}
+      </select>
+    </div>
+    <div class="form-grupo">
+      <label for="cp-gancho">Gancho (hook)</label>
+      <textarea id="cp-gancho" rows="2" placeholder="Primeira frase que prende a atenção">${_esc(post.gancho || '')}</textarea>
+    </div>
+    <div class="form-grupo">
+      <label for="cp-orient">Orientações de produção</label>
+      <textarea id="cp-orient" rows="3" placeholder="Instruções para criação do conteúdo">${_esc(post.orientacoes || '')}</textarea>
+    </div>
+    <div class="form-grupo">
+      <label for="cp-roteiro">Roteiro</label>
+      <textarea id="cp-roteiro" rows="6" placeholder="Escreva o roteiro do post aqui...">${_esc(post.roteiro || '')}</textarea>
+    </div>
+  `;
+
+  document.querySelectorAll("#modal-cal-post-body input, #modal-cal-post-body select, #modal-cal-post-body textarea")
+    .forEach(el => {
+      el.addEventListener("input",  _autoSavePostCal);
+      el.addEventListener("change", _autoSavePostCal);
+    });
+  setSaveStatus(null);
+}
+
+async function salvarPostCal() {
+  const titulo = document.getElementById("cp-titulo")?.value.trim();
+  if (!titulo) { alert("O título é obrigatório."); return; }
+
+  const linhaVal = (document.getElementById("cp-linha")?.value || "").trim() || _linhasDoCliente()[0];
+
+  const dados = {
+    titulo,
+    linha:       linhaVal,
+    subtema:     document.getElementById("cp-subtema")?.value.trim()  || "",
+    formato:     document.getElementById("cp-formato")?.value         || FORMATOS[0],
+    funil:       document.getElementById("cp-funil")?.value           || FUNIS[0],
+    mes:         document.getElementById("cp-mes")?.value             || "Banco",
+    status:      document.getElementById("cp-status")?.value          || STATUS[0],
+    serie:       document.getElementById("cp-serie")?.value           || "—",
+    gancho:      document.getElementById("cp-gancho")?.value.trim()   || "",
+    orientacoes: document.getElementById("cp-orient")?.value.trim()   || "",
+    roteiro:     document.getElementById("cp-roteiro")?.value.trim()  || ""
+  };
+
+  const btnSalvar = document.querySelector("#modal-cal-post .btn-primary");
+  if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.textContent = "Salvando..."; }
+
+  const postAtualizado = await db.atualizarPost(CAL_STATE.editandoPostId, dados);
+
+  if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = "Salvar"; }
+
+  if (!postAtualizado) return;
+
+  const idx = POSTS.findIndex(p => p.id === CAL_STATE.editandoPostId);
+  if (idx !== -1) POSTS[idx] = { ...POSTS[idx], ...postAtualizado };
+
+  setSaveStatus("salvo");
+  closeModal("modal-cal-post");
+  _renderCalendar();
+  showToast("✓ Post atualizado");
+  CAL_STATE.editandoPostId = null;
+}
+
+const _autoSavePostCal = _debounce(async function() {
+  if (!CAL_STATE.editandoPostId) return;
+  const titulo = document.getElementById("cp-titulo")?.value.trim();
+  if (!titulo) return;
+
+  const linhaVal = (document.getElementById("cp-linha")?.value || "").trim() || _linhasDoCliente()[0];
+  const dados = {
+    titulo,
+    linha:       linhaVal,
+    subtema:     document.getElementById("cp-subtema")?.value.trim()  || "",
+    formato:     document.getElementById("cp-formato")?.value         || FORMATOS[0],
+    funil:       document.getElementById("cp-funil")?.value           || FUNIS[0],
+    mes:         document.getElementById("cp-mes")?.value             || "Banco",
+    status:      document.getElementById("cp-status")?.value          || STATUS[0],
+    serie:       document.getElementById("cp-serie")?.value           || "—",
+    gancho:      document.getElementById("cp-gancho")?.value.trim()   || "",
+    orientacoes: document.getElementById("cp-orient")?.value.trim()   || "",
+    roteiro:     document.getElementById("cp-roteiro")?.value.trim()  || ""
+  };
+
+  setSaveStatus("salvando");
+  const resultado = await db.atualizarPost(CAL_STATE.editandoPostId, dados);
+  if (resultado) {
+    const idx = POSTS.findIndex(p => p.id === CAL_STATE.editandoPostId);
+    if (idx !== -1) POSTS[idx] = { ...POSTS[idx], ...resultado };
+    setSaveStatus("salvo");
+  } else {
+    setSaveStatus("erro");
+  }
+}, 1000);
 
 /* -----------------------------------------------
    INICIALIZAR MODAIS
