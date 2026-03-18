@@ -10,6 +10,24 @@
   <link rel="stylesheet" href="css/style.css">
   <style>
     body { font-family: 'Inter', -apple-system, sans-serif; }
+
+    /* ── Lista de posts do mês ── */
+    .cal-lista-mes      { margin-top: 8px; margin-bottom: 32px; }
+    .cal-lista-header   { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #888; margin-bottom: 10px; }
+    .cal-lista-count    { background: #DDD; color: #555; border-radius: 20px; font-size: 10px; font-weight: 700; padding: 1px 7px; }
+    .cal-lista-items    { display: flex; flex-direction: column; gap: 5px; }
+    .cal-lista-item     { display: flex; align-items: center; gap: 10px; background: #FFF; border: 1px solid #EEE; border-left-width: 4px; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: box-shadow .13s; }
+    .cal-lista-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .cal-lista-item.mev   { border-left-color: #1A5276; }
+    .cal-lista-item.conv  { border-left-color: #922B21; }
+    .cal-lista-item.causa { border-left-color: #1E8449; }
+    .cal-lista-item.hum   { border-left-color: #76448A; }
+    .cal-lista-data       { font-size: 11px; font-weight: 700; color: #333; min-width: 64px; flex-shrink: 0; }
+    .cal-lista-data.sem-data { color: #AAA; font-weight: 400; }
+    .cal-lista-fmt        { font-size: 10px; font-weight: 700; background: #F0F0F0; color: #555; border-radius: 4px; padding: 2px 6px; flex-shrink: 0; }
+    .cal-lista-titulo     { flex: 1; font-size: 13px; font-weight: 600; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-lista-linha      { font-size: 10px; color: #AAA; flex-shrink: 0; }
+    .cal-lista-vazio      { color: #AAA; font-size: 13px; padding: 12px 0; }
   </style>
 </head>
 <body>

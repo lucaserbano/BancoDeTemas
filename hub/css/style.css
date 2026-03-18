@@ -1526,18 +1526,6 @@ th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: "⇅"; }
   gap: 6px;
 }
 
-/* Tag de formato no chip do calendário */
-.cal-fmt-tag {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 700;
-  background: rgba(0,0,0,.12);
-  border-radius: 3px;
-  padding: 0 3px;
-  margin-right: 4px;
-  letter-spacing: .03em;
-  vertical-align: middle;
-}
 
 /* -----------------------------------------------
    LISTA DE POSTS DO MÊS (abaixo do calendário)

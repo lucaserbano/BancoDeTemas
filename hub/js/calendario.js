@@ -125,12 +125,12 @@ function _renderCalendar() {
 
     const chipsHtml = posts.map(p => {
       const cls = _linhaClassCal(p.linha);
-      const titulo = p.titulo.length > 16 ? p.titulo.slice(0, 15) + "…" : p.titulo;
-      const fmt = _formatoAbrev(p.formato);
+      const fmt   = _formatoAbrev(p.formato);
+      const titulo = p.titulo.length > 15 ? p.titulo.slice(0, 14) + "…" : p.titulo;
       return `<span class="cal-post-chip ${cls}"
                     title="${_escCal(p.titulo)} · ${_escCal(p.formato)}"
                     onclick="event.stopPropagation();abrirModalRemover('${p.id}',${dia},'${_escCal(p.titulo)}')"
-              ><span class="cal-fmt-tag">${fmt}</span>${titulo}</span>`;
+              >${fmt}-${titulo}</span>`;
     }).join("");
 
     const dataStr = `${ano}-${String(mesNum).padStart(2,"0")}-${String(dia).padStart(2,"0")}`;
