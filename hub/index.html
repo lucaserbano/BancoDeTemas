@@ -137,8 +137,10 @@
         <input id="nc-meta" type="number" min="1" max="20" value="4">
       </div>
       <div class="form-grupo">
-        <label for="nc-linhas">Linhas editoriais <span style="font-weight:400;color:#888">(uma por linha — deixe vazio para usar o padrão)</span></label>
-        <textarea id="nc-linhas" rows="4" placeholder="Ex:&#10;Medicina do Estilo de Vida&#10;Conversão&#10;Causa &amp; Conscientização&#10;Humanização"></textarea>
+        <label>Linhas editoriais <span style="font-weight:400;color:#888">(deixe vazio para usar o padrão global)</span></label>
+        <div class="linhas-manager" id="nc-linhas-manager">
+          <!-- Renderizado por app.js → _renderLinhasManager() -->
+        </div>
       </div>
     </div>
     <div class="modal-foot">

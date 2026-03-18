@@ -272,6 +272,7 @@ function renderTabela() {
           <th></th><th>#</th>
           ${_th("Título",  "titulo")}
           ${_th("Linha",   "linha")}
+          ${_th("Subtema", "subtema")}
           ${_th("Formato", "formato")}
           ${_th("Funil",   "funil")}
           ${_th("Mês",     "mes")}
@@ -295,6 +296,7 @@ function _linhaPost(p, num) {
       <td class="col-num">${num}</td>
       <td class="col-titulo"><span class="col-titulo-text" title="${_esc(p.titulo)}" onclick="abrirModalEditarPost('${p.id}')" style="cursor:pointer">${p.titulo}</span></td>
       <td>${badgeHTML("linha", linhaAbrev(p.linha))}</td>
+      <td>${p.subtema ? `<span class="badge badge-neutro">${_esc(p.subtema)}</span>` : `<span style="color:#CCC">—</span>`}</td>
       <td>${badgeHTML("formato", p.formato)}</td>
       <td>${badgeHTML("funil", p.funil)}</td>
       <td>${badgeHTML("mes", p.mes)}</td>
@@ -351,20 +353,29 @@ function _preencherModalPost(post, cliente) {
       <label for="fp-titulo">Título *</label>
       <input id="fp-titulo" type="text" placeholder="Título do post" value="${post ? _esc(post.titulo) : ""}">
     </div>
-    <div class="form-row">
-      <div class="form-grupo">
-        <label for="fp-linha">Linha editorial</label>
-        <input id="fp-linha" list="fp-linha-list" type="text"
-               placeholder="Selecione ou escreva uma nova linha"
-               value="${post ? _esc(post.linha) : _esc(linhas[0] || '')}">
-        <datalist id="fp-linha-list">
-          ${linhas.map(l => `<option value="${_esc(l)}">`).join("")}
-        </datalist>
+    <div class="form-grupo">
+      <label>Linha editorial</label>
+      <div class="linha-chips-wrap" id="fp-linha-chips">
+        ${(() => {
+          const linhaAtiva = post ? post.linha : (linhas[0] || "");
+          const linhasDisplay = post && post.linha && !linhas.includes(post.linha)
+            ? [post.linha, ...linhas] : linhas;
+          return linhasDisplay.map(l =>
+            `<span class="linha-chip ${l === linhaAtiva ? "ativa" : ""}" data-linha="${_esc(l)}" onclick="_selecionarLinhaChip(this)">${_esc(l)}</span>`
+          ).join("") + `<span class="linha-chip-nova" id="fp-linha-chip-nova" onclick="_mostrarNovaLinhaInput()">+ Nova</span>`;
+        })()}
       </div>
-      <div class="form-grupo">
-        <label for="fp-subtema">Subtema</label>
-        <input id="fp-subtema" type="text" placeholder="Ex: Exercício Físico" value="${post ? _esc(post.subtema) : ""}">
+      <div class="linha-nova-input-row" id="linha-nova-row">
+        <input id="linha-nova-input" type="text" placeholder="Nome da nova linha..."
+               onkeydown="if(event.key==='Enter'){event.preventDefault();_adicionarNovaLinha();}">
+        <button class="btn btn-secondary" style="padding:5px 10px;font-size:12px;flex-shrink:0" onclick="_adicionarNovaLinha()">Adicionar</button>
+        <button class="btn btn-secondary" style="padding:5px 8px;font-size:12px;flex-shrink:0" onclick="_cancelarNovaLinha()">✕</button>
       </div>
+      <input type="hidden" id="fp-linha" value="${post ? _esc(post.linha) : _esc(linhas[0] || '')}">
+    </div>
+    <div class="form-grupo">
+      <label for="fp-subtema">Subtema</label>
+      <input id="fp-subtema" type="text" placeholder="Ex: Exercício Físico" value="${post ? _esc(post.subtema) : ""}">
     </div>
     <div class="form-row">
       <div class="form-grupo">
@@ -531,8 +542,7 @@ function abrirModalNovoCliente() {
   });
   const meta = document.getElementById("nc-meta");
   if (meta) meta.value = "4";
-  const linhasEl = document.getElementById("nc-linhas");
-  if (linhasEl) linhasEl.value = "";
+  _renderLinhasManager([]);
 
   openModal("modal-cliente");
 }
@@ -555,8 +565,7 @@ function abrirModalEditarCliente() {
   set("nc-espec",  c.especialidade);
   const metaEl = document.getElementById("nc-meta");
   if (metaEl) metaEl.value = c.meta_posts_mes || 4;
-  const linhasEl = document.getElementById("nc-linhas");
-  if (linhasEl) linhasEl.value = (c.linhas_editoriais || []).join("\n");
+  _renderLinhasManager(c.linhas_editoriais || []);
 
   openModal("modal-cliente");
 }
@@ -569,8 +578,7 @@ async function salvarCliente() {
   const btnSalvar = document.querySelector("#modal-cliente .btn-primary");
   if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.textContent = "Salvando..."; }
 
-  const linhasRaw = document.getElementById("nc-linhas")?.value || "";
-  const linhas_editoriais = linhasRaw.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  const linhas_editoriais = _getLinhasDoManager();
 
   if (STATE.editandoClienteId) {
     // ── Editar cliente existente ──
@@ -714,5 +722,124 @@ const _autoSavePost = _debounce(async function() {
     setSaveStatus("erro");
   }
 }, 1000);
+
+/* -----------------------------------------------
+   SELETOR DE LINHA EDITORIAL (chips no modal de post)
+----------------------------------------------- */
+function _selecionarLinhaChip(el) {
+  document.querySelectorAll("#fp-linha-chips .linha-chip").forEach(c => c.classList.remove("ativa"));
+  el.classList.add("ativa");
+  const hiddenInput = document.getElementById("fp-linha");
+  if (hiddenInput) hiddenInput.value = el.dataset.linha;
+  if (STATE.editandoId) _autoSavePost();
+}
+
+function _mostrarNovaLinhaInput() {
+  const row = document.getElementById("linha-nova-row");
+  if (row) row.classList.add("visivel");
+  const input = document.getElementById("linha-nova-input");
+  if (input) { input.value = ""; input.focus(); }
+}
+
+function _cancelarNovaLinha() {
+  const row = document.getElementById("linha-nova-row");
+  if (row) row.classList.remove("visivel");
+}
+
+function _adicionarNovaLinha() {
+  const input = document.getElementById("linha-nova-input");
+  const val = input?.value.trim();
+  if (!val) return;
+
+  const chipsWrap = document.getElementById("fp-linha-chips");
+  if (!chipsWrap) return;
+
+  // Deseleciona todos
+  chipsWrap.querySelectorAll(".linha-chip").forEach(c => c.classList.remove("ativa"));
+
+  // Cria novo chip e insere antes do "+ Nova"
+  const btnNova = document.getElementById("fp-linha-chip-nova");
+  const newChip = document.createElement("span");
+  newChip.className = "linha-chip ativa";
+  newChip.dataset.linha = val;
+  newChip.textContent = val;
+  newChip.onclick = function() { _selecionarLinhaChip(this); };
+  chipsWrap.insertBefore(newChip, btnNova);
+
+  // Atualiza hidden input
+  const hiddenInput = document.getElementById("fp-linha");
+  if (hiddenInput) hiddenInput.value = val;
+
+  _cancelarNovaLinha();
+  if (STATE.editandoId) _autoSavePost();
+}
+
+/* -----------------------------------------------
+   GERENCIADOR DE LINHAS EDITORIAIS (modal cliente)
+----------------------------------------------- */
+function _renderLinhasManager(linhasIniciais) {
+  const container = document.getElementById("nc-linhas-manager");
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="linhas-tags-wrap" id="nc-linhas-tags"></div>
+    <div class="linhas-add-row">
+      <input id="nc-nova-linha" type="text" placeholder="Nova linha editorial..."
+             onkeydown="if(event.key==='Enter'){event.preventDefault();_adicionarLinhaCliente();}">
+      <button class="btn btn-secondary" onclick="_adicionarLinhaCliente()" style="flex-shrink:0">Adicionar</button>
+    </div>
+  `;
+
+  const wrap = document.getElementById("nc-linhas-tags");
+  (linhasIniciais || []).forEach(l => _adicionarTagLinhas(wrap, l));
+  _atualizarVazioLinhas(wrap);
+}
+
+function _adicionarTagLinhas(wrap, texto) {
+  const span = document.createElement("span");
+  span.className = "linhas-tag";
+  span.dataset.linha = texto;
+  span.innerHTML = `${_esc(texto)}<button class="linhas-tag-del" title="Remover">×</button>`;
+  span.querySelector(".linhas-tag-del").onclick = () => {
+    span.remove();
+    _atualizarVazioLinhas(wrap);
+  };
+  wrap.appendChild(span);
+}
+
+function _atualizarVazioLinhas(wrap) {
+  const vazio = wrap.querySelector(".linhas-tag-vazio");
+  const temTags = wrap.querySelectorAll(".linhas-tag").length > 0;
+  if (!temTags && !vazio) {
+    const e = document.createElement("span");
+    e.className = "linhas-tag-vazio";
+    e.textContent = "Nenhuma linha — usará o padrão global";
+    wrap.appendChild(e);
+  } else if (temTags && vazio) {
+    vazio.remove();
+  }
+}
+
+function _adicionarLinhaCliente() {
+  const input = document.getElementById("nc-nova-linha");
+  const val = input?.value.trim();
+  if (!val) return;
+
+  const wrap = document.getElementById("nc-linhas-tags");
+  if (!wrap) return;
+
+  const existentes = Array.from(wrap.querySelectorAll(".linhas-tag")).map(t => t.dataset.linha);
+  if (existentes.includes(val)) { if (input) input.value = ""; return; }
+
+  _adicionarTagLinhas(wrap, val);
+  _atualizarVazioLinhas(wrap);
+  if (input) input.value = "";
+}
+
+function _getLinhasDoManager() {
+  const wrap = document.getElementById("nc-linhas-tags");
+  if (!wrap) return [];
+  return Array.from(wrap.querySelectorAll(".linhas-tag")).map(t => t.dataset.linha);
+}
 
 // _esc está definido em ui.js (compartilhado)
