@@ -1449,10 +1449,15 @@ th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: "⇅"; }
   transition: opacity .12s;
 }
 .cal-post-chip:hover { opacity: .75; }
-.cal-post-chip.mev   { background: #EBF8FF; color: #1A5276; }
-.cal-post-chip.conv  { background: #FDEDEC; color: #922B21; }
-.cal-post-chip.causa { background: #D5F5E3; color: #1E8449; }
-.cal-post-chip.hum   { background: #F4ECF7; color: #76448A; }
+/* Chips por status (espelham as cores dos badges de status) */
+.cal-post-chip.ideia      { background: #EEEEEE; color: #444444; }
+.cal-post-chip.roteiro    { background: #EBF8FF; color: #2B6CB0; }
+.cal-post-chip.gravado    { background: #FDEBD0; color: #784212; }
+.cal-post-chip.editado    { background: #E8DAEF; color: #6C3483; }
+.cal-post-chip.publicado  { background: #D5F5E3; color: #1E8449; }
+.cal-post-chip.emproducao { background: #FFF3CD; color: #856404; }
+.cal-post-chip.aprovado   { background: #D1FAE5; color: #065F46; }
+.cal-post-chip.reprovado  { background: #FEE2E2; color: #991B1B; }
 
 /* Botão + para adicionar post ao dia */
 .cal-dia-add {

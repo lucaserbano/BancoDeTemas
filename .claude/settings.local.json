@@ -16,7 +16,14 @@
       "Bash(grep -n '^\\\\];$' \"/Users/lucas/Downloads/Paôla - Calendário Editorial 2026/banco_temas.html\")",
       "Bash(gh --version)",
       "Bash(git --version)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(python3:*)",
+      "WebFetch(domain:www.dicsbc.org)",
+      "WebFetch(domain:www.instagram.com)",
+      "WebFetch(domain:departamentos2026.com.br)",
+      "WebFetch(domain:congressodic2025.com.br)",
+      "WebFetch(domain:agrupamed.com.br)",
+      "WebFetch(domain:usebip.com)"
     ]
   }
 }

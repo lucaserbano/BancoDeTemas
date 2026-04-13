@@ -592,7 +592,7 @@ function _preencherModalPost(post, cliente) {
       <div class="form-grupo">
         <label for="fp-status">Status</label>
         <select id="fp-status">
-          ${STATUS.map(s => `<option value="${s}" ${post.status===s?"selected":""}>${s}</option>`).join("")}
+          ${[...STATUS, ...(post.status && !STATUS.includes(post.status) ? [post.status] : [])].map(s => `<option value="${s}" ${post.status===s?"selected":""}>${s}</option>`).join("")}
         </select>
       </div>
     </div>
@@ -622,6 +622,9 @@ function _preencherModalPost(post, cliente) {
       el.addEventListener("input",  _autoSavePost);
       el.addEventListener("change", _autoSavePost);
     });
+
+  // Auto-resize nas textareas
+  _initAutoResize("#modal-post-body");
   setSaveStatus(null);
 }
 

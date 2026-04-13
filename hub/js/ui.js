@@ -268,6 +268,28 @@ function setSaveStatus(estado) {
 }
 
 /**
+ * Expande uma textarea para caber seu conteúdo.
+ * @param {HTMLTextAreaElement} el
+ */
+function _autoResizeTextarea(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
+
+/**
+ * Ativa auto-resize em todas as textareas dentro de um container.
+ * @param {string} containerSelector
+ */
+function _initAutoResize(containerSelector) {
+  document.querySelectorAll(containerSelector + " textarea").forEach(ta => {
+    ta.style.overflow = "hidden";
+    ta.style.resize   = "none";
+    _autoResizeTextarea(ta);
+    ta.addEventListener("input", () => _autoResizeTextarea(ta));
+  });
+}
+
+/**
  * Retorna uma versão com debounce da função fn.
  * @param {Function} fn
  * @param {number} delay - milissegundos

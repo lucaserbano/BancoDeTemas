@@ -124,7 +124,7 @@ function _renderCalendar() {
     const posts  = porDia[dia] || [];
 
     const chipsHtml = posts.map(p => {
-      const cls = _linhaClassCal(p.linha);
+      const cls = _statusClassCal(p.status);
       const fmt   = _formatoAbrev(p.formato);
       const titulo = p.titulo.length > 15 ? p.titulo.slice(0, 14) + "…" : p.titulo;
       return `<span class="cal-post-chip ${cls}"
@@ -152,14 +152,12 @@ function _renderCalendar() {
   _renderListaMes();
 }
 
-function _linhaClassCal(linha) {
-  if (!linha) return "mev";
-  const l = linha.toLowerCase();
-  if (l.includes("estilo") || l.includes("mev"))   return "mev";
-  if (l.includes("convers"))                        return "conv";
-  if (l.includes("causa") || l.includes("consci")) return "causa";
-  if (l.includes("human"))                          return "hum";
-  return "mev";
+function _statusClassCal(status) {
+  if (!status) return "ideia";
+  return status.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "")
+    .replace(/[^a-z0-9]/g, "");
 }
 
 function _escCal(s) {
@@ -205,7 +203,7 @@ function _renderListaMes() {
   const diasSemana = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 
   const itensHtml = ordenados.map(p => {
-    const cls = _linhaClassCal(p.linha);
+    const cls = _statusClassCal(p.status);
     const fmt = _formatoAbrev(p.formato);
 
     let dataHtml;
@@ -387,7 +385,7 @@ function _preencherModalPostCal(post, cliente) {
       <div class="form-grupo">
         <label for="cp-status">Status</label>
         <select id="cp-status">
-          ${STATUS.map(s => `<option value="${s}" ${post.status===s?"selected":""}>${s}</option>`).join("")}
+          ${[...STATUS, ...(post.status && !STATUS.includes(post.status) ? [post.status] : [])].map(s => `<option value="${s}" ${post.status===s?"selected":""}>${s}</option>`).join("")}
         </select>
       </div>
     </div>
@@ -416,6 +414,9 @@ function _preencherModalPostCal(post, cliente) {
       el.addEventListener("input",  _autoSavePostCal);
       el.addEventListener("change", _autoSavePostCal);
     });
+
+  // Auto-resize nas textareas
+  _initAutoResize("#modal-cal-post-body");
   setSaveStatus(null);
 }
 
