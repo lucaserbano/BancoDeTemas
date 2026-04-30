@@ -52,7 +52,12 @@ function badgeHTML(tipo, valor) {
 ----------------------------------------------- */
 function openModal(id) {
   const el = document.getElementById(id);
-  if (el) el.classList.add("aberto");
+  if (el) {
+    el.classList.add("aberto");
+    requestAnimationFrame(() => {
+      el.querySelectorAll("textarea").forEach(_autoResizeTextarea);
+    });
+  }
   document.body.style.overflow = "hidden";
 }
 

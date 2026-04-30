@@ -434,6 +434,8 @@ function _preencherModalPost(post, cliente) {
       });
     setSaveStatus(null);
   }
+
+  _initAutoResize("#modal-post-body");
 }
 
 async function salvarPost() {

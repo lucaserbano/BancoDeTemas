@@ -244,6 +244,7 @@ function abrirModalObjetivo() {
   document.getElementById("obj-fundo").value            = obj?.funil_fundo ?? 20;
 
   openModal("modal-objetivo");
+  _initAutoResize("#modal-objetivo");
 
   // Auto-save em todos os campos do formulário de objetivo
   document.querySelectorAll("#modal-objetivo input, #modal-objetivo textarea")

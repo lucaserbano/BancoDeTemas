@@ -101,9 +101,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (PORTAL_STATE.isPreview) _renderBannerPreview();
   _renderHeader();
   _renderBloco1_Objetivos();
+  _initAutoResize("#bloco-objetivos");
   _renderBloco2_Orcamento();
+  _initAutoResize("#bloco-orcamento");
   _renderBloco3_Calendario();
   _renderBloco4_Lista();
+  _initAutoResize("#bloco-lista");
 });
 
 /* -----------------------------------------------
@@ -549,9 +552,13 @@ async function toggleCard(postId) {
   const jaAberto = card.classList.contains("aberto");
   card.classList.toggle("aberto");
 
-  // Carregar comentários na primeira abertura
-  if (!jaAberto && PORTAL_STATE.comentarios[postId] === undefined) {
-    await _carregarComentarios(postId);
+  if (!jaAberto) {
+    requestAnimationFrame(() => {
+      card.querySelectorAll("textarea").forEach(_autoResizeTextarea);
+    });
+    if (PORTAL_STATE.comentarios[postId] === undefined) {
+      await _carregarComentarios(postId);
+    }
   }
 }
 
